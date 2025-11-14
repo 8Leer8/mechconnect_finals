@@ -1,0 +1,16 @@
+# Ignore Python virtual environments
+backend/venv/
+backend/.venv/
+
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+
+# Editor directories
+.vscode/
+.idea/
+
+# Flutter build
+mobile/mechconnect_flutter/.dart_tool/
+mobile/mechconnect_flutter/build/
