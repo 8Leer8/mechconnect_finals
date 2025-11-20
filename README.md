@@ -1,5 +1,5 @@
 # Mechconnect Finals — Setup and Requirements
-
+database pass = Mechconnect221
 This repository contains two main parts:
 
 - backend: Django REST API (in `backend/`)

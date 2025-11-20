@@ -92,12 +92,12 @@ WSGI_APPLICATION = 'mechconnect_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'FXDjzMXmfdjeHxwZxgqrIbQabnMNZoXy',
-        'HOST': 'gondola.proxy.rlwy.net',
-        'PORT': '32344',
+        'PASSWORD': 'Mechconnect221',
+        'HOST': 'db.tsokmagrbtfuuzlemufw.supabase.co',
+        'PORT': '5432',
     }
 }
 
