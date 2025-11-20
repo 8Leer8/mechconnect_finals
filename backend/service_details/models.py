@@ -1,5 +1,5 @@
 from django.db import models
-from booking.models import BackJobsBooking, RescheduledBooking
+from bookings.models import BackJobsBooking, RescheduledBooking
 from requests.models import DirectRequest, CustomRequest
 
 class ServiceLocation(models.Model):
