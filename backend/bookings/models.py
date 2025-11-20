@@ -22,7 +22,7 @@ class Booking(models.Model):
 
 class ActiveBooking(models.Model):
     active_booking_id = models.AutoField(primary_key=True)
-    booking = models.OneToOneField('booking.Booking', on_delete=models.CASCADE, related_name='active_booking')
+    booking = models.OneToOneField('bookings.Booking', on_delete=models.CASCADE, related_name='active_booking')
     status = models.CharField(max_length=50, null=True, blank=True)
     before_picture_service = models.CharField(max_length=1024, null=True, blank=True)
     after_picture_service = models.CharField(max_length=1024, null=True, blank=True)
@@ -32,7 +32,7 @@ class ActiveBooking(models.Model):
 
 class RescheduledBooking(models.Model):
     rescheduled_booking_id = models.AutoField(primary_key=True)
-    booking = models.ForeignKey('booking.Booking', on_delete=models.CASCADE, related_name='reschedules')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='reschedules')
     reason = models.CharField(max_length=1024, null=True, blank=True)
     requested_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='reschedule_requests')
     requested_by_role = models.CharField(max_length=20, null=True, blank=True)  # enum: client, mechanic, shop
@@ -43,7 +43,7 @@ class RescheduledBooking(models.Model):
 
 class CancelledBooking(models.Model):
     cancelled_booking_id = models.AutoField(primary_key=True)
-    booking = models.ForeignKey('booking.Booking', on_delete=models.CASCADE, related_name='cancellations')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='cancellations')
     reason = models.TextField(null=True, blank=True)
     cancelled_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='cancellations_made')
     cancelled_by_role = models.CharField(max_length=20, null=True, blank=True)
@@ -54,7 +54,7 @@ class CancelledBooking(models.Model):
 
 class BackJobsBooking(models.Model):
     back_jobs_booking_id = models.AutoField(primary_key=True)
-    booking = models.ForeignKey('booking.Booking', on_delete=models.CASCADE, related_name='back_jobs')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='back_jobs')
     requested_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='back_jobs_requests')
     reason = models.TextField(null=True, blank=True)
     STATUS_CHOICES = [('pending','pending'),('approved','approved'),('rejected','rejected'),('completed','completed')]
@@ -66,7 +66,7 @@ class BackJobsBooking(models.Model):
 
 class Dispute(models.Model):
     dispute_id = models.AutoField(primary_key=True)
-    booking = models.ForeignKey('booking.Booking', on_delete=models.CASCADE, related_name='disputes')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='disputes')
     complainer = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='disputes_made')
     complainer_role = models.CharField(max_length=20, null=True, blank=True)
     complaint_against = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='disputes_received')
@@ -83,7 +83,7 @@ class Dispute(models.Model):
 
 class RefundedBooking(models.Model):
     refunded_booking_id = models.AutoField(primary_key=True)
-    booking = models.ForeignKey('booking.Booking', on_delete=models.CASCADE, related_name='refunds')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='refunds')
     requested_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='refund_requests')
     requested_by_role = models.CharField(max_length=20, null=True, blank=True)
     admin = models.ForeignKey('accounts.Admin', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunds_processed')
@@ -111,12 +111,12 @@ class ClientRequestList(models.Model):
 class ClientBookingList(models.Model):
     client_booking_list_id = models.AutoField(primary_key=True)
     client = models.ForeignKey('accounts.Client', on_delete=models.CASCADE, related_name='booking_list')
-    booking = models.ForeignKey('booking.Booking', on_delete=models.CASCADE, related_name='in_client_lists')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='in_client_lists')
 
 
 class CompletedBooking(models.Model):
     completed_booking_id = models.AutoField(primary_key=True)
-    booking = models.OneToOneField('booking.Booking', on_delete=models.CASCADE, related_name='completed_booking')
+    booking = models.OneToOneField('bookings.Booking', on_delete=models.CASCADE, related_name='completed_booking')
     completed_at = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     notes = models.TextField(null=True, blank=True)

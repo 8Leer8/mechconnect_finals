@@ -2,8 +2,8 @@ from django.db import models
 
 class ServiceLocation(models.Model):
     service_location_id = models.AutoField(primary_key=True)
-    back_jobs = models.ForeignKey('booking.BackJobsBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_locations')
-    reschedule = models.ForeignKey('booking.RescheduledBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_locations')
+    back_jobs = models.ForeignKey('bookings.BackJobsBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_locations')
+    reschedule = models.ForeignKey('bookings.RescheduledBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_locations')
     direct_request = models.ForeignKey('requests.DirectRequest', on_delete=models.CASCADE, null=True, blank=True, related_name='service_locations')
     custom_request = models.ForeignKey('requests.CustomRequest', on_delete=models.CASCADE, null=True, blank=True, related_name='service_locations')
 
@@ -18,8 +18,8 @@ class ServiceLocation(models.Model):
 
 class ServiceTime(models.Model):
     service_time_id = models.AutoField(primary_key=True)
-    back_jobs = models.ForeignKey('booking.BackJobsBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_times')
-    reschedule = models.ForeignKey('booking.RescheduledBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_times')
+    back_jobs = models.ForeignKey('bookings.BackJobsBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_times')
+    reschedule = models.ForeignKey('bookings.RescheduledBooking', on_delete=models.CASCADE, null=True, blank=True, related_name='service_times')
     direct_request = models.ForeignKey('requests.DirectRequest', on_delete=models.CASCADE, null=True, blank=True, related_name='service_times')
     custom_request = models.ForeignKey('requests.CustomRequest', on_delete=models.CASCADE, null=True, blank=True, related_name='service_times')
 

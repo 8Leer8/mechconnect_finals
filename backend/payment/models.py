@@ -2,7 +2,11 @@ from django.db import models
 
 class TokenPurchase(models.Model):
     token_purchase_id = models.AutoField(primary_key=True)
-    account = models.ForeignKey('accounts.Account', on_delete=models.CASCADE, related_name='token_purchases')
+    account = models.ForeignKey(
+        'accounts.Account',
+        on_delete=models.CASCADE,
+        related_name='payment_token_purchases'  
+    )
     tokens_amount = models.IntegerField(default=0)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     payment_method = models.CharField(max_length=255, null=True, blank=True)
