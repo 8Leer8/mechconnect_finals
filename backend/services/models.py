@@ -1,9 +1,11 @@
 from django.db import models
-from shop.models import Shop
 
-class Category(models.Model):
-    category_id = models.AutoField(primary_key=True)
+class ServiceCategory(models.Model):
+    service_category_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
+    worth_token = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -11,33 +13,51 @@ class Category(models.Model):
 
 class Service(models.Model):
     service_id = models.AutoField(primary_key=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='services')
-    service_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
+    service_banner = models.TextField(null=True, blank=True)
+    service_category = models.ForeignKey('services.ServiceCategory', on_delete=models.SET_NULL, null=True, related_name='services')
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.service_name
+        return self.name
 
 
-class ServiceImage(models.Model):
-    image_id = models.AutoField(primary_key=True)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images')
-    image_path = models.CharField(max_length=1024)
+class MechanicService(models.Model):
+    service = models.ForeignKey('services.Service', on_delete=models.CASCADE, related_name='mechanic_services')
+    mechanic = models.ForeignKey('accounts.Mechanic', on_delete=models.CASCADE, related_name='mechanic_services')
 
-    def __str__(self):
-        return f"Image for {self.service}"
+    class Meta:
+        unique_together = (('service', 'mechanic'),)
 
 
 class ShopService(models.Model):
-    shop_service_id = models.AutoField(primary_key=True)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='shop_services')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='shop_services')
-    base_price = models.DecimalField(max_digits=12, decimal_places=2)
+    service = models.ForeignKey('services.Service', on_delete=models.CASCADE, related_name='shop_services')
+    shop = models.ForeignKey('shop.Shop', on_delete=models.CASCADE, related_name='shop_services')
 
     class Meta:
-        unique_together = ('shop', 'service')
+        unique_together = (('service', 'shop'),)
 
-    def __str__(self):
-        return f"{self.shop} offers {self.service} @ {self.base_price}"
+
+class ShopServiceMechanic(models.Model):
+    shop_service_mechanic_id = models.AutoField(primary_key=True)
+    shop_service = models.ForeignKey('services.ShopService', on_delete=models.CASCADE, related_name='shop_service_mechanics')
+    mechanic = models.ForeignKey('accounts.Mechanic', on_delete=models.CASCADE, related_name='shop_service_assignments')
+
+
+class ServiceAddOn(models.Model):
+    service_add_on_id = models.AutoField(primary_key=True)
+    service = models.ForeignKey('services.Service', on_delete=models.CASCADE, related_name='add_ons')
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ServiceInclude(models.Model):
+    service_include_id = models.AutoField(primary_key=True)
+    service = models.ForeignKey('services.Service', on_delete=models.CASCADE, related_name='includes')
+    include_description = models.TextField()
