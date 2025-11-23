@@ -36,28 +36,17 @@ Notes:
 - The project uses Django 5.2.8 (pinned in `requirements.txt`).
 - If a `backend/venv` or `backend/.venv` directory exists locally, remove it from the repo and keep virtual environments local only. This repo's `.gitignore` already ignores typical venv folders.
 
-## Mobile (Flutter)
+## Mobile & Web (ionic)
+cd frontend
+npm install
 
-The Flutter app lives in `mobile/mechconnect_flutter/` and already contains a `pubspec.yaml` with package dependencies.
+for development use this commands:
+# copy only web files
+npx cap copy
 
-Prerequisites:
-- Install Flutter SDK: https://flutter.dev/docs/get-started/install
-- For Android: install Android Studio and Android SDK (set ANDROID_HOME / PATH as needed).
-- For iOS/macOS: Xcode is required on macOS.
+# copy and update native plugins/configs
+npx cap sync
 
-Install Flutter packages and run:
-
-```cmd
-cd mobile\mechconnect_flutter
-flutter pub get
-flutter run   # pick a connected device or an emulator
-```
-
-If you only want to fetch the packages (CI or quick setup):
-
-```cmd
-flutter pub get
-```
 
 ## Notes for collaborators
 
@@ -69,10 +58,3 @@ flutter pub get
 - `backend/requirements.txt` — Python packages for the Django backend.
 - `README.md` — This onboarding/setup guide (you are reading it).
 - `.gitignore` — Top-level ignore rules to keep venvs, build artifacts, and common IDE files out of the repo.
-
-If you'd like, I can also:
-- Pin exact versions for DRF and `django-cors-headers` in `backend/requirements.txt`.
-- Add a short `CONTRIBUTING.md` with branch and PR rules.
-- Create a `dev` script or `Makefile`/PowerShell script to automate the steps above.
-
-Happy hacking!

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MechConnect - Ionic Vanilla</title>
+
+    <!-- Ionic Core (CDN) -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+    <!-- your styles -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <ion-app>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>MechConnect</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" id="app-content">
+        <div id="home">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Welcome</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-button id="btn-login">Simulate login</ion-button>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-content>
+    </ion-app>
+
+    <script src="app.js"></script>
+  </body>
+</html>

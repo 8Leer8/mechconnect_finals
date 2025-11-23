@@ -1,0 +1,4 @@
+body, html {
+  height: 100%;
+}
+ion-content { --padding-top: 10px; }
