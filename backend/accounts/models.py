@@ -138,6 +138,7 @@ class Mechanic(models.Model):
     is_working_for_shop = models.BooleanField(default=False)
     shop = models.ForeignKey('shop.Shop', on_delete=models.SET_NULL, null=True, blank=True, related_name='mechanics_assigned')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
+    token_wallet = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -151,6 +152,7 @@ class ShopOwner(models.Model):
     owns_shop = models.BooleanField(default=False)
     shop = models.ForeignKey('shop.Shop', on_delete=models.SET_NULL, null=True, blank=True, related_name='owners')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    token_wallet = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
