@@ -1,0 +1,13 @@
+POST /api/accounts/register/           - Register new user
+POST /api/accounts/login/              - User login
+GET  /api/accounts/profile/            - Get user profile
+PUT  /api/accounts/profile/update/     - Update profile
+POST /api/accounts/password/change/    - Change password
+POST /api/accounts/password/reset/request/ - Request password reset
+POST /api/accounts/password/reset/confirm/ - Confirm password reset
+GET  /api/accounts/users/              - List users (admin)
+GET  /api/accounts/users/{id}/         - Get user by ID
+PUT  /api/accounts/users/{id}/activate/ - Activate user
+PUT  /api/accounts/users/{id}/deactivate/ - Deactivate user
+GET  /api/accounts/notifications/      - Get notifications
+GET  /api/accounts/health/             - Health check
