@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Datepicker</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .input-group {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+        
+        /* Datepicker Input */
+        .datepicker-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 400;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+        
+        .datepicker-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 48px 0 16px; /* Extra padding on right for icon */
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #334155;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .datepicker-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        
+        .datepicker-input:hover {
+            border-color: #cbd5e1;
+        }
+        
+        .datepicker-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none; /* This prevents the icon from blocking clicks */
+        }
+        
+        /* Calendar */
+        .calendar {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+            display: none;
+            width: 100%;
+            position: absolute;
+            z-index: 1000;
+        }
+        
+        .calendar.active {
+            display: block;
+        }
+        
+        /* Calendar Header */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-month {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .nav-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        /* Calendar Grid */
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            padding: 8px 0;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        
+        .day {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .day:hover {
+            background: #f1f5f9;
+        }
+        
+        .day.selected {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .day.other-month {
+            color: #cbd5e1;
+            cursor: not-allowed;
+        }
+        
+        .day.today {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        
+        .day:disabled {
+            color: #e2e8f0;
+            cursor: not-allowed;
+        }
+        
+        .day:disabled:hover {
+            background: transparent;
+        }
+        
+        /* Helper Text */
+        .input-helper {
+            font-size: 12px;
+            font-weight: 300;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modern Datepicker</h1>
+        
+        <div class="input-group">
+            <h2>Datepicker</h2>
+            
+            <div class="datepicker-container">
+                <label class="input-label">Select Date</label>
+                <input type="text" class="datepicker-input" placeholder="Choose a date" readonly>
+                <span class="datepicker-icon material-icons-round">calendar_today</span>
+                <div class="input-helper">Click to open calendar</div>
+                
+                <div class="calendar" id="calendar">
+                    <div class="calendar-header">
+                        <span class="calendar-month" id="currentMonth">November 2024</span>
+                        <div class="calendar-nav">
+                            <button class="nav-btn" id="prevMonth">
+                                <span class="material-icons-round">chevron_left</span>
+                            </button>
+                            <button class="nav-btn" id="nextMonth">
+                                <span class="material-icons-round">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- Days populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Datepicker {
+            constructor() {
+                this.currentDate = new Date();
+                this.selectedDate = null;
+                this.input = document.querySelector('.datepicker-input');
+                this.calendar = document.getElementById('calendar');
+                this.calendarDays = document.getElementById('calendarDays');
+                this.currentMonth = document.getElementById('currentMonth');
+                this.prevMonthBtn = document.getElementById('prevMonth');
+                this.nextMonthBtn = document.getElementById('nextMonth');
+                
+                this.init();
+            }
+            
+            init() {
+                // Listen for clicks on the input field (not the icon)
+                this.input.addEventListener('click', () => this.toggleCalendar());
+                this.prevMonthBtn.addEventListener('click', () => this.changeMonth(-1));
+                this.nextMonthBtn.addEventListener('click', () => this.changeMonth(1));
+                document.addEventListener('click', (e) => this.handleClickOutside(e));
+                
+                this.renderCalendar();
+            }
+            
+            toggleCalendar() {
+                this.calendar.classList.toggle('active');
+            }
+            
+            handleClickOutside(e) {
+                // Close calendar when clicking outside
+                if (!this.calendar.contains(e.target) && 
+                    !this.input.contains(e.target) && 
+                    e.target !== this.input) {
+                    this.calendar.classList.remove('active');
+                }
+            }
+            
+            changeMonth(direction) {
+                this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+                this.renderCalendar();
+            }
+            
+            renderCalendar() {
+                const year = this.currentDate.getFullYear();
+                const month = this.currentDate.getMonth();
+                
+                // Update month header
+                this.currentMonth.textContent = this.currentDate.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+                
+                // Clear previous days
+                this.calendarDays.innerHTML = '';
+                
+                // Get first day of month and total days
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const totalDays = lastDay.getDate();
+                const startingDay = firstDay.getDay();
+                
+                // Add days from previous month
+                const prevMonthLastDay = new Date(year, month, 0).getDate();
+                for (let i = startingDay - 1; i >= 0; i--) {
+                    const day = this.createDayElement(prevMonthLastDay - i, true);
+                    this.calendarDays.appendChild(day);
+                }
+                
+                // Add current month days
+                const today = new Date();
+                for (let i = 1; i <= totalDays; i++) {
+                    const day = this.createDayElement(i, false);
+                    
+                    // Check if today
+                    if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
+                        day.classList.add('today');
+                    }
+                    
+                    // Check if selected
+                    if (this.selectedDate && 
+                        year === this.selectedDate.getFullYear() && 
+                        month === this.selectedDate.getMonth() && 
+                        i === this.selectedDate.getDate()) {
+                        day.classList.add('selected');
+                    }
+                    
+                    this.calendarDays.appendChild(day);
+                }
+                
+                // Add days from next month to fill grid
+                const totalCells = 42; // 6 rows × 7 days
+                const remainingCells = totalCells - (startingDay + totalDays);
+                for (let i = 1; i <= remainingCells; i++) {
+                    const day = this.createDayElement(i, true);
+                    this.calendarDays.appendChild(day);
+                }
+            }
+            
+            createDayElement(day, isOtherMonth) {
+                const dayElement = document.createElement('button');
+                dayElement.className = 'day';
+                dayElement.textContent = day;
+                dayElement.type = 'button'; // Prevent form submission
+                
+                if (isOtherMonth) {
+                    dayElement.classList.add('other-month');
+                    dayElement.disabled = true;
+                } else {
+                    dayElement.addEventListener('click', () => this.selectDate(day));
+                }
+                
+                return dayElement;
+            }
+            
+            selectDate(day) {
+                this.selectedDate = new Date(
+                    this.currentDate.getFullYear(),
+                    this.currentDate.getMonth(),
+                    day
+                );
+                
+                // Update input
+                this.input.value = this.selectedDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                // Close calendar
+                this.calendar.classList.remove('active');
+                
+                // Re-render to update selected state
+                this.renderCalendar();
+            }
+        }
+        
+        // Initialize datepicker
+        new Datepicker();
+    </script>
+</body>
+</html>

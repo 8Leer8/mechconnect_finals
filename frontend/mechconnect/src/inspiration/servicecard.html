@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Cards</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 20px; /* Headings, major sections */
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 0 20px;
+        }
+        
+        /* Service Card */
+        .service-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Card Image */
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Service Type Tag - Matching your tag system */
+        .service-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px; /* Slightly smaller than 12px for tags */
+            font-weight: 600;
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .service-type.shop {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .service-type.mechanic {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Category Tag */
+        .category-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .category-maintenance {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .category-repair {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .category-emergency {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Card Content */
+        .card-content {
+            padding: 20px;
+        }
+        
+        .service-name {
+            font-size: 16px; /* Titles, important content */
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        
+        /* Ratings */
+        .ratings {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .star {
+            color: #fbbf24;
+            font-size: 20px; /* Buttons, list items, inputs */
+        }
+        
+        .rating-text {
+            font-size: 12px; /* Captions, labels, small text */
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        /* Price and Stats */
+        .price-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .price {
+            font-size: 16px; /* Titles, important content */
+            font-weight: 700;
+            color: #0f172a;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px; /* Captions, labels, small text */
+            color: #64748b;
+        }
+        
+        .stat-icon {
+            font-size: 16px; /* Inline with body text */
+            color: #64748b;
+        }
+        
+        /* Provider Info */
+        .provider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .provider-avatar {
+            width: 32px; /* Prominent features, avatars */
+            height: 32px; /* Prominent features, avatars */
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px; /* Body text, default content */
+        }
+        
+        .provider-info {
+            flex: 1;
+        }
+        
+        .provider-name {
+            font-size: 12px; /* Captions, labels, small text */
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+        
+        .provider-type {
+            font-size: 12px; /* Captions, labels, small text */
+            color: #64748b;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Available Services</h1>
+        
+        <div class="cards-grid">
+            <!-- Card 1: Independent Mechanic -->
+            <div class="service-card">
+                <div class="card-image">
+                    <div class="service-type mechanic">Independent Mechanic</div>
+                    <div class="category-tag category-repair">Repair</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="service-name">Car Engine Repair</h3>
+                    
+                    <div class="ratings">
+                        <span class="material-icons-round star">star</span>
+                        <span class="rating-text">4.5 (128 reviews)</span>
+                    </div>
+                    
+                    <div class="price-stats">
+                        <div class="price">$120</div>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="material-icons-round stat-icon">bookmark</span>
+                                2.4k
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="provider">
+                        <div class="provider-avatar">MJ</div>
+                        <div class="provider-info">
+                            <div class="provider-name">Mike Johnson Auto</div>
+                            <div class="provider-type">Independent Mechanic</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 2: Shop -->
+            <div class="service-card">
+                <div class="card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="service-type shop">Shop</div>
+                    <div class="category-tag category-maintenance">Maintenance</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="service-name">Brake System Service</h3>
+                    
+                    <div class="ratings">
+                        <span class="material-icons-round star">star</span>
+                        <span class="rating-text">5.0 (89 reviews)</span>
+                    </div>
+                    
+                    <div class="price-stats">
+                        <div class="price">$85</div>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="material-icons-round stat-icon">bookmark</span>
+                                1.8k
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="provider">
+                        <div class="provider-avatar">PS</div>
+                        <div class="provider-info">
+                            <div class="provider-name">Precision Service</div>
+                            <div class="provider-type">Shop</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 3: Independent Mechanic -->
+            <div class="service-card">
+                <div class="card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="service-type mechanic">Independent Mechanic</div>
+                    <div class="category-tag category-maintenance">Maintenance</div>
+                </div>
+                <div class="card-content">
+                    <h3 class="service-name">Oil Change Service</h3>
+                    
+                    <div class="ratings">
+                        <span class="material-icons-round star">star</span>
+                        <span class="rating-text">4.2 (256 reviews)</span>
+                    </div>
+                    
+                    <div class="price-stats">
+                        <div class="price">$45</div>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="material-icons-round stat-icon">bookmark</span>
+                                3.1k
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="provider">
+                        <div class="provider-avatar">DR</div>
+                        <div class="provider-info">
+                            <div class="provider-name">David Rodriguez</div>
+                            <div class="provider-type">Independent Mechanic</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click functionality to cards
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const serviceName = card.querySelector('.service-name').textContent;
+                const category = card.querySelector('.category-tag').textContent;
+                alert(`Selected: ${serviceName}\nCategory: ${category}`);
+            });
+        });
+    </script>
+</body>
+</html>

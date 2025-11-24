@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Checkbox</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .checkbox-input {
+            display: none;
+        }
+        
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            background: white;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkbox-check {
+            font-family: 'Material Icons Round';
+            font-size: 16px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-input:checked + .checkbox-custom {
+            border-color: #3b82f6;
+            background-color: #3b82f6;
+        }
+        
+        .checkbox-input:checked + .checkbox-custom .checkbox-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .checkbox-label {
+            font-size: 14px;
+            font-weight: 400;
+            color: #334155;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkbox-item">
+        <input type="checkbox" id="checkbox1" class="checkbox-input" checked>
+        <label for="checkbox1" class="checkbox-custom">
+            <span class="checkbox-check">check</span>
+        </label>
+        <label for="checkbox1" class="checkbox-label">Accept terms and conditions</label>
+    </div>
+</body>
+</html>

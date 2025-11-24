@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Cards</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        /* Request Card */
+        .request-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .request-header {
+            padding: 20px 20px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .provider-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .provider-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .provider-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .provider-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+        
+        .provider-type {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .request-id {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        
+        /* Status Tag in Upper Right */
+        .status-tag {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            cursor: default;
+        }
+        
+        /* Tag Variants */
+        .tag-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .tag-quoted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag-accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .tag-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .request-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+        
+        .request-time {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        /* Button Base Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .btn:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        /* Button Sizes */
+        .btn-sm {
+            height: 36px;
+            font-size: 12px;
+            border-radius: 8px;
+            padding: 0 16px;
+        }
+        
+        /* Button Variants */
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .btn-secondary:active {
+            background-color: #cbd5e1;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+        }
+        
+        .icon-sm {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Service Requests</h1>
+        
+        <div class="cards-container">
+            <!-- Request Card 1: Pending -->
+            <div class="request-card">
+                <div class="status-tag tag-pending">
+                    <span class="material-icons-round" style="font-size: 12px;">schedule</span>
+                    Pending
+                </div>
+                
+                <div class="request-header">
+                    <div class="provider-info">
+                        <div class="provider-avatar">MJ</div>
+                        <div class="provider-details">
+                            <div class="provider-name">Mike Johnson</div>
+                            <div class="provider-type">Independent Mechanic</div>
+                            <div class="request-id">#REQ-2847</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="request-footer">
+                    <div class="request-time">Requested 2 hours ago</div>
+                    <button class="btn btn-secondary btn-sm">
+                        <span class="material-icons-round icon-sm">visibility</span>
+                        See Details
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Request Card 2: Quoted -->
+            <div class="request-card">
+                <div class="status-tag tag-quoted">
+                    <span class="material-icons-round" style="font-size: 12px;">request_quote</span>
+                    Quoted
+                </div>
+                
+                <div class="request-header">
+                    <div class="provider-info">
+                        <div class="provider-avatar">PS</div>
+                        <div class="provider-details">
+                            <div class="provider-name">Precision Service</div>
+                            <div class="provider-type">Shop</div>
+                            <div class="request-id">#REQ-2846</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="request-footer">
+                    <div class="request-time">Requested yesterday</div>
+                    <button class="btn btn-secondary btn-sm">
+                        <span class="material-icons-round icon-sm">visibility</span>
+                        See Details
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Request Card 3: Accepted -->
+            <div class="request-card">
+                <div class="status-tag tag-accepted">
+                    <span class="material-icons-round" style="font-size: 12px;">check_circle</span>
+                    Accepted
+                </div>
+                
+                <div class="request-header">
+                    <div class="provider-info">
+                        <div class="provider-avatar">AE</div>
+                        <div class="provider-details">
+                            <div class="provider-name">Auto Expert Garage</div>
+                            <div class="provider-type">Shop</div>
+                            <div class="request-id">#REQ-2843</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="request-footer">
+                    <div class="request-time">Requested 3 days ago</div>
+                    <button class="btn btn-secondary btn-sm">
+                        <span class="material-icons-round icon-sm">visibility</span>
+                        See Details
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Request Card 4: Rejected -->
+            <div class="request-card">
+                <div class="status-tag tag-rejected">
+                    <span class="material-icons-round" style="font-size: 12px;">cancel</span>
+                    Rejected
+                </div>
+                
+                <div class="request-header">
+                    <div class="provider-info">
+                        <div class="provider-avatar">DR</div>
+                        <div class="provider-details">
+                            <div class="provider-name">David Rodriguez</div>
+                            <div class="provider-type">Independent Mechanic</div>
+                            <div class="request-id">#REQ-2839</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="request-footer">
+                    <div class="request-time">Requested 1 week ago</div>
+                    <button class="btn btn-secondary btn-sm">
+                        <span class="material-icons-round icon-sm">visibility</span>
+                        See Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click functionality to "See Details" buttons
+        document.querySelectorAll('.btn-secondary').forEach(button => {
+            button.addEventListener('click', function() {
+                const card = this.closest('.request-card');
+                const providerName = card.querySelector('.provider-name').textContent;
+                const providerType = card.querySelector('.provider-type').textContent;
+                const requestId = card.querySelector('.request-id').textContent;
+                const status = card.querySelector('.status-tag').textContent.trim();
+                const time = card.querySelector('.request-time').textContent;
+                
+                alert(`Request ID: ${requestId}\nProvider: ${providerName}\nType: ${providerType}\nStatus: ${status}\n${time}\n\nDetails would be shown here in a real application.`);
+            });
+        });
+    </script>
+</body>
+</html>

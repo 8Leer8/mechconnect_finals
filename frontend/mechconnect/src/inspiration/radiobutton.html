@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Radio Button</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            max-width: 300px;
+            width: 100%;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .radio-item:hover {
+            background-color: #f8fafc;
+        }
+        
+        .radio-input {
+            display: none;
+        }
+        
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            background: white;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .radio-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease;
+        }
+        
+        .radio-input:checked + .radio-custom {
+            border-color: #3b82f6;
+            background-color: #3b82f6;
+        }
+        
+        .radio-input:checked + .radio-custom .radio-dot {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .radio-label {
+            font-size: 14px;
+            font-weight: 400;
+            color: #334155;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-group">
+        <div class="radio-item">
+            <input type="radio" id="radio1" name="option" class="radio-input" checked>
+            <label for="radio1" class="radio-custom">
+                <span class="radio-dot"></span>
+            </label>
+            <label for="radio1" class="radio-label">Option 1</label>
+        </div>
+        
+        <div class="radio-item">
+            <input type="radio" id="radio2" name="option" class="radio-input">
+            <label for="radio2" class="radio-custom">
+                <span class="radio-dot"></span>
+            </label>
+            <label for="radio2" class="radio-label">Option 2</label>
+        </div>
+        
+        <div class="radio-item">
+            <input type="radio" id="radio3" name="option" class="radio-input">
+            <label for="radio3" class="radio-custom">
+                <span class="radio-dot"></span>
+            </label>
+            <label for="radio3" class="radio-label">Option 3</label>
+        </div>
+        
+        <div class="radio-item">
+            <input type="radio" id="radio4" name="option" class="radio-input">
+            <label for="radio4" class="radio-custom">
+                <span class="radio-dot"></span>
+            </label>
+            <label for="radio4" class="radio-label">Option 4</label>
+        </div>
+    </div>
+
+    <script>
+        // Add interaction feedback
+        document.querySelectorAll('.radio-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove any visual feedback for all items
+                document.querySelectorAll('.radio-item').forEach(i => {
+                    i.style.backgroundColor = '';
+                });
+                
+                // Add visual feedback for selected item
+                this.style.backgroundColor = '#f1f5f9';
+            });
+        });
+    </script>
+</body>
+</html>

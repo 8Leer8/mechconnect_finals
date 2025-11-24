@@ -1,0 +1,91 @@
+theme
+
+--bg: hsl(40, 20%, 98%);           /* Warm off-white */
+--bg-light: hsl(0, 0%, 100%);      /* Pure white */
+--text: hsl(40, 15%, 15%);         /* Dark brown-gray */
+--text-muted: hsl(40, 10%, 40%);   /* Medium gray */
+--highlight: hsl(40, 25%, 95%);    /* Warm highlight */
+--border: hsl(40, 15%, 85%);       /* Light warm border */
+--border-muted: hsl(40, 10%, 92%); /* Very subtle border */
+
+
+--primary: hsl(25, 85%, 55%);      /* Vibrant orange */
+--primary-light: hsl(25, 85%, 95%); /* Light orange background */
+--primary-subtle: hsl(25, 85%, 97%); /* Very pale orange */
+--primary-hover: hsl(25, 85%, 50%); /* Slightly darker orange */
+
+--danger: hsl(5, 75%, 55%);        /* Red-orange */
+--danger-light: hsl(5, 75%, 96%);  /* Light red background */
+--danger-subtle: hsl(5, 75%, 98%); /* Very pale red */
+
+--warning: hsl(45, 85%, 55%);      /* Amber yellow */
+--warning-light: hsl(45, 85%, 95%); /* Light yellow background */
+--warning-subtle: hsl(45, 85%, 97%); /* Very pale yellow */
+
+--success: hsl(140, 60%, 45%);     /* Green */
+--success-light: hsl(140, 60%, 96%); /* Light green background */
+--success-subtle: hsl(140, 60%, 98%); /* Very pale green */
+
+--info: hsl(210, 80%, 50%);        /* Blue */
+--info-light: hsl(210, 80%, 96%);  /* Light blue background */
+--info-subtle: hsl(210, 80%, 98%); /* Very pale blue */
+
+
+
+
+typography
+
+12px  •  Captions, labels, small text
+14px  •  Body text, buttons, inputs (DEFAULT)
+16px  •  Titles, important content
+20px  •  Headings, major sections
+
+Light (300)    •  Subtle text, captions
+Base (400)   •  Body text, default content
+Bold (600)     •  Headings, buttons, emphasis
+
+
+
+
+Icon
+
+12px  •  Tiny decorative elements
+16px  •  Inline with body text
+20px  •  Buttons, list items, inputs
+24px  •  Navigation, headings, features
+32px  •  Prominent features, avatars
+
+Text:   12 → 14 → 16 → 20
+Icons:  12 → 16 → 20 → 24 → 32
+
+
+
+
+
+
+button
+
+SMALL (36px)
+└── Height: 36px
+└── Text: 12px (Bold)
+└── Icons: 16px
+└── Radius: 8px
+└── Padding: 0 16px
+
+BASE (44px) 
+└── Height: 44px (Industry touch target standard)
+└── Text: 14px (Bold)
+└── Icons: 20px
+└── Radius: 12px (Premium feel)
+└── Padding: 0 20px
+
+
+Small:   12px text → 16px icon (1.33:1)
+Base:    14px text → 20px icon (1.43:1) 
+
+
+
+
+
+
+

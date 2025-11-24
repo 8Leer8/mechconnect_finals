@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Input System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .input-group {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+        
+        /* Base Input Styles */
+        .input-container {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 400;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+        
+        .input-field {
+            width: 100%;
+            height: 44px;
+            padding: 0 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #334155;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        
+        .input-field:hover {
+            border-color: #cbd5e1;
+        }
+        
+        .input-field::placeholder {
+            color: #94a3b8;
+        }
+        
+        /* Textbox Styles */
+        .textbox {
+            height: 120px;
+            padding: 12px 16px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        
+        /* Input with Icon - Left */
+        .input-with-icon-left {
+            position: relative;
+        }
+        
+        .input-icon-left {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+        
+        .input-with-icon-left .input-field {
+            padding-left: 48px;
+        }
+        
+        /* Input with Icon - Right */
+        .input-with-icon-right {
+            position: relative;
+        }
+        
+        .input-icon-right {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+        
+        .input-with-icon-right .input-field {
+            padding-right: 48px;
+        }
+        
+        /* 4-Digit Input */
+        .digit-inputs {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .digit-input {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            color: #334155;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .digit-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        
+        .digit-input:hover {
+            border-color: #cbd5e1;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Helper Text */
+        .input-helper {
+            font-size: 12px;
+            font-weight: 300;
+            color: #64748b;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modern Input System</h1>
+        
+        <!-- Input without Icon -->
+        <div class="input-group">
+            <h2>Input without Icon</h2>
+            
+            <div class="input-container">
+                <label class="input-label">Full Name</label>
+                <input type="text" class="input-field" placeholder="Enter your full name">
+                <div class="input-helper">Please enter your legal name</div>
+            </div>
+            
+            <div class="input-container">
+                <label class="input-label">Email Address</label>
+                <input type="email" class="input-field" placeholder="your@email.com">
+                <div class="input-helper">We'll never share your email</div>
+            </div>
+        </div>
+        
+        <!-- Textbox Input -->
+        <div class="input-group">
+            <h2>Textbox Input</h2>
+            
+            <div class="input-container">
+                <label class="input-label">Message</label>
+                <textarea class="input-field textbox" placeholder="Type your message here..."></textarea>
+                <div class="input-helper">Maximum 500 characters</div>
+            </div>
+            
+            <div class="input-container">
+                <label class="input-label">Bio</label>
+                <textarea class="input-field textbox" placeholder="Tell us about yourself..."></textarea>
+            </div>
+        </div>
+        
+        <!-- Input with Icon - Left -->
+        <div class="input-group">
+            <h2>Input with Icon (Left)</h2>
+            
+            <div class="input-container">
+                <label class="input-label">Email Address</label>
+                <div class="input-with-icon-left">
+                    <span class="input-icon-left material-icons-round">email</span>
+                    <input type="email" class="input-field" placeholder="your@email.com">
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <label class="input-label">Search</label>
+                <div class="input-with-icon-left">
+                    <span class="input-icon-left material-icons-round">search</span>
+                    <input type="search" class="input-field" placeholder="Search...">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input with Icon - Right -->
+        <div class="input-group">
+            <h2>Input with Icon (Right)</h2>
+            
+            <div class="input-container">
+                <label class="input-label">Password</label>
+                <div class="input-with-icon-right">
+                    <input type="password" class="input-field" placeholder="Enter your password">
+                    <span class="input-icon-right material-icons-round">lock</span>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <label class="input-label">Website</label>
+                <div class="input-with-icon-right">
+                    <input type="url" class="input-field" placeholder="https://example.com">
+                    <span class="input-icon-right material-icons-round">link</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 4-Digit Input -->
+        <div class="input-group">
+            <h2>4-Digit Code</h2>
+            
+            <div class="input-container">
+                <label class="input-label">Verification Code</label>
+                <div class="digit-inputs">
+                    <input type="text" class="digit-input" maxlength="1" pattern="[0-9]">
+                    <input type="text" class="digit-input" maxlength="1" pattern="[0-9]">
+                    <input type="text" class="digit-input" maxlength="1" pattern="[0-9]">
+                    <input type="text" class="digit-input" maxlength="1" pattern="[0-9]">
+                </div>
+                <div class="input-helper">Enter the 4-digit code sent to your phone</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus next digit input
+        document.addEventListener('DOMContentLoaded', function() {
+            const digitInputs = document.querySelectorAll('.digit-input');
+            
+            digitInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    if (this.value.length === 1 && index < digitInputs.length - 1) {
+                        digitInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        digitInputs[index - 1].focus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

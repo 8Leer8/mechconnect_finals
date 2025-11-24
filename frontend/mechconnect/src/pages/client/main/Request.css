@@ -1,0 +1,352 @@
+/* Request Page Styles */
+.request-content {
+  --background: hsl(40, 20%, 98%);
+  padding-bottom: 160px;
+}
+
+/* Header */
+.request-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.request-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.notification-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.notification-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Request Section */
+.request-section {
+  padding: 0 20px 20px;
+}
+
+/* Tabs */
+.tabs-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  background: white;
+  padding: 6px;
+  border-radius: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 4px;
+  scroll-behavior: smooth;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-container::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, white);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tabs-container.scrollable::after {
+  opacity: 1;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 90px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-button.active {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Cards Container */
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Request Card */
+.request-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.request-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Status Tag */
+.status-tag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  cursor: default;
+}
+
+.tag-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.tag-quoted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.tag-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.tag-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.request-header {
+  padding: 20px 20px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.provider-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.provider-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.provider-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.provider-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 2px;
+}
+
+.provider-type {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.request-id {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.request-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.request-time {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.btn-details {
+  height: 36px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0 16px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-details:hover {
+  background-color: #e2e8f0;
+}
+
+.btn-details:active {
+  background-color: #cbd5e1;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Custom Request Button Section */
+.custom-request-section {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  padding: 0 20px 20px;
+  background: linear-gradient(to top, hsl(40, 20%, 98%) 60%, transparent);
+  pointer-events: none;
+}
+
+.custom-request-btn {
+  width: 100%;
+  height: 52px;
+  background: hsl(25, 85%, 55%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px hsla(25, 85%, 55%, 0.3);
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.custom-request-btn:hover {
+  background: hsl(25, 85%, 50%);
+  box-shadow: 0 6px 16px hsla(25, 85%, 55%, 0.4);
+  transform: translateY(-2px);
+}
+
+.custom-request-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px hsla(25, 85%, 55%, 0.3);
+}
+
+.custom-request-btn .material-icons-round {
+  font-size: 24px;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: white;
+  border-top: 1px solid #f1f5f9;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 8px;
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  flex: 1;
+  max-width: 80px;
+}
+
+.nav-item span {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.nav-item.active {
+  color: hsl(25, 85%, 55%);
+  font-weight: 600;
+}
+
+.nav-item:hover {
+  color: hsl(25, 15%, 25%);
+}

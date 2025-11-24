@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Button System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #0f172a;
+        }
+        
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 32px 0 16px;
+            color: #1e293b;
+        }
+        
+        p {
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 24px;
+            color: #475569;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Button Base Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .btn:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        /* Button Sizes */
+        .btn-sm {
+            height: 36px;
+            font-size: 12px;
+            border-radius: 8px;
+            padding: 0 16px;
+        }
+        
+        .btn-base {
+            height: 44px;
+            font-size: 14px;
+            border-radius: 12px;
+            padding: 0 20px;
+        }
+        
+        /* Icon Sizes */
+        .icon-sm {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .icon-base {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Button Variants */
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-primary:active {
+            background-color: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .btn-secondary:active {
+            background-color: #cbd5e1;
+        }
+        
+        .btn-ghost {
+            background-color: transparent;
+            color: #475569;
+        }
+        
+        .btn-ghost:hover {
+            background-color: #f8fafc;
+        }
+        
+        .btn-ghost:active {
+            background-color: #f1f5f9;
+        }
+        
+        /* Icon Only Button */
+        .btn-icon {
+            width: 44px;
+            padding: 0;
+        }
+        
+        .btn-icon.btn-sm {
+            width: 36px;
+        }
+        
+        /* Button Group */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        /* Demo Layout */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .demo-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .demo-label {
+            font-size: 12px;
+            font-weight: 300;
+            color: #64748b;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: 'liga';
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modern Button System</h1>
+        <p>A clean, minimalist button system following typography and icon sizing rules with Google Material Icons Rounded.</p>
+        
+        <!-- Primary Buttons -->
+        <div class="section">
+            <h2>Primary Buttons</h2>
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <span class="demo-label">Small</span>
+                    <button class="btn btn-primary btn-sm">
+                        <span class="material-icons-round icon-sm">favorite</span>
+                        Like
+                    </button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Base</span>
+                    <button class="btn btn-primary btn-base">
+                        <span class="material-icons-round icon-base">shopping_cart</span>
+                        Add to Cart
+                    </button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Text Only</span>
+                    <button class="btn btn-primary btn-base">Continue</button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Icon Only</span>
+                    <button class="btn btn-primary btn-base btn-icon">
+                        <span class="material-icons-round icon-base">add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Secondary Buttons -->
+        <div class="section">
+            <h2>Secondary Buttons</h2>
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <span class="demo-label">Small</span>
+                    <button class="btn btn-secondary btn-sm">
+                        <span class="material-icons-round icon-sm">save</span>
+                        Save
+                    </button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Base</span>
+                    <button class="btn btn-secondary btn-base">
+                        <span class="material-icons-round icon-base">download</span>
+                        Download
+                    </button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Text Only</span>
+                    <button class="btn btn-secondary btn-base">Cancel</button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Icon Only</span>
+                    <button class="btn btn-secondary btn-base btn-icon">
+                        <span class="material-icons-round icon-base">edit</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ghost Buttons -->
+        <div class="section">
+            <h2>Ghost Buttons</h2>
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <span class="demo-label">Small</span>
+                    <button class="btn btn-ghost btn-sm">
+                        <span class="material-icons-round icon-sm">share</span>
+                        Share
+                    </button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Base</span>
+                    <button class="btn btn-ghost btn-base">
+                        <span class="material-icons-round icon-base">settings</span>
+                        Settings
+                    </button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Text Only</span>
+                    <button class="btn btn-ghost btn-base">Learn More</button>
+                </div>
+                <div class="demo-item">
+                    <span class="demo-label">Icon Only</span>
+                    <button class="btn btn-ghost btn-base btn-icon">
+                        <span class="material-icons-round icon-base">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Button Group Example -->
+        <div class="section">
+            <h2>Button Group Example</h2>
+            <div class="button-group">
+                <button class="btn btn-primary btn-base">
+                    <span class="material-icons-round icon-base">play_arrow</span>
+                    Play Now
+                </button>
+                <button class="btn btn-secondary btn-base">
+                    <span class="material-icons-round icon-base">info</span>
+                    More Info
+                </button>
+                <button class="btn btn-ghost btn-base btn-icon">
+                    <span class="material-icons-round icon-base">favorite_border</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Disabled State Example -->
+        <div class="section">
+            <h2>Disabled State</h2>
+            <div class="button-group">
+                <button class="btn btn-primary btn-base" disabled>
+                    <span class="material-icons-round icon-base">lock</span>
+                    Disabled
+                </button>
+                <button class="btn btn-secondary btn-base" disabled>
+                    <span class="material-icons-round icon-base">block</span>
+                    Disabled
+                </button>
+                <button class="btn btn-ghost btn-base" disabled>
+                    Disabled
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

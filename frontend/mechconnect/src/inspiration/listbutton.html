@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Item Buttons</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .list-section {
+            background: white;
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            padding: 16px 20px 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* List Item Button */
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .list-item:hover {
+            background-color: #f8fafc;
+        }
+        
+        .list-item:active {
+            background-color: #f1f5f9;
+        }
+        
+        /* Icon Container */
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .icon-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .icon-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .icon-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .icon-favorite {
+            background: #fce7f3;
+            color: #db2777;
+        }
+        
+        .icon-history {
+            background: #f0fdf4;
+            color: #166534;
+        }
+        
+        /* Content */
+        .item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .item-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+        
+        .item-description {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        /* Arrow */
+        .item-arrow {
+            color: #94a3b8;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 0 20px;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Settings</h1>
+        
+        <!-- Account Section -->
+        <div class="list-section">
+            <div class="section-title">Account</div>
+            
+            <button class="list-item">
+                <div class="item-icon icon-primary">
+                    <span class="material-icons-round">person</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-label">Account Settings</div>
+                    <div class="item-description">Manage your profile and preferences</div>
+                </div>
+                <div class="item-arrow">
+                    <span class="material-icons-round">chevron_right</span>
+                </div>
+            </button>
+            
+            <div class="divider"></div>
+            
+            <button class="list-item">
+                <div class="item-icon icon-secondary">
+                    <span class="material-icons-round">switch_account</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-label">Switch Account</div>
+                    <div class="item-description">Change to another account</div>
+                </div>
+                <div class="item-arrow">
+                    <span class="material-icons-round">chevron_right</span>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Favorites Section -->
+        <div class="list-section">
+            <div class="section-title">Favorites</div>
+            
+            <button class="list-item">
+                <div class="item-icon icon-favorite">
+                    <span class="material-icons-round">favorite</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-label">Favorites</div>
+                    <div class="item-description">View your saved mechanics and shops</div>
+                </div>
+                <div class="item-arrow">
+                    <span class="material-icons-round">chevron_right</span>
+                </div>
+            </button>
+        </div>
+        
+        <!-- History Section -->
+        <div class="list-section">
+            <div class="section-title">History</div>
+            
+            <button class="list-item">
+                <div class="item-icon icon-history">
+                    <span class="material-icons-round">history</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-label">Payment History</div>
+                    <div class="item-description">View your transaction history</div>
+                </div>
+                <div class="item-arrow">
+                    <span class="material-icons-round">chevron_right</span>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Actions Section (No Arrow) -->
+        <div class="list-section">
+            <div class="section-title">Actions</div>
+            
+            <button class="list-item">
+                <div class="item-icon icon-danger">
+                    <span class="material-icons-round">logout</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-label">Log Out</div>
+                    <div class="item-description">Sign out of your account</div>
+                </div>
+                <!-- No arrow -->
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Add click functionality to list items
+        document.querySelectorAll('.list-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const label = this.querySelector('.item-label').textContent;
+                alert(`Clicked: ${label}`);
+                
+                // In a real app, you would navigate or show a modal
+                // For example:
+                // if (label === 'Log Out') {
+                //     window.location.href = '/logout';
+                // } else if (label === 'Account Settings') {
+                //     window.location.href = '/settings/account';
+                // } else if (label === 'Favorites') {
+                //     window.location.href = '/favorites';
+                // } else if (label === 'Payment History') {
+                //     window.location.href = '/history/payments';
+                // }
+            });
+        });
+    </script>
+</body>
+</html>

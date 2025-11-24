@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Navigation</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .nav-demo {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+        
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+            padding: 24px 24px 0;
+        }
+        
+        /* Navigation Base */
+        .nav {
+            display: flex;
+            align-items: center;
+            padding: 16px 24px;
+            background: white;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        /* Type 1: Header + Notification */
+        .nav-type-1 {
+            justify-content: space-between;
+        }
+        
+        .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-icon:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        /* Type 2: Back Button + Header */
+        .nav-type-2 {
+            gap: 16px;
+        }
+        
+        .back-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .back-button:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        
+        .nav-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            flex: 1;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 24px;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Top Navigation</h1>
+        
+        <!-- Type 1: Header + Notification -->
+        <div class="nav-demo">
+            <h2>Header + Notification</h2>
+            <div class="nav nav-type-1">
+                <div class="nav-title">Dashboard</div>
+                <div class="nav-actions">
+                    <button class="nav-icon">
+                        <span class="material-icons-round">notifications</span>
+                        <span class="notification-badge"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="content">
+                This navigation has a page title on the left and notification bell on the right. Perfect for dashboard and main pages.
+            </div>
+        </div>
+        
+        <!-- Type 2: Back Button + Header -->
+        <div class="nav-demo">
+            <h2>Back Button + Header</h2>
+            <div class="nav nav-type-2">
+                <button class="back-button">
+                    <span class="material-icons-round">arrow_back</span>
+                </button>
+                <div class="nav-header">Settings</div>
+            </div>
+            <div class="content">
+                This navigation has a back button on the left and page title. Ideal for detail pages and settings screens.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click handlers for interactive elements
+        document.querySelectorAll('.back-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('Back button clicked!');
+            });
+        });
+        
+        document.querySelectorAll('.nav-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                alert('Notification bell clicked!');
+            });
+        });
+    </script>
+</body>
+</html>

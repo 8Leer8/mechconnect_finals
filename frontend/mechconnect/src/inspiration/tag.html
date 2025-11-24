@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Tag System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            color: #0f172a;
+            text-align: center;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+        
+        /* Tag Base Styles */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: default;
+        }
+        
+        /* Tag Variants */
+        .tag-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .tag-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .tag-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .tag-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Tag Close Button */
+        .tag-close {
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: currentColor;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+        
+        .tag-close:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Tag Container */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        /* Material Icons */
+        .material-icons-round {
+            font-family: 'Material Icons Round';
+            font-weight: normal;
+            font-style: normal;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Tag System</h1>
+        
+        <!-- Basic Tags -->
+        <div class="section">
+            <h2>Basic Tags</h2>
+            <div class="tag-container">
+                <span class="tag tag-primary">Design</span>
+                <span class="tag tag-secondary">Development</span>
+                <span class="tag tag-success">Completed</span>
+                <span class="tag tag-warning">Pending</span>
+                <span class="tag tag-error">Urgent</span>
+            </div>
+        </div>
+        
+        <!-- Tags with Icons -->
+        <div class="section">
+            <h2>Tags with Icons</h2>
+            <div class="tag-container">
+                <span class="tag tag-primary">
+                    <span class="material-icons-round">label</span>
+                    Label
+                </span>
+                <span class="tag tag-success">
+                    <span class="material-icons-round">check_circle</span>
+                    Verified
+                </span>
+                <span class="tag tag-warning">
+                    <span class="material-icons-round">schedule</span>
+                    Waiting
+                </span>
+                <span class="tag tag-error">
+                    <span class="material-icons-round">priority_high</span>
+                    Important
+                </span>
+            </div>
+        </div>
+        
+        <!-- Removable Tags -->
+        <div class="section">
+            <h2>Removable Tags</h2>
+            <div class="tag-container" id="removableTags">
+                <span class="tag tag-primary">
+                    React
+                    <button class="tag-close">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </span>
+                <span class="tag tag-secondary">
+                    Vue.js
+                    <button class="tag-close">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </span>
+                <span class="tag tag-success">
+                    Angular
+                    <button class="tag-close">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </span>
+                <span class="tag tag-warning">
+                    Svelte
+                    <button class="tag-close">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </span>
+                <span class="tag tag-error">
+                    Next.js
+                    <button class="tag-close">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click events to all close buttons
+        document.querySelectorAll('.tag-close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+import { useState } from 'react';
+import { IonContent, IonPage, IonInput, IonButton, IonText } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
+import './Login.css';
+
+const Signup: React.FC = () => {
+  const history = useHistory();
+  const [step, setStep] = useState(1);
+  
+  // Step 1: Basic Info
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [email, setEmail] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  
+  // Step 2: Personal Info
+  const [gender, setGender] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  
+  // Step 3: Address
+  const [houseBuildingNumber, setHouseBuildingNumber] = useState('');
+  const [streetName, setStreetName] = useState('');
+  const [subdivisionVillage, setSubdivisionVillage] = useState('');
+  const [barangay, setBarangay] = useState('');
+  const [cityMunicipality, setCityMunicipality] = useState('');
+  const [province, setProvince] = useState('');
+  const [region, setRegion] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  
+  // Step 4: Account
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Step 5: Verification
+  const [code1, setCode1] = useState('');
+  const [code2, setCode2] = useState('');
+  const [code3, setCode3] = useState('');
+  const [code4, setCode4] = useState('');
+
+  const handleNext = () => {
+    if (step < 5) setStep(step + 1);
+  };
+
+  const handleSignup = () => {
+    // TODO: Implement signup logic
+    console.log('Signup complete');
+  };
+
+  const goToLogin = () => {
+    history.push('/login');
+  };
+
+  return (
+    <IonPage>
+      <IonContent className="auth-content">
+        <div className="auth-container">
+          <div className="auth-logo">
+            <img src="/src/assets/images/mechlogo.png" alt="MechConnect Logo" />
+          </div>
+          
+          <h1 className="auth-title">MechConnect</h1>
+
+          <div className="signup-steps">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <div key={s} className={`step-indicator ${step >= s ? 'active' : ''}`} />
+            ))}
+          </div>
+
+          <div className="auth-form">
+            {step === 1 && (
+              <>
+                <div className="input-container">
+                  <IonInput
+                    value={firstname}
+                    onIonInput={(e) => setFirstname(e.detail.value!)}
+                    placeholder="Firstname"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={lastname}
+                    onIonInput={(e) => setLastname(e.detail.value!)}
+                    placeholder="Lastname"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    type="email"
+                    value={email}
+                    onIonInput={(e) => setEmail(e.detail.value!)}
+                    placeholder="Email"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    type="tel"
+                    value={contactNumber}
+                    onIonInput={(e) => setContactNumber(e.detail.value!)}
+                    placeholder="Contact Number"
+                    className="auth-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <div className="input-container">
+                  <IonInput
+                    value={gender}
+                    onIonInput={(e) => setGender(e.detail.value!)}
+                    placeholder="Gender"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    type="date"
+                    value={dateOfBirth}
+                    onIonInput={(e) => setDateOfBirth(e.detail.value!)}
+                    placeholder="Date of Birth"
+                    className="auth-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <div className="input-container">
+                  <IonInput
+                    value={houseBuildingNumber}
+                    onIonInput={(e) => setHouseBuildingNumber(e.detail.value!)}
+                    placeholder="House/Building Number"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={streetName}
+                    onIonInput={(e) => setStreetName(e.detail.value!)}
+                    placeholder="Street Name"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={subdivisionVillage}
+                    onIonInput={(e) => setSubdivisionVillage(e.detail.value!)}
+                    placeholder="Subdivision/Village"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={barangay}
+                    onIonInput={(e) => setBarangay(e.detail.value!)}
+                    placeholder="Barangay"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={cityMunicipality}
+                    onIonInput={(e) => setCityMunicipality(e.detail.value!)}
+                    placeholder="City/Municipality"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={province}
+                    onIonInput={(e) => setProvince(e.detail.value!)}
+                    placeholder="Province"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={region}
+                    onIonInput={(e) => setRegion(e.detail.value!)}
+                    placeholder="Region"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    value={postalCode}
+                    onIonInput={(e) => setPostalCode(e.detail.value!)}
+                    placeholder="Postal Code"
+                    className="auth-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {step === 4 && (
+              <>
+                <div className="input-container">
+                  <IonInput
+                    value={username}
+                    onIonInput={(e) => setUsername(e.detail.value!)}
+                    placeholder="Username"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    type="password"
+                    value={password}
+                    onIonInput={(e) => setPassword(e.detail.value!)}
+                    placeholder="Password"
+                    className="auth-input"
+                  />
+                </div>
+                <div className="input-container">
+                  <IonInput
+                    type="password"
+                    value={confirmPassword}
+                    onIonInput={(e) => setConfirmPassword(e.detail.value!)}
+                    placeholder="Confirm Password"
+                    className="auth-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {step === 5 && (
+              <>
+                <div className="code-inputs">
+                  <IonInput
+                    type="number"
+                    maxlength={1}
+                    value={code1}
+                    onIonInput={(e) => setCode1(e.detail.value!)}
+                    className="code-input auth-input"
+                  />
+                  <IonInput
+                    type="number"
+                    maxlength={1}
+                    value={code2}
+                    onIonInput={(e) => setCode2(e.detail.value!)}
+                    className="code-input auth-input"
+                  />
+                  <IonInput
+                    type="number"
+                    maxlength={1}
+                    value={code3}
+                    onIonInput={(e) => setCode3(e.detail.value!)}
+                    className="code-input auth-input"
+                  />
+                  <IonInput
+                    type="number"
+                    maxlength={1}
+                    value={code4}
+                    onIonInput={(e) => setCode4(e.detail.value!)}
+                    className="code-input auth-input"
+                  />
+                </div>
+              </>
+            )}
+
+            <IonButton
+              expand="block"
+              onClick={step === 5 ? handleSignup : handleNext}
+              className="auth-button"
+            >
+              {step === 5 ? 'Signup' : 'Next'}
+            </IonButton>
+
+            <div className="auth-footer">
+              <IonText className="auth-link-text">
+                Already have an account?{' '}
+                <button 
+                  type="button"
+                  className="auth-link" 
+                  onClick={goToLogin}
+                >
+                  Login
+                </button>
+              </IonText>
+            </div>
+          </div>
+        </div>
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default Signup;
