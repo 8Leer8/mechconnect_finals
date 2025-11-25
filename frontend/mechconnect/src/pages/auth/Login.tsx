@@ -1,16 +1,70 @@
 import { useState } from 'react';
-import { IonContent, IonPage, IonInput, IonButton, IonText } from '@ionic/react';
+import { IonContent, IonPage, IonInput, IonButton, IonText, IonLoading, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import './Login.css';
+
+// API Configuration
+const API_BASE_URL = 'http://localhost:8000/api/accounts';
 
 const Login: React.FC = () => {
   const history = useHistory();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
 
-  const handleLogin = () => {
-    // TODO: Implement login logic
-    console.log('Login:', { email, password });
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setToastMessage('Please fill in all fields');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/login/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: email, // Send email as username - backend now supports email login
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setToastMessage('Login successful!');
+        setToastColor('success');
+        setShowToast(true);
+        
+        // Store user data if needed
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
+        // Navigate to client home page
+        setTimeout(() => {
+          history.push('/client/home');
+        }, 1000);
+      } else {
+        setToastMessage(data.error || 'Login failed. Please check your credentials.');
+        setToastColor('danger');
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setToastMessage('Network error. Please try again.');
+      setToastColor('danger');
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const goToSignup = () => {
@@ -56,8 +110,9 @@ const Login: React.FC = () => {
               expand="block"
               onClick={handleLogin}
               className="auth-button"
+              disabled={loading}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </IonButton>
 
             <div className="auth-footer">
@@ -86,6 +141,16 @@ const Login: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        <IonLoading isOpen={loading} message="Logging in..." />
+        
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={3000}
+          color={toastColor}
+        />
       </IonContent>
     </IonPage>
   );

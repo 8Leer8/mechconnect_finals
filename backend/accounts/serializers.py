@@ -206,7 +206,19 @@ class UserLoginSerializer(serializers.Serializer):
         
         if username and password:
             try:
-                user = Account.objects.get(username=username)
+                # Try to find user by email first, then by username
+                user = None
+                if '@' in username:
+                    # If username contains @, treat it as email
+                    try:
+                        user = Account.objects.get(email=username)
+                    except Account.DoesNotExist:
+                        pass
+                
+                # If not found by email or doesn't contain @, try username
+                if user is None:
+                    user = Account.objects.get(username=username)
+                
                 if not user.is_active:
                     raise serializers.ValidationError('Account is deactivated.')
                 
