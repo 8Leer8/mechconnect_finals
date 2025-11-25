@@ -1,6 +1,7 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import BottomNav from '../../../components/BottomNav';
 import './Request.css';
 
 const Request: React.FC = () => {
@@ -10,10 +11,6 @@ const Request: React.FC = () => {
   const [isScrollable, setIsScrollable] = useState(false);
 
   const goToNotifications = () => history.push('/client/notifications');
-  const goToBooking = () => history.push('/client/booking');
-  const goToHome = () => history.push('/client/home');
-  const goToDiscover = () => history.push('/client/discover');
-  const goToProfile = () => history.push('/client/profile');
   const goToCustomRequest = () => history.push('/client/custom-request');
   const goToRequestDetail = (id: string) => history.push(`/client/request-detail/${id}`);
 
@@ -244,29 +241,7 @@ const Request: React.FC = () => {
         </div>
       </IonContent>
 
-      {/* Bottom Navigation */}
-      <div className="bottom-nav">
-        <button className="nav-item" onClick={goToBooking}>
-          <span className="material-icons-round">event</span>
-          <span>Booking</span>
-        </button>
-        <button className="nav-item active">
-          <span className="material-icons-round">build_circle</span>
-          <span>Request</span>
-        </button>
-        <button className="nav-item" onClick={goToHome}>
-          <span className="material-icons-round">home</span>
-          <span>Home</span>
-        </button>
-        <button className="nav-item" onClick={goToDiscover}>
-          <span className="material-icons-round">explore</span>
-          <span>Discover</span>
-        </button>
-        <button className="nav-item" onClick={goToProfile}>
-          <span className="material-icons-round">person</span>
-          <span>Profile</span>
-        </button>
-      </div>
+      <BottomNav />
     </IonPage>
   );
 };

@@ -1,15 +1,12 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import BottomNav from '../../../components/BottomNav';
 import './Profile.css';
 
 const Profile: React.FC = () => {
   const history = useHistory();
 
   const goToNotifications = () => history.push('/client/notifications');
-  const goToBooking = () => history.push('/client/booking');
-  const goToRequest = () => history.push('/client/request');
-  const goToHome = () => history.push('/client/home');
-  const goToDiscover = () => history.push('/client/discover');
   const goToAccountSettings = () => history.push('/client/account-settings');
   const goToSwitchAccount = () => history.push('/client/switch-account');
   const goToFavorites = () => history.push('/client/favorites');
@@ -121,29 +118,7 @@ const Profile: React.FC = () => {
         </div>
       </IonContent>
 
-      {/* Bottom Navigation */}
-      <div className="bottom-nav">
-        <button className="nav-item" onClick={goToBooking}>
-          <span className="material-icons-round">event</span>
-          <span>Booking</span>
-        </button>
-        <button className="nav-item" onClick={goToRequest}>
-          <span className="material-icons-round">build_circle</span>
-          <span>Request</span>
-        </button>
-        <button className="nav-item" onClick={goToHome}>
-          <span className="material-icons-round">home</span>
-          <span>Home</span>
-        </button>
-        <button className="nav-item" onClick={goToDiscover}>
-          <span className="material-icons-round">explore</span>
-          <span>Discover</span>
-        </button>
-        <button className="nav-item active">
-          <span className="material-icons-round">person</span>
-          <span>Profile</span>
-        </button>
-      </div>
+      <BottomNav />
     </IonPage>
   );
 };
