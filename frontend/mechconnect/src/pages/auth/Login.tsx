@@ -31,7 +31,7 @@ const Login: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: email, // Send email as username - backend now supports email login
+          username: email, 
           password: password,
         }),
       });

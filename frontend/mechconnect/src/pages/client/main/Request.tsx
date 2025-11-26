@@ -38,7 +38,7 @@ const Request: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="request-content">
+      <IonContent className="request-content" style={{ paddingBottom: '80px' }}>
         {/* Header */}
         <div className="request-header-top">
           <h1 className="request-title">Request</h1>

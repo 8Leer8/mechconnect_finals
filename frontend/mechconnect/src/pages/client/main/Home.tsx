@@ -15,7 +15,7 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="home-content">
+      <IonContent className="home-content" style={{ paddingBottom: '80px' }}>
         {/* Header */}
         <div className="home-header">
           <h1 className="home-title">Home</h1>

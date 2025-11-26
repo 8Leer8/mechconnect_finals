@@ -41,7 +41,7 @@ const Booking: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="booking-content">
+      <IonContent className="booking-content" style={{ paddingBottom: '80px' }}>
         {/* Header */}
         <div className="booking-header-top">
           <h1 className="booking-title">Booking</h1>

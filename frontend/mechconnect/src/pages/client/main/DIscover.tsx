@@ -45,7 +45,7 @@ const Discover: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="discover-content">
+      <IonContent className="discover-content" style={{ paddingBottom: '80px' }}>
         {/* Header */}
         <div className="discover-header">
           <h1 className="discover-title">Discover</h1>
