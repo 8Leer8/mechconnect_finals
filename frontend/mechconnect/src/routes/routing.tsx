@@ -10,6 +10,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword';
 import Home from '../pages/client/main/Home';
 import Request from '../pages/client/main/Request';
 import Booking from '../pages/client/main/Booking';
+import Discover from '../pages/client/main/DIscover';
 import Profile from '../pages/client/main/Profile';
 
 const AppRoutes: React.FC = () => {
@@ -21,6 +22,7 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/client/home" component={Home} />
       <Route exact path="/client/request" component={Request} />
       <Route exact path="/client/booking" component={Booking} />
+      <Route exact path="/client/discover" component={Discover} />
       <Route exact path="/client/profile" component={Profile} />
       <Route exact path="/">
         <Redirect to="/client/home" />
