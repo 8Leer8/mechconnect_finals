@@ -13,6 +13,9 @@ import Booking from '../pages/client/main/Booking';
 import Discover from '../pages/client/main/DIscover';
 import Profile from '../pages/client/main/Profile';
 
+// Shop Owner Pages
+import Dashboard from '../pages/shopowner/main/dashboard';
+
 const AppRoutes: React.FC = () => {
   return (
     <IonRouterOutlet>
@@ -24,8 +27,9 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/client/booking" component={Booking} />
       <Route exact path="/client/discover" component={Discover} />
       <Route exact path="/client/profile" component={Profile} />
+      <Route exact path="/shopowner/dashboard" component={Dashboard} />
       <Route exact path="/">
-        <Redirect to="/client/home" />
+        <Redirect to="/shopowner/dashboard" />
       </Route>
     </IonRouterOutlet>
   );
