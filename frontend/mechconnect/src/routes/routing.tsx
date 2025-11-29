@@ -31,7 +31,7 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/shopowner/dashboard" component={Dashboard} />
       <Route exact path="/shopowner/mechanics" component={Mechanic} />
       <Route exact path="/">
-        <Redirect to="/client/home" />
+        <Redirect to="/login" />
       </Route>
     </IonRouterOutlet>
   );
