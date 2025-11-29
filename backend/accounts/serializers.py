@@ -310,6 +310,52 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return user
 
 
+class MechanicDiscoverySerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+    profile_photo = serializers.CharField(source='mechanic_profile.profile_photo')
+    bio = serializers.CharField(source='mechanic_profile.bio')
+    average_rating = serializers.DecimalField(source='mechanic_profile.average_rating', max_digits=3, decimal_places=2, read_only=True)
+    ranking = serializers.CharField(source='mechanic_profile.ranking')
+    location = serializers.SerializerMethodField()
+    total_jobs = serializers.SerializerMethodField()
+    contact_number = serializers.CharField(source='mechanic_profile.contact_number')
+    status = serializers.CharField(source='mechanic_profile.status')
+    
+    class Meta:
+        model = Account
+        fields = [
+            'acc_id', 'full_name', 'profile_photo', 'bio', 'average_rating', 
+            'ranking', 'location', 'total_jobs', 'contact_number', 'status'
+        ]
+    
+    def get_full_name(self, obj):
+        """Get formatted full name"""
+        middle_initial = f" {obj.middlename[0]}." if obj.middlename else ""
+        return f"{obj.firstname}{middle_initial} {obj.lastname}"
+    
+    def get_location(self, obj):
+        """Get formatted location from address"""
+        if hasattr(obj, 'address') and obj.address:
+            address = obj.address
+            # Create a readable location string
+            location_parts = []
+            if address.city_municipality:
+                location_parts.append(address.city_municipality)
+            if address.province:
+                location_parts.append(address.province)
+            return ", ".join(location_parts) if location_parts else "Location not specified"
+        return "Location not specified"
+    
+    def get_total_jobs(self, obj):
+        """Get total completed jobs - placeholder for now"""
+        # This would need to be implemented based on your requests/jobs model
+        # For now, return a placeholder number based on rating count estimation
+        if hasattr(obj, 'mechanic_profile') and obj.mechanic_profile.average_rating:
+            # Estimate based on rating - this is just a placeholder
+            return max(1, int(obj.mechanic_profile.average_rating * 50))  # Rough estimation
+        return 0
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
