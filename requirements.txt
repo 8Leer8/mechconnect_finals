@@ -3,5 +3,5 @@ djangorestframework
 django-cors-headers
 psycopg2-binary
 python-dotenv==1.0.1
-Pillow==10.2.0
+Pillow==9.5.0
     

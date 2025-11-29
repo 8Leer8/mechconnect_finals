@@ -15,6 +15,7 @@ import Profile from '../pages/client/main/Profile';
 
 // Shop Owner Pages
 import Dashboard from '../pages/shopowner/main/dashboard';
+import Mechanic from '../pages/shopowner/main/mechanic';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -28,8 +29,9 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/client/discover" component={Discover} />
       <Route exact path="/client/profile" component={Profile} />
       <Route exact path="/shopowner/dashboard" component={Dashboard} />
+      <Route exact path="/shopowner/mechanics" component={Mechanic} />
       <Route exact path="/">
-        <Redirect to="/shopowner/dashboard" />
+        <Redirect to="/client/home" />
       </Route>
     </IonRouterOutlet>
   );
