@@ -1,0 +1,432 @@
+/* Independent Mechanic Service Detail Styles */
+.service-detail-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+/* Header */
+.service-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Service Image */
+.service-image {
+  width: 100%;
+  height: 240px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.service-type-badge {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+/* Service Info Section */
+.service-info-section {
+  padding: 0 20px 20px;
+}
+
+.service-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 8px;
+}
+
+.service-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: hsl(25, 85%, 55%);
+  margin-bottom: 24px;
+}
+
+/* Section Block */
+.section-block {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 16px;
+}
+
+.service-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Includes List */
+.includes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.include-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.check-icon {
+  color: #10b981;
+  font-size: 20px;
+}
+
+.include-text {
+  font-size: 14px;
+  color: hsl(25, 15%, 25%);
+}
+
+/* Add-ons List */
+.addons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addon-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addon-item:hover {
+  background: #f1f5f9;
+}
+
+.addon-item.selected {
+  background: hsl(25, 85%, 97%);
+  border-color: hsl(25, 85%, 55%);
+}
+
+.addon-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.addon-item.selected .addon-checkbox {
+  background: hsl(25, 85%, 55%);
+  border-color: hsl(25, 85%, 55%);
+}
+
+.addon-checkbox .material-icons-round {
+  font-size: 18px;
+  color: white;
+}
+
+.addon-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addon-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: hsl(25, 15%, 25%);
+}
+
+.addon-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 85%, 55%);
+}
+
+/* Provider Card */
+.provider-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.provider-card:hover {
+  background: #f1f5f9;
+}
+
+.provider-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.provider-details {
+  flex: 1;
+}
+
+.provider-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 4px;
+}
+
+.provider-type {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.type-icon {
+  font-size: 16px;
+}
+
+.arrow-icon {
+  color: #94a3b8;
+  font-size: 24px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(25, 85%, 97%);
+  border-radius: 10px;
+}
+
+.stat-icon-wrapper .material-icons-round {
+  font-size: 24px;
+  color: hsl(25, 85%, 55%);
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Reviews */
+.review-card {
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.review-card:last-child {
+  margin-bottom: 0;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.reviewer-details {
+  flex: 1;
+}
+
+.reviewer-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 4px;
+}
+
+.review-rating {
+  display: flex;
+  gap: 2px;
+}
+
+.review-rating .material-icons-round {
+  font-size: 16px;
+}
+
+.review-rating .star {
+  color: #fbbf24;
+}
+
+.review-rating .star-outline {
+  color: #cbd5e1;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.review-comment {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Book Now Button */
+.book-now-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  background: hsl(25, 85%, 55%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(230, 110, 50, 0.3);
+  margin-top: 16px;
+}
+
+.book-now-button:hover {
+  background: hsl(25, 85%, 50%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(230, 110, 50, 0.4);
+}
+
+.book-now-button .material-icons-round {
+  font-size: 24px;
+}

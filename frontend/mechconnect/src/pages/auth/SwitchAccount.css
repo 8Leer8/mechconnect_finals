@@ -1,0 +1,189 @@
+/* Switch Account Styles */
+.switch-account-content {
+  --background: hsl(40, 20%, 98%);
+}
+
+/* Header */
+.switch-account-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  z-index: 101;
+}
+
+.back-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.back-button .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  color: hsl(25, 15%, 25%);
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Container */
+.switch-account-container {
+  padding: 0 20px 100px;
+}
+
+/* Info Card */
+.info-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: #dbeafe;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.info-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  color: white;
+}
+
+.info-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e40af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Application Options */
+.application-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Application Card */
+.application-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.application-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Icon */
+.card-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.application-card.mechanic .card-icon {
+  background: hsl(25, 95%, 97%);
+}
+
+.application-card.shop .card-icon {
+  background: #f1f5f9;
+}
+
+.card-icon .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 28px;
+}
+
+.application-card.mechanic .card-icon .material-icons-round {
+  color: hsl(25, 85%, 55%);
+}
+
+.application-card.shop .card-icon .material-icons-round {
+  color: #475569;
+}
+
+/* Card Content */
+.card-content {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 4px 0;
+}
+
+.card-description {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Card Arrow */
+.card-arrow {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-arrow .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 20px;
+  color: #64748b;
+}

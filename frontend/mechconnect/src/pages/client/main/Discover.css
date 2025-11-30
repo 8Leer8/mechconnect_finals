@@ -114,7 +114,7 @@
   position: relative;
 }
 
-.service-type-tag {
+.card-image .service-type-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -126,19 +126,20 @@
   top: 12px;
   left: 12px;
   background: rgba(255, 255, 255, 0.95);
+  z-index: 1;
 }
 
-.service-type-tag.service-mechanic {
+.card-image .service-type-tag.service-mechanic {
   background: #dbeafe;
   color: #1e40af;
 }
 
-.service-type-tag.service-shop {
+.card-image .service-type-tag.service-shop {
   background: #f1f5f9;
   color: #475569;
 }
 
-.category-tag {
+.card-image .category-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -150,19 +151,20 @@
   top: 12px;
   right: 12px;
   background: rgba(255, 255, 255, 0.95);
+  z-index: 1;
 }
 
-.category-tag.category-maintenance {
+.card-image .category-tag.category-maintenance {
   background: #dcfce7;
   color: #166534;
 }
 
-.category-tag.category-repair {
+.card-image .category-tag.category-repair {
   background: #fef3c7;
   color: #92400e;
 }
 
-.category-tag.category-emergency {
+.card-image .category-tag.category-emergency {
   background: #fee2e2;
   color: #991b1b;
 }
@@ -281,17 +283,15 @@
 
 .profile-header {
   width: 100%;
-  height: 140px;
+  height: 160px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   padding: 20px;
-  display: flex;
-  align-items: flex-start;
 }
 
 .profile-card .profile-avatar {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   display: flex;
@@ -299,7 +299,7 @@
   justify-content: center;
   color: #1e40af;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 24px;
   border: 4px solid white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -337,7 +337,7 @@
 .profile-name {
   font-size: 20px;
   font-weight: 600;
-  color: hsl(25, 15%, 25%);
+  color: #0f172a;
   margin-bottom: 8px;
 }
 
@@ -349,7 +349,7 @@
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .service-type-badge.service-independent {
@@ -378,7 +378,7 @@
 .stat-value {
   font-size: 16px;
   font-weight: 700;
-  color: hsl(25, 15%, 25%);
+  color: #0f172a;
   margin-bottom: 4px;
 }
 

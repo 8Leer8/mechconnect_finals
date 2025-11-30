@@ -15,7 +15,10 @@ const Request: React.FC = () => {
   const goToDiscover = () => history.push('/client/discover');
   const goToProfile = () => history.push('/client/profile');
   const goToCustomRequest = () => history.push('/client/custom-request');
-  const goToRequestDetail = (id: string) => history.push(`/client/request-detail/${id}`);
+  const goToPendingRequest = () => history.push('/client/pending-request');
+  const goToQuotedRequest = () => history.push('/client/quoted-request');
+  const goToAcceptedRequest = () => history.push('/client/accepted-request');
+  const goToRejectedRequest = () => history.push('/client/rejected-request');
 
   useEffect(() => {
     const checkScrollable = () => {
@@ -33,11 +36,6 @@ const Request: React.FC = () => {
   const handleTabQuoted = () => setActiveTab('quoted');
   const handleTabAccepted = () => setActiveTab('accepted');
   const handleTabRejected = () => setActiveTab('rejected');
-
-  const handleRequestCard1 = () => goToRequestDetail('2847');
-  const handleRequestCard2 = () => goToRequestDetail('2846');
-  const handleRequestCard3 = () => goToRequestDetail('2843');
-  const handleRequestCard4 = () => goToRequestDetail('2839');
 
   return (
     <IonPage>
@@ -87,7 +85,7 @@ const Request: React.FC = () => {
           {/* Pending Requests */}
           {activeTab === 'pending' && (
             <div className="cards-container">
-              <div className="request-card" onClick={handleRequestCard1}>
+              <div className="request-card">
                 <span className="status-tag tag-pending">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>schedule</span>
                   Pending
@@ -106,14 +104,14 @@ const Request: React.FC = () => {
                 
                 <div className="request-footer">
                   <div className="request-time">Requested 2 hours ago</div>
-                  <button className="btn-details">
+                  <button className="btn-details" onClick={goToPendingRequest}>
                     <span className="material-icons-round icon-sm">visibility</span>
                     See Details
                   </button>
                 </div>
               </div>
 
-              <div className="request-card" onClick={handleRequestCard2}>
+              <div className="request-card">
                 <span className="status-tag tag-pending">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>schedule</span>
                   Pending
@@ -132,7 +130,7 @@ const Request: React.FC = () => {
                 
                 <div className="request-footer">
                   <div className="request-time">Requested 5 hours ago</div>
-                  <button className="btn-details">
+                  <button className="btn-details" onClick={goToPendingRequest}>
                     <span className="material-icons-round icon-sm">visibility</span>
                     See Details
                   </button>
@@ -144,7 +142,7 @@ const Request: React.FC = () => {
           {/* Quoted Requests */}
           {activeTab === 'quoted' && (
             <div className="cards-container">
-              <div className="request-card" onClick={handleRequestCard2}>
+              <div className="request-card">
                 <span className="status-tag tag-quoted">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>request_quote</span>
                   Quoted
@@ -163,7 +161,7 @@ const Request: React.FC = () => {
                 
                 <div className="request-footer">
                   <div className="request-time">Requested yesterday</div>
-                  <button className="btn-details">
+                  <button className="btn-details" onClick={goToQuotedRequest}>
                     <span className="material-icons-round icon-sm">visibility</span>
                     See Details
                   </button>
@@ -175,7 +173,7 @@ const Request: React.FC = () => {
           {/* Accepted Requests */}
           {activeTab === 'accepted' && (
             <div className="cards-container">
-              <div className="request-card" onClick={handleRequestCard3}>
+              <div className="request-card">
                 <span className="status-tag tag-accepted">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>check_circle</span>
                   Accepted
@@ -194,7 +192,7 @@ const Request: React.FC = () => {
                 
                 <div className="request-footer">
                   <div className="request-time">Requested 3 days ago</div>
-                  <button className="btn-details">
+                  <button className="btn-details" onClick={goToAcceptedRequest}>
                     <span className="material-icons-round icon-sm">visibility</span>
                     See Details
                   </button>
@@ -206,7 +204,7 @@ const Request: React.FC = () => {
           {/* Rejected Requests */}
           {activeTab === 'rejected' && (
             <div className="cards-container">
-              <div className="request-card" onClick={handleRequestCard4}>
+              <div className="request-card">
                 <span className="status-tag tag-rejected">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>cancel</span>
                   Rejected
@@ -225,7 +223,7 @@ const Request: React.FC = () => {
                 
                 <div className="request-footer">
                   <div className="request-time">Requested 1 week ago</div>
-                  <button className="btn-details">
+                  <button className="btn-details" onClick={goToRejectedRequest}>
                     <span className="material-icons-round icon-sm">visibility</span>
                     See Details
                   </button>

@@ -14,7 +14,16 @@ const Booking: React.FC = () => {
   const goToHome = () => history.push('/client/home');
   const goToDiscover = () => history.push('/client/discover');
   const goToProfile = () => history.push('/client/profile');
-  const goToBookingDetail = (id: string) => history.push(`/client/booking-detail/${id}`);
+  
+  // Navigation to specific booking detail pages
+  const goToActiveBooking = () => history.push('/client/active-booking');
+  const goToCompletedBooking = () => history.push('/client/completed-booking');
+  const goToRescheduledBooking = () => history.push('/client/rescheduled-booking');
+  const goToBackJobsBooking = () => history.push('/client/backjobs-booking');
+  const goToRejectedBooking = () => history.push('/client/rejected-booking');
+  const goToCanceledBooking = () => history.push('/client/canceled-booking');
+  const goToDisputedBooking = () => history.push('/client/disputed-booking');
+  const goToRefundedBooking = () => history.push('/client/refunded-booking');
 
   useEffect(() => {
     const checkScrollable = () => {
@@ -36,11 +45,6 @@ const Booking: React.FC = () => {
   const handleTabCanceled = () => setActiveTab('canceled');
   const handleTabDisputed = () => setActiveTab('disputed');
   const handleTabRefunded = () => setActiveTab('refunded');
-
-  const handleBookingCard1 = () => goToBookingDetail('2847');
-  const handleBookingCard2 = () => goToBookingDetail('2846');
-  const handleBookingCard3 = () => goToBookingDetail('2843');
-  const handleBookingCard4 = () => goToBookingDetail('2839');
 
   return (
     <IonPage>
@@ -114,7 +118,7 @@ const Booking: React.FC = () => {
           {/* Active Bookings */}
           {activeTab === 'active' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard1}>
+              <div className="booking-card" onClick={goToActiveBooking}>
                 <span className="status-tag tag-active">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>play_circle</span>
                   Active
@@ -145,7 +149,7 @@ const Booking: React.FC = () => {
           {/* Completed Bookings */}
           {activeTab === 'completed' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard2}>
+              <div className="booking-card" onClick={goToCompletedBooking}>
                 <span className="status-tag tag-completed">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>check_circle</span>
                   Completed
@@ -176,7 +180,7 @@ const Booking: React.FC = () => {
           {/* Rescheduled Bookings */}
           {activeTab === 'rescheduled' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard3}>
+              <div className="booking-card" onClick={goToRescheduledBooking}>
                 <span className="status-tag tag-rescheduled">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>schedule</span>
                   Rescheduled
@@ -207,7 +211,7 @@ const Booking: React.FC = () => {
           {/* Back Jobs Bookings */}
           {activeTab === 'back-jobs' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard4}>
+              <div className="booking-card" onClick={goToBackJobsBooking}>
                 <span className="status-tag tag-back-jobs">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>build_circle</span>
                   Back Jobs
@@ -238,7 +242,7 @@ const Booking: React.FC = () => {
           {/* Rejected Bookings */}
           {activeTab === 'rejected' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard1}>
+              <div className="booking-card" onClick={goToRejectedBooking}>
                 <span className="status-tag tag-rejected">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>cancel</span>
                   Rejected
@@ -269,7 +273,7 @@ const Booking: React.FC = () => {
           {/* Canceled Bookings */}
           {activeTab === 'canceled' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard2}>
+              <div className="booking-card" onClick={goToCanceledBooking}>
                 <span className="status-tag tag-canceled">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>cancel</span>
                   Canceled
@@ -300,7 +304,7 @@ const Booking: React.FC = () => {
           {/* Disputed Bookings */}
           {activeTab === 'disputed' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard3}>
+              <div className="booking-card" onClick={goToDisputedBooking}>
                 <span className="status-tag tag-disputed">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>warning</span>
                   Disputed
@@ -331,7 +335,7 @@ const Booking: React.FC = () => {
           {/* Refunded Bookings */}
           {activeTab === 'refunded' && (
             <div className="cards-container">
-              <div className="booking-card" onClick={handleBookingCard4}>
+              <div className="booking-card" onClick={goToRefundedBooking}>
                 <span className="status-tag tag-refunded">
                   <span className="material-icons-round" style={{fontSize: '12px'}}>payments</span>
                   Refunded

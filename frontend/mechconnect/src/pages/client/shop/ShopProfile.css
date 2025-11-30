@@ -1,0 +1,470 @@
+/* Shop Profile Styles */
+.shop-profile-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+/* Header */
+.shop-profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Profile Banner */
+.profile-banner {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
+.profile-picture-wrapper {
+  position: relative;
+}
+
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: white;
+  border: 6px solid white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* Profile Info Section */
+.profile-info-section {
+  background: white;
+  padding: 24px 20px;
+  margin-bottom: 16px;
+}
+
+.name-favorite {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.shop-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.favorite-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: #fef3c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: hsl(25, 85%, 55%);
+  transition: all 0.2s ease;
+}
+
+.favorite-button:hover {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  transform: scale(1.05);
+}
+
+.favorite-button .material-icons-round {
+  font-size: 24px;
+}
+
+/* Bio */
+.shop-bio {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+/* Joined Info */
+.joined-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.joined-icon {
+  color: #64748b;
+  font-size: 18px;
+}
+
+.joined-text {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Specialties Section */
+.specialties-section {
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 12px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.specialty-tag {
+  padding: 8px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.specialty-tag:hover {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  border-color: hsl(25, 85%, 55%);
+}
+
+/* Profile Stats */
+.profile-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.stat-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 10px;
+}
+
+.stat-icon-wrapper .stat-icon {
+  font-size: 24px;
+  color: hsl(25, 85%, 55%);
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Custom Request Button */
+.custom-request-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  background: hsl(25, 85%, 55%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(230, 110, 50, 0.3);
+}
+
+.custom-request-button:hover {
+  background: hsl(25, 85%, 50%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(230, 110, 50, 0.4);
+}
+
+.button-icon {
+  font-size: 24px;
+}
+
+/* Services Section */
+.services-section {
+  padding: 0 20px 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 16px;
+}
+
+/* Cards Container */
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Service Card - Copied from Discover */
+.service-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-image {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.service-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.service-type-tag.service-shop {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.category-tag.category-maintenance {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.category-tag.category-repair {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.category-tag.category-emergency {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.service-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 8px;
+}
+
+.ratings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.star {
+  color: #fbbf24;
+  font-size: 20px;
+}
+
+.rating-text {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.price-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.stat-icon {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.provider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.provider-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.provider-info {
+  flex: 1;
+}
+
+.provider-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 2px;
+}
+
+.provider-type {
+  font-size: 12px;
+  color: #64748b;
+}

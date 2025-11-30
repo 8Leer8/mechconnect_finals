@@ -14,9 +14,11 @@ const Discover: React.FC = () => {
   const goToRequest = () => history.push('/client/request');
   const goToHome = () => history.push('/client/home');
   const goToProfile = () => history.push('/client/profile');
-  const goToServiceDetail = (id: string) => history.push(`/client/service-detail/${id}`);
-  const goToMechanicDetail = (id: string) => history.push(`/client/mechanic-detail/${id}`);
-  const goToShopDetail = (id: string) => history.push(`/client/shop-detail/${id}`);
+  const goToIndependentMechanicServiceDetail = (id: string) => history.push(`/client/independent-mechanic-service-detail/${id}`);
+  const goToShopServiceDetail = (id: string) => history.push(`/client/shop-service-detail/${id}`);
+  const goToIndependentMechanicProfile = (id: string) => history.push(`/client/mechanic-profile/${id}`);
+  const goToShopMechanicProfile = (id: string) => history.push(`/client/shop-mechanic-profile/${id}`);
+  const goToShopProfile = (id: string) => history.push(`/client/shop-profile/${id}`);
 
   useEffect(() => {
     const checkScrollable = () => {
@@ -34,17 +36,17 @@ const Discover: React.FC = () => {
   const handleTabMechanic = () => setActiveTab('mechanic');
   const handleTabShop = () => setActiveTab('shop');
   
-  const handleServiceCard1 = () => goToServiceDetail('1');
-  const handleServiceCard2 = () => goToServiceDetail('2');
-  const handleServiceCard3 = () => goToServiceDetail('3');
+  const handleServiceCard1 = () => goToIndependentMechanicServiceDetail('1'); // Independent Mechanic Service
+  const handleServiceCard2 = () => goToShopServiceDetail('1'); // Shop Service
+  const handleServiceCard3 = () => goToIndependentMechanicServiceDetail('2'); // Independent Mechanic Service
   
-  const handleMechanicCard1 = () => goToMechanicDetail('1');
-  const handleMechanicCard2 = () => goToMechanicDetail('2');
-  const handleMechanicCard3 = () => goToMechanicDetail('3');
+  const handleMechanicCard1 = () => goToIndependentMechanicProfile('1');
+  const handleMechanicCard2 = () => goToShopMechanicProfile('1');
+  const handleMechanicCard3 = () => goToIndependentMechanicProfile('2');
   
-  const handleShopCard1 = () => goToShopDetail('1');
-  const handleShopCard2 = () => goToShopDetail('2');
-  const handleShopCard3 = () => goToShopDetail('3');
+  const handleShopCard1 = () => goToShopProfile('1');
+  const handleShopCard2 = () => goToShopProfile('2');
+  const handleShopCard3 = () => goToShopProfile('3');
 
   return (
     <IonPage>
@@ -203,9 +205,6 @@ const Discover: React.FC = () => {
                 
                 <div className="profile-content">
                   <div className="profile-name">Mike Johnson</div>
-                  <div className="service-type-badge service-independent">
-                    Independent Mechanic
-                  </div>
                   
                   <div className="profile-stats">
                     <div className="stat-item">
@@ -241,9 +240,6 @@ const Discover: React.FC = () => {
                 
                 <div className="profile-content">
                   <div className="profile-name">Precision Service</div>
-                  <div className="service-type-badge service-shop">
-                    Shop Affiliated
-                  </div>
                   
                   <div className="profile-stats">
                     <div className="stat-item">
@@ -279,9 +275,6 @@ const Discover: React.FC = () => {
                 
                 <div className="profile-content">
                   <div className="profile-name">David Rodriguez</div>
-                  <div className="service-type-badge service-independent">
-                    Independent Mechanic
-                  </div>
                   
                   <div className="profile-stats">
                     <div className="stat-item">

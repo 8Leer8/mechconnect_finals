@@ -12,7 +12,7 @@ const Profile: React.FC = () => {
   const goToDiscover = () => history.push('/client/discover');
   const goToAccountSettings = () => history.push('/client/account-settings');
   const goToSwitchAccount = () => history.push('/client/switch-account');
-  const goToFavorites = () => history.push('/client/favorites');
+  const goToFavorites = () => history.push('/client/favorite');
   const goToPaymentHistory = () => history.push('/client/payment-history');
   const handleLogout = () => {
     // In real app: clear auth tokens, redirect to login

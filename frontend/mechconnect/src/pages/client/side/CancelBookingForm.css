@@ -1,0 +1,181 @@
+.cancel-booking-form-content {
+  --background: hsl(40, 20%, 98%);
+}
+
+.cancel-booking-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  z-index: 101;
+}
+
+.back-button:hover {
+  background: hsl(40, 20%, 95%);
+  transform: scale(1.05);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.back-button .material-icons-round {
+  font-size: 24px;
+  color: hsl(25, 15%, 25%);
+  font-family: 'Material Icons Round';
+}
+
+.cancel-booking-form-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+.cancel-booking-form-container {
+  padding: 0 20px 100px;
+}
+
+.cancel-booking-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.booking-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 14px;
+  color: hsl(0, 0%, 50%);
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 14px;
+  color: hsl(0, 0%, 20%);
+  font-weight: 600;
+  text-align: right;
+}
+
+.section-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 24px 0;
+}
+
+.reason-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reason-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.reason-textarea {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: hsl(25, 15%, 25%);
+  background: white;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.reason-textarea:focus {
+  outline: none;
+  border-color: hsl(25, 85%, 55%);
+  background: hsl(25, 95%, 97%);
+}
+
+.reason-textarea::placeholder {
+  color: #cbd5e1;
+}
+
+.warning-section {
+  margin-top: 20px;
+}
+
+.warning-card {
+  background: hsl(45, 100%, 96%);
+  border: 1px solid hsl(45, 100%, 85%);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.warning-icon {
+  font-size: 24px;
+  color: hsl(45, 100%, 45%);
+  font-family: 'Material Icons Round';
+  flex-shrink: 0;
+}
+
+.warning-text {
+  font-size: 13px;
+  color: hsl(45, 100%, 30%);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btn-submit-cancel {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 12px;
+  background: hsl(0, 75%, 55%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px hsla(0, 75%, 55%, 0.3);
+  transition: all 0.2s ease;
+  margin-top: 24px;
+}
+
+.btn-submit-cancel:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px hsla(0, 75%, 55%, 0.3);
+}

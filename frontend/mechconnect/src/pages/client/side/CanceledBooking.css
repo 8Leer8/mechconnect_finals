@@ -1,0 +1,226 @@
+.canceled-booking-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Header */
+.canceled-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.canceled-booking-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Booking Container */
+.booking-container {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Booking Card */
+.booking-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.booking-id-badge {
+  display: inline-flex;
+  background: hsl(210, 100%, 95%);
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.booking-id-badge.canceled {
+  background: hsl(220, 10%, 95%);
+}
+
+.booking-id-badge.canceled .booking-id {
+  color: hsl(220, 10%, 40%);
+}
+
+.booking-id {
+  font-size: 14px;
+  font-weight: 700;
+  color: hsl(210, 80%, 50%);
+}
+
+/* Booking Sections */
+.booking-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0 0 8px 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--text-muted, hsl(40, 10%, 40%));
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  font-weight: 500;
+  text-align: right;
+}
+
+.provider-name {
+  color: hsl(210, 80%, 50%);
+  font-weight: 600;
+}
+
+.booking-divider {
+  height: 1px;
+  background: hsl(40, 10%, 92%);
+  margin: 16px 0;
+}
+
+/* Cancellation Box */
+.cancellation-box {
+  background: hsl(220, 10%, 97%);
+  border: 1px solid hsl(220, 10%, 90%);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cancellation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cancellation-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(220, 10%, 40%);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cancellation-reason {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cancellation-footer {
+  padding-top: 8px;
+  border-top: 1px solid hsl(220, 10%, 92%);
+}
+
+.cancellation-from {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(220, 10%, 35%);
+}
+
+/* Request Again Button */
+.btn-request-again {
+  width: 100%;
+  height: 48px;
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-request-again:hover {
+  background: hsl(25, 85%, 50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-request-again:active {
+  background: hsl(25, 85%, 45%);
+  transform: scale(0.98);
+}

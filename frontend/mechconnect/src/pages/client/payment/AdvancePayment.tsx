@@ -1,12 +1,12 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
-import './ClientPayment.css';
+import './AdvancePayment.css';
 
-const ClientPayment: React.FC = () => {
+const AdvancePayment: React.FC = () => {
   const history = useHistory();
   const [proofImage, setProofImage] = useState<string | null>(null);
-  const [remainingAmount, setRemainingAmount] = useState<string>('');
+  const [advanceAmount, setAdvanceAmount] = useState<string>('');
 
   const goBack = () => history.goBack();
 
@@ -22,19 +22,19 @@ const ClientPayment: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    console.log('Submit payment');
+    console.log('Submit advance payment');
     history.goBack();
   };
 
   return (
     <IonPage>
-      <IonContent className="client-payment-content">
+      <IonContent className="advance-payment-content">
         {/* Header */}
-        <div className="client-payment-header">
+        <div className="advance-payment-header">
           <button className="back-button" onClick={goBack}>
             <span className="material-icons-round">arrow_back</span>
           </button>
-          <h1 className="page-title">Complete Payment</h1>
+          <h1 className="page-title">Advance Payment</h1>
           <div className="header-spacer"></div>
         </div>
 
@@ -61,17 +61,17 @@ const ClientPayment: React.FC = () => {
               <span className="detail-value price-value">₱2,500.00</span>
             </div>
 
-            {/* Remaining Balance to Pay */}
+            {/* Amount to Pay in Advance */}
             <div className="amount-input-section">
-              <label className="input-label">Remaining Balance to Pay:</label>
+              <label className="input-label">Amount to Pay in Advance:</label>
               <div className="input-wrapper">
                 <span className="currency-symbol">₱</span>
                 <input
                   type="number"
                   className="amount-input"
                   placeholder="0.00"
-                  value={remainingAmount}
-                  onChange={(e) => setRemainingAmount(e.target.value)}
+                  value={advanceAmount}
+                  onChange={(e) => setAdvanceAmount(e.target.value)}
                   min="0"
                   step="0.01"
                 />
@@ -124,7 +124,7 @@ const ClientPayment: React.FC = () => {
           {/* Submit Button */}
           <button className="btn-submit-payment" onClick={handleSubmit}>
             <span className="material-icons-round icon-sm">check_circle</span>
-            Submit Payment
+            Submit Advance Payment
           </button>
         </div>
       </IonContent>
@@ -132,4 +132,4 @@ const ClientPayment: React.FC = () => {
   );
 };
 
-export default ClientPayment;
+export default AdvancePayment;

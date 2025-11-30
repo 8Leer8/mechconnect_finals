@@ -1,0 +1,492 @@
+.custom-request-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Header */
+.custom-request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.custom-request-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Request Container */
+.request-container {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Request Card */
+.request-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: visible;
+}
+
+/* Form Sections */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: visible;
+  position: relative;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border, hsl(40, 15%, 85%));
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  background: white;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  box-shadow: 0 0 0 3px var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+.form-textarea::placeholder {
+  color: hsl(40, 10%, 60%);
+}
+
+/* Image Upload */
+.image-upload-box {
+  height: 160px;
+  border: 2px dashed hsl(40, 10%, 85%);
+  border-radius: 12px;
+  background: hsl(40, 25%, 97%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-upload-box:hover {
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  background: hsl(25, 85%, 98%);
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: hsl(40, 10%, 60%);
+}
+
+.upload-text {
+  font-size: 13px;
+  color: hsl(40, 10%, 50%);
+  font-weight: 500;
+}
+
+.image-preview-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Location Grid */
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.location-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border, hsl(40, 15%, 85%));
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.location-input:focus {
+  outline: none;
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  box-shadow: 0 0 0 3px var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+.location-input::placeholder {
+  color: hsl(40, 10%, 60%);
+}
+
+/* Budget Input */
+.budget-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border, hsl(40, 15%, 85%));
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.budget-input:focus {
+  outline: none;
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  box-shadow: 0 0 0 3px var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+.budget-input::placeholder {
+  color: hsl(40, 10%, 60%);
+}
+
+/* Schedule Type Buttons */
+.schedule-type-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.schedule-btn {
+  height: 48px;
+  border: 2px solid hsl(40, 10%, 92%);
+  background: white;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.schedule-btn:hover {
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  background: hsl(25, 85%, 98%);
+}
+
+.schedule-btn.active {
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+}
+
+/* Datepicker */
+.datepicker-container {
+  position: relative;
+  overflow: visible;
+}
+
+.datepicker-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 44px 0 12px;
+  border: 1px solid var(--border, hsl(40, 15%, 85%));
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.datepicker-input:focus {
+  outline: none;
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  box-shadow: 0 0 0 3px var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+.datepicker-input::placeholder {
+  color: hsl(40, 10%, 60%);
+}
+
+.datepicker-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsl(40, 10%, 50%);
+  pointer-events: none;
+}
+
+/* Calendar */
+.calendar {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid hsl(40, 10%, 92%);
+  margin-top: 8px;
+  display: none;
+  width: calc(100% - 40px);
+  max-width: 400px;
+  position: fixed;
+  z-index: 10000;
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.calendar.active {
+  display: block;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.calendar-month {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: hsl(40, 25%, 97%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: hsl(40, 10%, 50%);
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: hsl(40, 10%, 92%);
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(40, 10%, 50%);
+  padding: 8px 0;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.day {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.day:hover {
+  background: hsl(40, 25%, 97%);
+}
+
+.day.selected {
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+}
+
+.day.other-month {
+  color: hsl(40, 10%, 85%);
+  cursor: not-allowed;
+}
+
+.day.today {
+  background: hsl(40, 25%, 97%);
+  font-weight: 600;
+}
+
+.day:disabled {
+  color: hsl(40, 10%, 92%);
+  cursor: not-allowed;
+}
+
+.day:disabled:hover {
+  background: transparent;
+}
+
+/* Time Input */
+.time-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border, hsl(40, 15%, 85%));
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  box-shadow: 0 0 0 3px var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+/* Request Button */
+.btn-request {
+  width: 100%;
+  height: 52px;
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(231, 111, 34, 0.25);
+}
+
+.btn-request:hover {
+  background: hsl(25, 85%, 50%);
+  box-shadow: 0 4px 12px rgba(231, 111, 34, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-request:active {
+  background: hsl(25, 85%, 45%);
+  transform: scale(0.98);
+}
