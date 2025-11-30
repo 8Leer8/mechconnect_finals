@@ -1,16 +1,146 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import BottomNavShop from '../../../components/bottomnavshop';
 import './mechanic.css';
 
+interface MechanicData {
+  id: string;
+  name: string;
+  initials: string;
+  email: string;
+  phone: string;
+  joinedDate: string;
+  expertise: string;
+  earnings: string;
+  rating: string;
+  bookings: number;
+  experience: string;
+  status: 'Active' | 'Invited';
+}
+
+interface SummaryCardData {
+  id: string;
+  icon: string;
+  iconClass: string;
+  value: string | number;
+  label: string;
+  subtext?: string;
+}
+
 const Mechanic: React.FC = () => {
   const history = useHistory();
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState<'All' | 'Active' | 'Invited'>('All');
   const [searchQuery, setSearchQuery] = useState('');
 
   const goToNotifications = () => history.push('/shopowner/notifications');
   const goToProfile = () => history.push('/shopowner/profile');
+
+  // Sample mechanic data
+  const [mechanics] = useState<MechanicData[]>([
+    {
+      id: '1',
+      name: 'John Doe',
+      initials: 'JD',
+      email: 'john.doe@example.com',
+      phone: '+1 (555) 123-4567',
+      joinedDate: '1/15/2023',
+      expertise: 'Engine Repair',
+      earnings: '₱3,200',
+      rating: '4.9',
+      bookings: 45,
+      experience: '5 years',
+      status: 'Active'
+    }
+  ]);
+
+  const filteredMechanics = useMemo(() => {
+    return mechanics.filter((mechanic) => {
+      const matchesFilter = activeFilter === 'All' || mechanic.status === activeFilter;
+      const searchTerm = searchQuery.toLowerCase();
+      const matchesSearch =
+        mechanic.name.toLowerCase().includes(searchTerm) ||
+        mechanic.email.toLowerCase().includes(searchTerm) ||
+        mechanic.expertise.toLowerCase().includes(searchTerm);
+      return matchesFilter && matchesSearch;
+    });
+  }, [mechanics, activeFilter, searchQuery]);
+
+  const summaryStats = useMemo(() => {
+    const totalMechanics = mechanics.length;
+    const activeMechanics = mechanics.filter((m) => m.status === 'Active').length;
+    const invitedMechanics = mechanics.filter((m) => m.status === 'Invited').length;
+    const totalEarnings = mechanics.reduce((sum, m) => {
+      const earnings = parseFloat(m.earnings.replace('₱', '').replace(',', '')) || 0;
+      return sum + earnings;
+    }, 0);
+    const totalBookings = mechanics.reduce((sum, m) => sum + m.bookings, 0);
+    const avgRating =
+      mechanics.filter((m) => m.rating !== '0').reduce((sum, m, _, arr) => sum + parseFloat(m.rating) / arr.length, 0) || 0;
+
+    return {
+      totalMechanics,
+      activeMechanics,
+      invitedMechanics,
+      totalEarnings: `₱${totalEarnings.toLocaleString()}`,
+      totalBookings,
+      avgRating: avgRating.toFixed(1)
+    };
+  }, [mechanics]);
+
+  const summaryCards: SummaryCardData[] = useMemo(
+    () => [
+      {
+        id: '1',
+        icon: 'people',
+        iconClass: 'summary-icon-blue',
+        value: summaryStats.totalMechanics,
+        label: 'Total Mechanics',
+        subtext: 'This month'
+      },
+      {
+        id: '2',
+        icon: 'check_circle',
+        iconClass: 'summary-icon-green',
+        value: summaryStats.activeMechanics,
+        label: 'Active',
+        subtext: 'Currently working'
+      },
+      {
+        id: '3',
+        icon: 'person_add',
+        iconClass: 'summary-icon-purple',
+        value: summaryStats.invitedMechanics,
+        label: 'Invited',
+        subtext: 'Awaiting response'
+      },
+      {
+        id: '4',
+        icon: 'payments',
+        iconClass: 'summary-icon-orange',
+        value: summaryStats.totalEarnings,
+        label: 'Total Earnings',
+        subtext: 'This month'
+      },
+      {
+        id: '5',
+        icon: 'event',
+        iconClass: 'summary-icon-blue',
+        value: summaryStats.totalBookings,
+        label: 'Total Bookings',
+        subtext: 'All time'
+      },
+      {
+        id: '6',
+        icon: 'star',
+        iconClass: 'summary-icon-gold',
+        value: summaryStats.avgRating,
+        label: 'Avg Rating',
+        subtext: 'Customer reviews'
+      }
+    ],
+    [summaryStats]
+  );
 
   return (
     <IonPage>
@@ -24,94 +154,41 @@ const Mechanic: React.FC = () => {
             <h1 className="header-title">MechConnect</h1>
           </div>
           <div className="header-right">
-            <button 
-              className="notification-button"
-              onClick={goToNotifications}
-            >
+            <button className="notification-button" onClick={goToNotifications}>
               <span className="material-icons-round">notifications</span>
               <span className="notification-badge"></span>
             </button>
-            <button 
-              className="profile-button"
-              onClick={goToProfile}
-            >
+            <button className="profile-button" onClick={goToProfile}>
               SO
             </button>
           </div>
         </div>
 
-        {/* Mechanics Management Title */}
+        {/* Title */}
         <div className="mechanic-title-section">
           <h2 className="mechanic-title">Mechanics Management</h2>
           <p className="mechanic-subtitle">Manage your shop's mechanics, add new team members, and track performance.</p>
         </div>
 
-        {/* Summary Cards */}
+        {/* Summary cards */}
         <div className="mechanic-section">
           <div className="summary-cards">
-            <div className="summary-card">
-              <div className="summary-icon summary-icon-blue">
-                <span className="material-icons-round">people</span>
+            {summaryCards.map((card) => (
+              <div key={card.id} className="summary-card">
+                <div className={`summary-icon ${card.iconClass}`}>
+                  <span className="material-icons-round">{card.icon}</span>
+                </div>
+                <div className="summary-content">
+                  <p className="summary-number">{card.value}</p>
+                  <p className="summary-label">{card.label}</p>
+                  {card.subtext && <p className="summary-subtext">{card.subtext}</p>}
+                </div>
               </div>
-              <div className="summary-content">
-                <p className="summary-number">4</p>
-                <p className="summary-label">Total Mechanics</p>
-              </div>
-            </div>
-
-            <div className="summary-card">
-              <div className="summary-icon summary-icon-green">
-                <span className="material-icons-round">check_circle</span>
-              </div>
-              <div className="summary-content">
-                <p className="summary-number">3</p>
-                <p className="summary-label">Active</p>
-              </div>
-            </div>
-
-            <div className="summary-card">
-              <div className="summary-icon summary-icon-purple">
-                <span className="material-icons-round">person_add</span>
-              </div>
-              <div className="summary-content">
-                <p className="summary-number">1</p>
-                <p className="summary-label">Invited</p>
-              </div>
-            </div>
-
-            <div className="summary-card">
-              <div className="summary-icon summary-icon-orange">
-                <span className="material-icons-round">attach_money</span>
-              </div>
-              <div className="summary-content">
-                <p className="summary-number">₱8,400</p>
-                <p className="summary-label">Total Earnings</p>
-              </div>
-            </div>
-
-            <div className="summary-card">
-              <div className="summary-icon summary-icon-blue">
-                <span className="material-icons-round">event</span>
-              </div>
-              <div className="summary-content">
-                <p className="summary-number">115</p>
-                <p className="summary-label">Total Bookings</p>
-              </div>
-            </div>
-
-            <div className="summary-card">
-              <div className="summary-icon summary-icon-orange">
-                <span className="material-icons-round">star</span>
-              </div>
-              <div className="summary-content">
-                <p className="summary-number">4.8</p>
-                <p className="summary-label">Avg Rating</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Search and Filter Bar */}
+        {/* Search & filters */}
         <div className="mechanic-section">
           <div className="search-filter-card">
             <div className="search-container">
@@ -124,75 +201,99 @@ const Mechanic: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="filter-buttons">
-              <button
-                className={`filter-button ${activeFilter === 'All' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('All')}
-              >
-                All
-              </button>
-              <button
-                className={`filter-button ${activeFilter === 'Active' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('Active')}
-              >
-                Active
-              </button>
-              <button
-                className={`filter-button ${activeFilter === 'Invited' ? 'active' : ''}`}
-                onClick={() => setActiveFilter('Invited')}
-              >
-                Invited
+            <div className="filter-row">
+              <div className="filter-buttons">
+                <button
+                  className={`filter-button ${activeFilter === 'All' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('All')}
+                >
+                  All
+                </button>
+                <button
+                  className={`filter-button ${activeFilter === 'Active' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('Active')}
+                >
+                  Active
+                </button>
+                <button
+                  className={`filter-button ${activeFilter === 'Invited' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('Invited')}
+                >
+                  Invited
+                </button>
+              </div>
+              <button className="invite-button">
+                <span className="material-icons-round">person_add</span>
+                Invite Mechanic
               </button>
             </div>
-            <button className="invite-button">
-              <span className="material-icons-round">person_add</span>
-              Invite Mechanic
-            </button>
           </div>
         </div>
 
-        {/* Mechanic Profile Cards */}
+        {/* Mechanic list */}
         <div className="mechanic-section">
-          <div className="mechanic-profile-card">
-            <div className="mechanic-card-header">
-              <div className="mechanic-card-avatar">JD</div>
-              <div className="status-badge status-active">Active</div>
-            </div>
-            <div className="mechanic-card-info">
-              <h3 className="mechanic-card-name">John Doe</h3>
-              <p className="mechanic-card-specialty">Engine Repair</p>
-              <p className="mechanic-card-performance">45 bookings ★ 4.9</p>
-              <div className="mechanic-card-details">
-                <div className="mechanic-card-detail">
-                  <span className="material-icons-round detail-icon">email</span>
-                  <span>john.doe@example.com</span>
+          <div className="mechanics-cards-container">
+            {filteredMechanics.length ? (
+              filteredMechanics.map((mechanic) => (
+                <div key={mechanic.id} className="mechanic-profile-card">
+                  <div className="mechanic-card-header">
+                    <div className="mechanic-card-avatar">{mechanic.initials}</div>
+                    <div className={`status-badge status-${mechanic.status.toLowerCase()}`}>{mechanic.status}</div>
+                  </div>
+                  <div className="mechanic-card-info">
+                    <div className="mechanic-card-top">
+                      <div>
+                        <h3 className="mechanic-card-name">{mechanic.name}</h3>
+                        <p className="mechanic-card-specialty">{mechanic.expertise}</p>
+                        <p className="mechanic-card-performance">
+                          {mechanic.bookings} bookings {mechanic.rating !== '0' && `• ★ ${mechanic.rating}`}
+                        </p>
+                      </div>
+                      <div className="mechanic-card-meta">
+                        <p className="meta-label">Experience</p>
+                        <p className="meta-value">{mechanic.experience}</p>
+                        <p className="meta-label">Bookings</p>
+                        <p className="meta-value">{mechanic.bookings}</p>
+                      </div>
+                    </div>
+                    <div className="mechanic-card-details">
+                      <div className="mechanic-card-detail">
+                        <span className="material-icons-round detail-icon">email</span>
+                        <span>{mechanic.email}</span>
+                      </div>
+                      <div className="mechanic-card-detail">
+                        <span className="material-icons-round detail-icon">phone</span>
+                        <span>{mechanic.phone}</span>
+                      </div>
+                      <div className="mechanic-card-detail">
+                        <span className="material-icons-round detail-icon">calendar_today</span>
+                        <span>Joined: {mechanic.joinedDate}</span>
+                      </div>
+                    </div>
+                    <div className="mechanic-card-revenue">
+                      <p className="mechanic-revenue-amount">{mechanic.earnings}</p>
+                      <p className="mechanic-revenue-label">Earnings</p>
+                    </div>
+                    <button className="remove-button">
+                      <span className="material-icons-round">delete</span>
+                      Remove from Shop
+                    </button>
+                  </div>
                 </div>
-                <div className="mechanic-card-detail">
-                  <span className="material-icons-round detail-icon">phone</span>
-                  <span>+1 (555) 123-4567</span>
-                </div>
-                <div className="mechanic-card-detail">
-                  <span className="material-icons-round detail-icon">calendar_today</span>
-                  <span>Joined: 1/15/2023</span>
-                </div>
+              ))
+            ) : (
+              <div className="no-mechanics-message">
+                <p>No mechanics found matching your search criteria.</p>
               </div>
-              <div className="mechanic-card-revenue">
-                <p className="mechanic-revenue-amount">₱3,200</p>
-                <p className="mechanic-revenue-label">Earnings</p>
-              </div>
-              <button className="remove-button">
-                <span className="material-icons-round">delete</span>
-                Remove from Shop
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </IonContent>
-
       <BottomNavShop />
     </IonPage>
   );
 };
 
 export default Mechanic;
+
 

@@ -132,7 +132,7 @@
 }
 
 .mechanic-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: hsl(25, 85%, 55%);
   margin: 0 0 8px 0;
@@ -140,7 +140,6 @@
 
 .mechanic-subtitle {
   font-size: 14px;
-  font-weight: 400;
   color: #64748b;
   margin: 0;
 }
@@ -151,36 +150,15 @@
 }
 
 .mechanic-section:last-child {
-  padding-bottom: 100px;
+  padding-bottom: 120px;
 }
 
-/* Summary Cards - Horizontal Scrollable */
+/* Summary cards */
 .summary-cards {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 8px;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
-  -webkit-overflow-scrolling: touch;
-}
-
-.summary-cards::-webkit-scrollbar {
-  height: 4px;
-}
-
-.summary-cards::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.summary-cards::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 2px;
-}
-
-.summary-cards::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  width: 100%;
 }
 
 .summary-card {
@@ -190,38 +168,47 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 140px;
-  flex-shrink: 0;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .summary-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.summary-icon .material-icons-round {
+  font-size: 24px;
+  color: white;
+}
+
 .summary-icon-blue {
-  background: hsl(210, 80%, 96%);
-  color: hsl(210, 80%, 50%);
+  background: hsl(210, 80%, 50%);
 }
 
 .summary-icon-green {
-  background: hsl(140, 60%, 96%);
-  color: hsl(140, 60%, 45%);
+  background: hsl(140, 60%, 45%);
 }
 
 .summary-icon-orange {
-  background: hsl(25, 85%, 95%);
-  color: hsl(25, 85%, 55%);
+  background: hsl(25, 85%, 55%);
 }
 
 .summary-icon-purple {
-  background: #f3e8ff;
-  color: #9333ea;
+  background: #a855f7;
+}
+
+.summary-icon-gold {
+  background: #fbbf24;
 }
 
 .summary-content {
@@ -231,7 +218,7 @@
 }
 
 .summary-number {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
   color: hsl(25, 15%, 25%);
   margin: 0;
@@ -239,12 +226,17 @@
 
 .summary-label {
   font-size: 12px;
-  font-weight: 400;
   color: #64748b;
   margin: 0;
 }
 
-/* Search and Filter Bar */
+.summary-subtext {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Search & Filters */
 .search-filter-card {
   background: white;
   border-radius: 16px;
@@ -253,6 +245,16 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .search-container {
@@ -265,7 +267,7 @@
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748b;
+  color: #94a3b8;
   pointer-events: none;
 }
 
@@ -287,7 +289,7 @@
 
 .search-input:focus {
   border-color: hsl(25, 85%, 55%);
-  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.15);
 }
 
 .filter-buttons {
@@ -333,7 +335,7 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
-  width: 100%;
+  white-space: nowrap;
 }
 
 .invite-button:hover {
@@ -345,18 +347,30 @@
   font-size: 18px;
 }
 
-/* Mechanic Profile Card */
+/* Mechanic cards */
+.mechanics-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .mechanic-profile-card {
   background: white;
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.mechanic-profile-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .mechanic-card-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
 }
 
@@ -371,7 +385,24 @@
   justify-content: center;
   font-size: 20px;
   font-weight: 600;
-  flex-shrink: 0;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background: hsl(140, 60%, 95%);
+  color: hsl(140, 60%, 35%);
+}
+
+.status-invited {
+  background: #f3e8ff;
+  color: #9333ea;
 }
 
 .mechanic-card-info {
@@ -380,63 +411,82 @@
   gap: 12px;
 }
 
+.mechanic-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .mechanic-card-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: hsl(25, 15%, 25%);
   margin: 0;
 }
 
 .mechanic-card-specialty {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 13px;
   color: #64748b;
   margin: 0;
 }
 
 .mechanic-card-performance {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 13px;
   color: #94a3b8;
   margin: 0;
+}
+
+.mechanic-card-meta {
+  text-align: right;
+  min-width: 120px;
+}
+
+.meta-label {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 8px 0;
 }
 
 .mechanic-card-details {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .mechanic-card-detail {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  color: #64748b;
+  font-size: 13px;
+  color: #475569;
 }
 
 .detail-icon {
-  font-size: 16px;
+  font-size: 18px;
   color: #94a3b8;
 }
 
 .mechanic-card-revenue {
   text-align: left;
-  margin-top: 8px;
 }
 
 .mechanic-revenue-amount {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: hsl(25, 15%, 25%);
-  margin: 0 0 4px 0;
+  margin: 0;
 }
 
 .mechanic-revenue-label {
   font-size: 12px;
-  font-weight: 400;
-  color: #64748b;
+  color: #94a3b8;
   margin: 0;
 }
 
@@ -455,48 +505,73 @@
   gap: 8px;
   transition: all 0.2s ease;
   margin-top: 12px;
-  width: 100%;
+  width: fit-content;
 }
 
 .remove-button:hover {
   background: #fecaca;
 }
 
-.remove-button .material-icons-round {
-  font-size: 18px;
+.no-mechanics-message {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  color: #94a3b8;
 }
 
-.status-badge {
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
+/* Responsive layout */
+@media (min-width: 768px) {
+  .mechanic-section {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+  }
+
+  .mechanics-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 20px;
+  }
+
+  .search-filter-card {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
 }
 
-.status-active {
-  background: hsl(140, 60%, 96%);
-  color: hsl(140, 60%, 45%);
+@media (max-width: 767px) {
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .invite-button {
+    width: 100%;
+  }
 }
 
-.status-invited {
-  background: #f3e8ff;
-  color: #9333ea;
-}
+@media (max-width: 480px) {
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
 
-/* Responsive Design */
-@media (max-width: 400px) {
   .summary-card {
     padding: 16px;
-    min-width: 120px;
   }
 
   .search-filter-card {
     padding: 16px;
-  }
-
-  .filter-buttons {
-    flex-wrap: wrap;
   }
 
   .mechanic-profile-card {

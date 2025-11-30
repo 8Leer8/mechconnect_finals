@@ -7,7 +7,7 @@ const BottomNavShop: React.FC = () => {
   const location = useLocation();
 
   const goToDashboard = () => history.push('/shopowner/dashboard');
-  const goToBookings = () => history.push('/shopowner/bookings');
+  const goToBookings = () => history.push('/shopowner/manage-bookings');
   const goToMechanics = () => history.push('/shopowner/mechanics');
   const goToShop = () => history.push('/shopowner/shop');
   const goToRevenue = () => history.push('/shopowner/revenue');
@@ -20,7 +20,7 @@ const BottomNavShop: React.FC = () => {
         <span className="material-icons-round">dashboard</span>
         <span>Dashboard</span>
       </button>
-      <button className={`nav-item-shop ${isActive('/shopowner/bookings') ? 'active' : ''}`} onClick={goToBookings}>
+      <button className={`nav-item-shop ${isActive('/shopowner/manage-bookings') ? 'active' : ''}`} onClick={goToBookings}>
         <span className="material-icons-round">event</span>
         <span>Bookings</span>
       </button>
