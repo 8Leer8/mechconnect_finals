@@ -1,0 +1,195 @@
+.rejected-request-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Header */
+.rejected-request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.rejected-request-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Request Container */
+.request-container {
+  padding: 0 20px;
+}
+
+/* Request Card */
+.request-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.request-id-badge {
+  display: inline-flex;
+  background: hsl(210, 100%, 95%);
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.request-id-badge.rejected {
+  background: hsl(0, 70%, 97%);
+}
+
+.request-id-badge.rejected .request-id {
+  color: hsl(0, 70%, 45%);
+}
+
+.request-id {
+  font-size: 14px;
+  font-weight: 700;
+  color: hsl(210, 80%, 50%);
+}
+
+/* Request Sections */
+.request-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0 0 8px 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--text-muted, hsl(40, 10%, 40%));
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  font-weight: 500;
+  text-align: right;
+}
+
+.provider-name {
+  color: hsl(210, 80%, 50%);
+  font-weight: 600;
+}
+
+.request-divider {
+  height: 1px;
+  background: hsl(40, 10%, 92%);
+  margin: 16px 0;
+}
+
+/* Rejection Box */
+.rejection-box {
+  background: hsl(0, 70%, 97%);
+  border: 1px solid hsl(0, 70%, 90%);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rejection-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rejection-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(0, 70%, 45%);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rejection-reason {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  line-height: 1.5;
+  margin: 0;
+}
+
+.rejection-footer {
+  padding-top: 8px;
+  border-top: 1px solid hsl(0, 70%, 92%);
+}
+
+.rejection-from {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(0, 70%, 40%);
+}

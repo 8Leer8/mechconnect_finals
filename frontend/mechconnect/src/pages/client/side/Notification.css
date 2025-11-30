@@ -1,0 +1,55 @@
+/* Notification Styles */
+.notification-content {
+  --background: hsl(40, 20%, 98%);
+}
+
+/* Header */
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  z-index: 101;
+}
+
+.back-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.back-button .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  color: hsl(25, 15%, 25%);
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Notification Container */
+.notification-container {
+  padding: 0 20px 100px;
+}

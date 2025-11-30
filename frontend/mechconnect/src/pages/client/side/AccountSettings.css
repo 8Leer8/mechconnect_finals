@@ -1,0 +1,352 @@
+.account-settings-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+/* Header */
+.account-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.account-settings-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Container */
+.account-settings-container {
+  padding: 0 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Profile Picture Section */
+.profile-picture-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.profile-picture-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-picture-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  border: 3px solid white;
+}
+
+.edit-picture-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.edit-picture-button:active {
+  transform: scale(0.95);
+}
+
+.edit-picture-button .material-icons-round {
+  font-size: 18px;
+}
+
+.profile-username {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+/* Form Section */
+.form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted, hsl(40, 10%, 40%));
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border, hsl(40, 15%, 85%));
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  box-shadow: 0 0 0 3px var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 14px;
+  height: 44px;
+  border-radius: 8px;
+  padding: 0 20px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-primary {
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover, hsl(25, 85%, 50%));
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* List Section */
+.list-section {
+  background: white;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 16px 20px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* List Item Button */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  position: relative;
+}
+
+.list-item:hover {
+  background-color: hsl(40, 20%, 96%);
+}
+
+.list-item:active {
+  background-color: #f1f5f9;
+}
+
+/* Icon Container */
+.item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-primary {
+  background: hsl(25, 85%, 95%);
+  color: hsl(25, 85%, 55%);
+}
+
+.icon-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Content */
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 2px;
+}
+
+.item-description {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Arrow */
+.item-arrow {
+  color: #94a3b8;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Danger Section */
+.danger-section {
+  border: 2px solid #fee2e2;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .account-settings-container {
+    padding: 0 16px 16px 16px;
+  }
+  
+  .form-section {
+    padding: 16px;
+  }
+  
+  .profile-picture {
+    width: 80px;
+    height: 80px;
+    font-size: 28px;
+  }
+  
+  .edit-picture-button {
+    width: 32px;
+    height: 32px;
+  }
+}

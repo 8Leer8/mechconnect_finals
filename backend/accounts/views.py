@@ -16,7 +16,7 @@ from .models import (
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, AccountSerializer,
     PasswordChangeSerializer, PasswordResetRequestSerializer, 
-    PasswordResetConfirmSerializer, NotificationSerializer
+    PasswordResetConfirmSerializer, NotificationSerializer, MechanicDiscoverySerializer
 )
 
 
@@ -445,6 +445,76 @@ def mark_notification_read(request, notification_id):
     except Exception as e:
         return Response({
             'error': 'Failed to mark notification as read',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def discover_mechanics(request):
+    """
+    Get all available mechanics for discovery page
+    """
+    try:
+        # Get all accounts with mechanic role
+        mechanic_accounts = Account.objects.filter(
+            roles__account_role=AccountRole.ROLE_MECHANIC,
+            is_active=True,
+            is_verified=True
+        ).select_related(
+            'mechanic_profile', 'address'
+        ).prefetch_related('roles').order_by('-mechanic_profile__average_rating')
+        
+        # Apply filters if provided
+        city = request.GET.get('city')
+        if city:
+            mechanic_accounts = mechanic_accounts.filter(
+                address__city_municipality__icontains=city
+            )
+        
+        ranking = request.GET.get('ranking')
+        if ranking:
+            mechanic_accounts = mechanic_accounts.filter(
+                mechanic_profile__ranking=ranking
+            )
+        
+        status_filter = request.GET.get('status')
+        if status_filter:
+            mechanic_accounts = mechanic_accounts.filter(
+                mechanic_profile__status=status_filter
+            )
+        
+        # Check if any mechanics found
+        if not mechanic_accounts.exists():
+            return Response({
+                'message': 'No mechanic available',
+                'mechanics': [],
+                'total_count': 0
+            }, status=status.HTTP_200_OK)
+        
+        # Pagination
+        page_size = int(request.GET.get('page_size', 10))
+        page = int(request.GET.get('page', 1))
+        start = (page - 1) * page_size
+        end = start + page_size
+        
+        total_count = mechanic_accounts.count()
+        mechanics_page = mechanic_accounts[start:end]
+        
+        serializer = MechanicDiscoverySerializer(mechanics_page, many=True)
+        
+        return Response({
+            'message': 'Mechanics found' if total_count > 0 else 'No mechanic available',
+            'mechanics': serializer.data,
+            'total_count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total_count + page_size - 1) // page_size
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch mechanics',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

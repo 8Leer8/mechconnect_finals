@@ -1,0 +1,440 @@
+@font-face {
+  font-family: 'Material Icons Round';
+  src: url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+}
+
+.service-detail-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+}
+
+.service-detail-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--bg, hsl(40, 20%, 98%));
+  z-index: 100;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 101;
+  position: relative;
+}
+
+.back-button .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Service Image */
+.service-image {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-type-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary, hsl(25, 85%, 55%));
+}
+
+/* Service Info Section */
+.service-info-section {
+  padding: 0 16px 80px;
+}
+
+.service-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0 0 8px 0;
+}
+
+.service-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary, hsl(25, 85%, 55%));
+  margin-bottom: 24px;
+}
+
+/* Section Blocks */
+.section-block {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0 0 12px 0;
+}
+
+.service-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary, hsl(25, 10%, 45%));
+  margin: 0;
+}
+
+/* Includes List */
+.includes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.include-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.check-icon {
+  font-family: 'Material Icons Round';
+  font-size: 20px;
+  color: #10b981;
+}
+
+.include-text {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+/* Add-ons List */
+.addons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addon-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid hsl(40, 15%, 90%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addon-item.selected {
+  border-color: var(--primary, hsl(25, 85%, 55%));
+  background: hsl(25, 100%, 98%);
+}
+
+.addon-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid hsl(40, 15%, 85%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.addon-item.selected .addon-checkbox {
+  background: var(--primary, hsl(25, 85%, 55%));
+  border-color: var(--primary, hsl(25, 85%, 55%));
+}
+
+.addon-checkbox .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 18px;
+  color: white;
+}
+
+.addon-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addon-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.addon-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary, hsl(25, 85%, 55%));
+}
+
+/* Provider Card */
+.provider-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.provider-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary, hsl(25, 85%, 55%)), hsl(35, 85%, 60%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.provider-details {
+  flex: 1;
+}
+
+.provider-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin-bottom: 4px;
+}
+
+.provider-type {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary, hsl(25, 10%, 45%));
+}
+
+.type-icon {
+  font-family: 'Material Icons Round';
+  font-size: 16px;
+}
+
+.arrow-icon {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  color: var(--text-secondary, hsl(25, 10%, 45%));
+}
+
+/* Mechanics List */
+.mechanics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mechanic-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.mechanic-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.mechanic-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 8px;
+  background: hsl(25, 100%, 98%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-wrapper .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 24px;
+  color: var(--primary, hsl(25, 85%, 55%));
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary, hsl(25, 10%, 45%));
+}
+
+/* Review Cards */
+.review-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.reviewer-info {
+  display: flex;
+  gap: 12px;
+}
+
+.reviewer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary, hsl(25, 85%, 55%)), hsl(35, 85%, 60%));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.reviewer-details {
+  flex: 1;
+}
+
+.reviewer-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin-bottom: 4px;
+}
+
+.review-rating {
+  display: flex;
+  gap: 2px;
+}
+
+.review-rating .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 14px;
+}
+
+.review-rating .star {
+  color: #fbbf24;
+}
+
+.review-rating .star-outline {
+  color: #d1d5db;
+}
+
+.review-date {
+  font-size: 12px;
+  color: var(--text-secondary, hsl(25, 10%, 45%));
+}
+
+.review-comment {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary, hsl(25, 10%, 45%));
+  margin: 0;
+}
+
+/* Book Now Button */
+.book-now-button {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary, hsl(25, 85%, 55%));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 24px;
+}
+
+.book-now-button .material-icons-round {
+  font-family: 'Material Icons Round';
+  font-size: 20px;
+}
+

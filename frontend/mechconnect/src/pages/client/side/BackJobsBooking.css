@@ -1,0 +1,316 @@
+.backjobs-booking-content {
+  --background: var(--bg, hsl(40, 20%, 98%));
+  padding-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Header */
+.backjobs-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.backjobs-booking-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Booking Container */
+.booking-container {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Booking Card */
+.booking-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.booking-id-badge {
+  display: inline-flex;
+  background: hsl(210, 100%, 95%);
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.booking-id-badge.backjobs {
+  background: hsl(45, 100%, 95%);
+}
+
+.booking-id-badge.backjobs .booking-id {
+  color: hsl(45, 100%, 30%);
+}
+
+.booking-id {
+  font-size: 14px;
+  font-weight: 700;
+  color: hsl(210, 80%, 50%);
+}
+
+/* Booking Sections */
+.booking-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0 0 8px 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--text-muted, hsl(40, 10%, 40%));
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  font-weight: 500;
+  text-align: right;
+}
+
+.provider-name {
+  color: hsl(210, 80%, 50%);
+  font-weight: 600;
+}
+
+.service-item {
+  padding: 12px;
+  background: hsl(40, 25%, 97%);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary, hsl(25, 85%, 55%));
+}
+
+.service-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.booking-divider {
+  height: 1px;
+  background: hsl(40, 10%, 92%);
+  margin: 16px 0;
+}
+
+/* Back Job Section */
+.backjob-section {
+  padding: 16px;
+  background: hsl(45, 100%, 97%);
+  border: 1px solid hsl(45, 100%, 88%);
+  border-radius: 12px;
+}
+
+.backjob-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: hsl(45, 100%, 92%);
+  color: hsl(45, 100%, 25%);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.backjob-note {
+  font-size: 13px;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Accordion */
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: hsl(40, 25%, 97%);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.accordion-header:hover {
+  background: hsl(40, 25%, 95%);
+}
+
+.accordion-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.accordion-icon {
+  transition: transform 0.3s ease;
+  color: var(--text-muted, hsl(40, 10%, 40%));
+}
+
+.accordion-icon.open {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  margin-top: 12px;
+  padding: 16px;
+  background: hsl(40, 25%, 98%);
+  border-radius: 8px;
+  border: 1px solid hsl(40, 10%, 92%);
+}
+
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.location-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.location-label {
+  font-size: 11px;
+  color: var(--text-muted, hsl(40, 10%, 40%));
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.location-value {
+  font-size: 14px;
+  color: var(--text, hsl(25, 15%, 25%));
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-cancel,
+.btn-complete {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: hsl(0, 70%, 97%);
+  color: hsl(0, 70%, 45%);
+  border: 1px solid hsl(0, 70%, 90%);
+}
+
+.btn-cancel:hover {
+  background: hsl(0, 70%, 95%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cancel:active {
+  background: hsl(0, 70%, 92%);
+  transform: scale(0.98);
+}
+
+.btn-complete {
+  background: hsl(140, 60%, 95%);
+  color: hsl(140, 60%, 35%);
+  border: 1px solid hsl(140, 60%, 85%);
+}
+
+.btn-complete:hover {
+  background: hsl(140, 60%, 92%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-complete:active {
+  background: hsl(140, 60%, 88%);
+  transform: scale(0.98);
+}
