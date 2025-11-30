@@ -468,3 +468,182 @@
   font-size: 12px;
   color: #64748b;
 }
+
+/* Loading and Error States */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f1f5f9;
+  border-top: 3px solid hsl(25, 85%, 55%);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-container h3 {
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 8px;
+}
+
+.error-container p {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.retry-button {
+  padding: 12px 24px;
+  background: hsl(25, 85%, 55%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background: hsl(25, 85%, 50%);
+}
+
+/* Contact Info */
+.contact-info {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.contact-icon {
+  color: #64748b;
+  font-size: 18px;
+}
+
+.contact-text {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Mechanics Section */
+.mechanics-section {
+  margin-bottom: 24px;
+}
+
+.mechanics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mechanic-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mechanic-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.mechanic-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mechanic-info {
+  flex: 1;
+}
+
+.mechanic-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 2px;
+}
+
+.mechanic-specialties {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.arrow-icon {
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+/* Assigned Mechanics */
+.assigned-mechanics {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+
+.mechanics-label {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.mechanics-names {
+  color: hsl(25, 85%, 55%);
+}
+
+/* No Services */
+.no-services {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+.no-services-icon {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.no-services p {
+  margin: 0;
+  font-size: 14px;
+}

@@ -474,6 +474,8 @@
 
 .profile-content {
   padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-name {
@@ -481,17 +483,27 @@
   font-weight: 600;
   color: #0f172a;
   margin-bottom: 8px;
+  display: block;
+  position: relative;
 }
 
 .service-type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 8px;
+  display: block !important;
+  position: static !important;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  margin-top: 4px;
+  max-width: 100%;
+  word-wrap: break-word;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  float: none !important;
 }
 
 .service-type-badge.service-independent {

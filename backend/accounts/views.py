@@ -540,6 +540,10 @@ def mechanic_detail(request, mechanic_id):
         # Get mechanic profile
         mechanic_profile = mechanic_account.mechanic_profile
         
+        # Prepare full name early since it's used in multiple places
+        full_name_parts = [mechanic_account.firstname, mechanic_account.middlename, mechanic_account.lastname]
+        full_name = ' '.join(part for part in full_name_parts if part)
+        
         # Get location from address
         location = "Location not specified"
         if hasattr(mechanic_account, 'address') and mechanic_account.address:
@@ -620,10 +624,6 @@ def mechanic_detail(request, mechanic_id):
                     'average_rating': '4.5',  # Calculate this based on actual ratings later
                     'total_bookings': 50,  # Calculate this based on actual bookings later
                 })
-        
-        # Build full name from firstname, lastname, middlename
-        full_name_parts = [mechanic_account.firstname, mechanic_account.middlename, mechanic_account.lastname]
-        full_name = ' '.join(part for part in full_name_parts if part)
         
         # Prepare response data
         mechanic_data = {

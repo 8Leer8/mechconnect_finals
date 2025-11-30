@@ -94,6 +94,25 @@ const Discover: React.FC = () => {
   const goToShopDetail = (id: string | number) => history.push(`/client/shop-detail/${id}`);
   const goToIndependentMechanicServiceDetail = (id: string | number) => history.push(`/client/service-detail/${id}`);
   const goToShopServiceDetail = (id: string | number) => history.push(`/client/service-detail/${id}`);
+
+  // Smart service redirect - determines if service belongs to shop or mechanic
+  const handleServiceCardClick = async (serviceId: string | number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/services/provider/${serviceId}/`);
+      const data = await response.json();
+      
+      if (response.ok && data.redirect_url) {
+        history.push(data.redirect_url);
+      } else {
+        // Fallback to generic service detail page
+        goToServiceDetail(serviceId);
+      }
+    } catch (error) {
+      console.error('Error fetching service provider info:', error);
+      // Fallback to generic service detail page
+      goToServiceDetail(serviceId);
+    }
+  };
   const goToShopProfile = (id: string | number) => history.push(`/client/shop-detail/${id}`);
 
   // Fetch shops from API
@@ -238,7 +257,7 @@ const Discover: React.FC = () => {
   
   // Dynamic click handlers
   const handleServiceClick = (serviceId: number) => {
-    goToServiceDetail(serviceId);
+    handleServiceCardClick(serviceId);
   };
 
   const handleShopClick = (shopId: number) => {

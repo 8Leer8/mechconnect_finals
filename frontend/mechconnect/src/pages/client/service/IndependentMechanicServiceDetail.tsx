@@ -1,15 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import './IndependentMechanicServiceDetail.css';
+
+interface RouteParams {
+  id: string;
+}
+
+interface ServiceData {
+  service_id: number;
+  service_name: string;
+  description: string;
+  price: number;
+  service_banner: string;
+  category: string;
+  provider_type: string;
+  provider_id: number;
+  provider_name: string;
+  provider_contact?: string;
+  provider_bio?: string;
+  created_at: string;
+}
 
 const IndependentMechanicServiceDetail: React.FC = () => {
   const history = useHistory();
+  const { id } = useParams<RouteParams>();
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  const [serviceData, setServiceData] = useState<ServiceData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const goBack = () => history.goBack();
-  const goToMechanicProfile = () => history.push('/client/mechanic-profile/1');
+  const goToMechanicProfile = () => {
+    if (serviceData) {
+      history.push(`/client/mechanic-detail/${serviceData.provider_id}`);
+    }
+  };
   const handleBookNow = () => history.push('/client/direct-request');
+
+  useEffect(() => {
+    fetchServiceDetails();
+  }, [id]);
+
+  const fetchServiceDetails = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/services/detail/${id}/`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setServiceData(data);
+      } else {
+        setError(data.error || 'Failed to fetch service details');
+      }
+    } catch (err) {
+      console.error('Error fetching service details:', err);
+      setError('Network error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddonClick = (addonId: string) => {
     setSelectedAddons((prev) => 
@@ -18,6 +67,52 @@ const IndependentMechanicServiceDetail: React.FC = () => {
         : [...prev, addonId]
     );
   };
+
+  if (loading) {
+    return (
+      <IonPage>
+        <IonContent className="service-detail-content">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading service details...</p>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (error) {
+    return (
+      <IonPage>
+        <IonContent className="service-detail-content">
+          <div className="error-container">
+            <div className="error-icon">⚠️</div>
+            <h3>Error Loading Service</h3>
+            <p>{error}</p>
+            <button className="retry-button" onClick={() => window.location.reload()}>
+              Try Again
+            </button>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (!serviceData) {
+    return (
+      <IonPage>
+        <IonContent className="service-detail-content">
+          <div className="error-container">
+            <h3>Service Not Found</h3>
+            <p>The service you're looking for doesn't exist.</p>
+            <button className="retry-button" onClick={goBack}>
+              Go Back
+            </button>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
 
   return (
     <IonPage>
@@ -35,8 +130,8 @@ const IndependentMechanicServiceDetail: React.FC = () => {
         </div>
 
         <div className="service-info-section">
-          <h2 className="service-name">Car Engine Repair</h2>
-          <div className="service-price">₱1,200</div>
+          <h2 className="service-name">{serviceData.service_name}</h2>
+          <div className="service-price">₱{serviceData.price?.toLocaleString()}</div>
 
           <div className="section-block">
             <h3 className="section-title">Description</h3>
@@ -139,7 +234,7 @@ const IndependentMechanicServiceDetail: React.FC = () => {
             <div className="provider-card" onClick={goToMechanicProfile}>
               <div className="provider-avatar">MJ</div>
               <div className="provider-details">
-                <div className="provider-name">Mike Johnson</div>
+                <div className="provider-name">{serviceData.provider_name}</div>
                 <div className="provider-type">
                   <span className="material-icons-round type-icon">person</span>
                   Independent Mechanic

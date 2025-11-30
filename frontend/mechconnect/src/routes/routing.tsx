@@ -13,6 +13,9 @@ import Booking from '../pages/client/main/Booking';
 import Discover from '../pages/client/main/DIscover';
 import Profile from '../pages/client/main/Profile';
 import IndependentMechanicProfile from '../pages/client/mechanic/IndependentMechanicProfile';
+import ShopProfile from '../pages/client/shop/ShopProfile';
+import IndependentMechanicServiceDetail from '../pages/client/service/IndependentMechanicServiceDetail';
+import ShopServiceDetail from '../pages/client/service/ShopServiceDetail';
 
 // Shop Owner Pages
 import Dashboard from '../pages/shopowner/main/dashboard';
@@ -32,6 +35,9 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/client/discover" component={Discover} />
       <Route exact path="/client/profile" component={Profile} />
       <Route exact path="/client/mechanic-detail/:id" component={IndependentMechanicProfile} />
+      <Route exact path="/client/shop-detail/:id" component={ShopProfile} />
+      <Route exact path="/client/service/independentMechanicService/:id" component={IndependentMechanicServiceDetail} />
+      <Route exact path="/client/service/shopServiceDetail/:id" component={ShopServiceDetail} />
       <Route exact path="/shopowner/dashboard" component={Dashboard} />
       <Route exact path="/shopowner/mechanics" component={Mechanic} />
       <Route exact path="/shopowner/manage-bookings" component={ManageBooking} />
