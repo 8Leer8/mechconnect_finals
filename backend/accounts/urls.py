@@ -26,6 +26,7 @@ urlpatterns = [
     
     # Discovery
     path('discover/mechanics/', views.discover_mechanics, name='discover_mechanics'),
+    path('mechanic/<int:mechanic_id>/', views.mechanic_detail, name='mechanic_detail'),
     
     # Health check
     path('health/', views.health_check, name='health_check'),

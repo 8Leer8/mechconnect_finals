@@ -528,3 +528,141 @@
   font-size: 12px;
   color: #64748b;
 }
+
+/* Profile avatar image styles */
+.profile-picture img,
+.provider-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Loading and Error States */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+}
+
+.loading-message,
+.error-message {
+  font-size: 16px;
+  font-weight: 500;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #dc2626;
+}
+
+.retry-button {
+  background: var(--primary, hsl(25, 85%, 55%));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background: var(--primary-dark, hsl(25, 85%, 45%));
+  transform: translateY(-1px);
+}
+
+.no-services-message {
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Shop Info Section */
+.shop-info-section {
+  margin-bottom: 24px;
+}
+
+.shop-info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.shop-info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary, hsl(25, 85%, 55%));
+}
+
+.shop-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.shop-details {
+  flex: 1;
+}
+
+.shop-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+  margin-bottom: 4px;
+}
+
+.shop-description {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.visit-shop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary, hsl(25, 85%, 55%));
+}
+
+.visit-shop .material-icons-round {
+  font-size: 16px;
+}
+
+/* Services Description */
+.services-description {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+  margin-top: 8px;
+}
