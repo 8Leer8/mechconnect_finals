@@ -1,27 +1,141 @@
 import { useState } from 'react';
-import { IonContent, IonPage, IonInput, IonButton, IonText } from '@ionic/react';
+import { IonContent, IonPage, IonInput, IonButton, IonText, IonLoading, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import './Login.css';
+
+// API Configuration
+const API_BASE_URL = 'http://localhost:8000/api/accounts';
 
 const ForgotPassword: React.FC = () => {
   const history = useHistory();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
-  const [code1, setCode1] = useState('');
-  const [code2, setCode2] = useState('');
-  const [code3, setCode3] = useState('');
-  const [code4, setCode4] = useState('');
+  const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
 
-  const handleNext = () => {
-    if (step < 3) setStep(step + 1);
+  const handleNext = async () => {
+    if (step === 1) {
+      // Request password reset
+      if (!email) {
+        setToastMessage('Please enter your email address');
+        setToastColor('danger');
+        setShowToast(true);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/password/reset/request/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setToastMessage('Password reset instructions sent to your email!');
+          setToastColor('success');
+          setShowToast(true);
+          
+          // For development, the token is returned in response
+          if (data.reset_token) {
+            setResetToken(data.reset_token);
+          }
+          
+          setTimeout(() => {
+            setStep(2);
+          }, 1500);
+        } else {
+          setToastMessage(data.error || 'Failed to send reset instructions');
+          setToastColor('danger');
+          setShowToast(true);
+        }
+      } catch (error) {
+        console.error('Password reset request error:', error);
+        setToastMessage('Network error. Please try again.');
+        setToastColor('danger');
+        setShowToast(true);
+      } finally {
+        setLoading(false);
+      }
+    } else if (step === 2) {
+      if (!resetToken) {
+        setToastMessage('Please enter the reset token from your email');
+        setToastColor('danger');
+        setShowToast(true);
+        return;
+      }
+      setStep(3);
+    }
   };
 
-  const handleConfirm = () => {
-    // TODO: Implement password reset logic
-    console.log('Password reset complete');
-    history.push('/login');
+  const handleConfirm = async () => {
+    if (!newPassword || !confirmPassword) {
+      setToastMessage('Please fill in all fields');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setToastMessage('Passwords do not match');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setToastMessage('Password must be at least 8 characters long');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/password/reset/confirm/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reset_token: resetToken,
+          new_password: newPassword,
+          new_password_confirm: confirmPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setToastMessage('Password reset successful!');
+        setToastColor('success');
+        setShowToast(true);
+        
+        setTimeout(() => {
+          history.push('/login');
+        }, 2000);
+      } else {
+        setToastMessage(data.error || 'Failed to reset password');
+        setToastColor('danger');
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error('Password reset confirm error:', error);
+      setToastMessage('Network error. Please try again.');
+      setToastColor('danger');
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const goToLogin = () => {
@@ -41,6 +155,12 @@ const ForgotPassword: React.FC = () => {
           <div className="auth-form">
             {step === 1 && (
               <>
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <h3>Forgot Password?</h3>
+                  <p style={{ color: '#64748b', fontSize: '14px' }}>
+                    Enter your email address and we'll send you instructions to reset your password.
+                  </p>
+                </div>
                 <div className="input-container">
                   <IonInput
                     type="email"
@@ -55,34 +175,25 @@ const ForgotPassword: React.FC = () => {
 
             {step === 2 && (
               <>
-                <div className="code-inputs">
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <h3>Enter Reset Token</h3>
+                  <p style={{ color: '#64748b', fontSize: '14px' }}>
+                    We've sent a reset token to your email. Enter it below to proceed.
+                  </p>
+                  {/* For development - show the token */}
+                  {resetToken && (
+                    <p style={{ color: '#10b981', fontSize: '12px', backgroundColor: '#f0f9ff', padding: '8px', borderRadius: '4px' }}>
+                      Dev mode: {resetToken}
+                    </p>
+                  )}
+                </div>
+                <div className="input-container">
                   <IonInput
-                    type="number"
-                    maxlength={1}
-                    value={code1}
-                    onIonInput={(e) => setCode1(e.detail.value!)}
-                    className="code-input auth-input"
-                  />
-                  <IonInput
-                    type="number"
-                    maxlength={1}
-                    value={code2}
-                    onIonInput={(e) => setCode2(e.detail.value!)}
-                    className="code-input auth-input"
-                  />
-                  <IonInput
-                    type="number"
-                    maxlength={1}
-                    value={code3}
-                    onIonInput={(e) => setCode3(e.detail.value!)}
-                    className="code-input auth-input"
-                  />
-                  <IonInput
-                    type="number"
-                    maxlength={1}
-                    value={code4}
-                    onIonInput={(e) => setCode4(e.detail.value!)}
-                    className="code-input auth-input"
+                    type="text"
+                    value={resetToken}
+                    onIonInput={(e) => setResetToken(e.detail.value!)}
+                    placeholder="Enter reset token"
+                    className="auth-input"
                   />
                 </div>
               </>
@@ -115,8 +226,12 @@ const ForgotPassword: React.FC = () => {
               expand="block"
               onClick={step === 3 ? handleConfirm : handleNext}
               className="auth-button"
+              disabled={loading}
             >
-              {step === 3 ? 'Confirm' : 'Next'}
+              {loading 
+                ? (step === 1 ? 'Sending...' : step === 3 ? 'Resetting...' : 'Processing...') 
+                : (step === 3 ? 'Reset Password' : step === 1 ? 'Send Reset Token' : 'Next')
+              }
             </IonButton>
 
             <div className="auth-footer">
@@ -133,6 +248,16 @@ const ForgotPassword: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        <IonLoading isOpen={loading} message="Processing..." />
+        
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={4000}
+          color={toastColor}
+        />
       </IonContent>
     </IonPage>
   );

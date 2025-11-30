@@ -1,5 +1,6 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import BottomNav from '../../../components/BottomNav';
 import './Home.css';
 
 const Home: React.FC = () => {
@@ -11,14 +12,10 @@ const Home: React.FC = () => {
   const goToShopDiscover = () => history.push('/client/discover?type=shop');
   const goToEmergencyRequest = () => history.push('/client/emergency-request');
   const goToBookingDetail = () => history.push('/client/booking-detail/12345');
-  const goToBooking = () => history.push('/client/booking');
-  const goToRequest = () => history.push('/client/request');
-  const goToDiscover = () => history.push('/client/discover');
-  const goToProfile = () => history.push('/client/profile');
 
   return (
     <IonPage>
-      <IonContent className="home-content">
+      <IonContent className="home-content" style={{ paddingBottom: '80px' }}>
         {/* Header */}
         <div className="home-header">
           <h1 className="home-title">Home</h1>
@@ -110,29 +107,7 @@ const Home: React.FC = () => {
         </div>
       </IonContent>
 
-      {/* Bottom Navigation */}
-      <div className="bottom-nav">
-        <button className="nav-item" onClick={goToBooking}>
-          <span className="material-icons-round">event</span>
-          <span>Booking</span>
-        </button>
-        <button className="nav-item" onClick={goToRequest}>
-          <span className="material-icons-round">build_circle</span>
-          <span>Request</span>
-        </button>
-        <button className="nav-item active">
-          <span className="material-icons-round">home</span>
-          <span>Home</span>
-        </button>
-        <button className="nav-item" onClick={goToDiscover}>
-          <span className="material-icons-round">explore</span>
-          <span>Discover</span>
-        </button>
-        <button className="nav-item" onClick={goToProfile}>
-          <span className="material-icons-round">person</span>
-          <span>Profile</span>
-        </button>
-      </div>
+      <BottomNav />
     </IonPage>
   );
 };

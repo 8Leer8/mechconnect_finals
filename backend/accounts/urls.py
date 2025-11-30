@@ -24,6 +24,9 @@ urlpatterns = [
     path('notifications/', views.user_notifications, name='user_notifications'),
     path('notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
     
+    # Discovery
+    path('discover/mechanics/', views.discover_mechanics, name='discover_mechanics'),
+    
     # Health check
     path('health/', views.health_check, name='health_check'),
 ]

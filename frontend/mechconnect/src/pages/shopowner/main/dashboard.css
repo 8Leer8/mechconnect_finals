@@ -1,0 +1,409 @@
+/* Dashboard Page Styles */
+.dashboard-content {
+  --background: hsl(40, 20%, 98%);
+  --padding-bottom: 96px;
+  overflow-y: auto;
+}
+
+.dashboard-content::part(scroll) {
+  padding-bottom: 16px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.menu-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.notification-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.profile-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: hsl(25, 85%, 55%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.profile-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Dashboard Title */
+.dashboard-title-section {
+  padding: 0 20px 20px;
+}
+
+.dashboard-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 85%, 55%);
+  margin: 0;
+}
+
+/* Dashboard Sections */
+.dashboard-section {
+  padding: 0 20px 20px;
+}
+
+/* Performance Overview Card */
+.performance-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.performance-header {
+  margin-bottom: 20px;
+}
+
+.performance-greeting {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 4px 0;
+}
+
+.performance-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #64748b;
+  margin: 0;
+}
+
+.performance-revenue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.revenue-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+  margin: 0 0 4px 0;
+}
+
+.revenue-amount {
+  font-size: 24px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.revenue-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: hsl(25, 85%, 95%);
+  color: hsl(25, 85%, 55%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summary-icon-blue {
+  background: hsl(210, 80%, 96%);
+  color: hsl(210, 80%, 50%);
+}
+
+.summary-icon-green {
+  background: hsl(140, 60%, 96%);
+  color: hsl(140, 60%, 45%);
+}
+
+.summary-icon-orange {
+  background: hsl(25, 85%, 95%);
+  color: hsl(25, 85%, 55%);
+}
+
+.summary-icon-purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-number {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.summary-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+  margin: 0;
+}
+
+.summary-subtext {
+  font-size: 11px;
+  font-weight: 400;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.summary-positive {
+  color: hsl(140, 60%, 45%);
+}
+
+/* Top Earning Mechanic Card */
+.earning-mechanic-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 16px 0;
+}
+
+.mechanic-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mechanic-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mechanic-avatar .material-icons-round {
+  font-size: 32px;
+}
+
+.mechanic-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mechanic-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.mechanic-specialty {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+  margin: 0;
+}
+
+.mechanic-performance {
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.mechanic-revenue {
+  text-align: right;
+}
+
+.mechanic-revenue-amount {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 4px 0;
+}
+
+.mechanic-revenue-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Mechanic Revenue Card */
+.revenue-list-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.view-all-button {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 85%, 55%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.view-all-button:hover {
+  color: hsl(25, 85%, 50%);
+}
+
+.revenue-list-content {
+  min-height: 100px;
+  /* Content can be added here later */
+}
+
+/* Responsive Design */
+@media (max-width: 400px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 16px;
+  }
+}
+

@@ -11,9 +11,9 @@ import ShopOwnerSignup from '../pages/auth/ShopOwnerSignup';
 
 // Client Pages
 import Home from '../pages/client/main/Home';
-import Discover from '../pages/client/main/Discover';
 import Request from '../pages/client/main/Request';
 import Booking from '../pages/client/main/Booking';
+import Discover from '../pages/client/main/DIscover';
 import Profile from '../pages/client/main/Profile';
 
 // Client Side Pages
@@ -69,9 +69,9 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/shop-owner-signup" component={ShopOwnerSignup} />
       <Route exact path="/client/switch-account" component={SwitchAccount} />
       <Route exact path="/client/home" component={Home} />
-      <Route exact path="/client/discover" component={Discover} />
       <Route exact path="/client/request" component={Request} />
       <Route exact path="/client/booking" component={Booking} />
+      <Route exact path="/client/discover" component={Discover} />
       <Route exact path="/client/profile" component={Profile} />
       <Route exact path="/client/payment-history" component={PaymentHistory} />
       <Route exact path="/client/favorite" component={Favorite} />
@@ -105,7 +105,7 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/client/independent-mechanic-service-detail/:id" component={IndependentMechanicServiceDetail} />
       <Route exact path="/client/shop-service-detail/:id" component={ShopServiceDetail} />
       <Route exact path="/">
-        <Redirect to="/client/home" />
+        <Redirect to="/login" />
       </Route>
     </IonRouterOutlet>
   );

@@ -1,6 +1,7 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import BottomNav from '../../../components/BottomNav';
 import './Booking.css';
 
 const Booking: React.FC = () => {
@@ -48,7 +49,7 @@ const Booking: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="booking-content">
+      <IonContent className="booking-content" style={{ paddingBottom: '80px' }}>
         {/* Header */}
         <div className="booking-header-top">
           <h1 className="booking-title">Booking</h1>
@@ -365,29 +366,7 @@ const Booking: React.FC = () => {
         </div>
       </IonContent>
 
-      {/* Bottom Navigation */}
-      <div className="bottom-nav">
-        <button className="nav-item active">
-          <span className="material-icons-round">event</span>
-          <span>Booking</span>
-        </button>
-        <button className="nav-item" onClick={goToRequest}>
-          <span className="material-icons-round">build_circle</span>
-          <span>Request</span>
-        </button>
-        <button className="nav-item" onClick={goToHome}>
-          <span className="material-icons-round">home</span>
-          <span>Home</span>
-        </button>
-        <button className="nav-item" onClick={goToDiscover}>
-          <span className="material-icons-round">explore</span>
-          <span>Discover</span>
-        </button>
-        <button className="nav-item" onClick={goToProfile}>
-          <span className="material-icons-round">person</span>
-          <span>Profile</span>
-        </button>
-      </div>
+      <BottomNav />
     </IonPage>
   );
 };
