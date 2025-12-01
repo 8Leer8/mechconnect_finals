@@ -160,12 +160,26 @@ class ShopOwner(models.Model):
 
 
 class Admin(models.Model):
+    PERMISSION_CHOICES = [
+        ('manage_users', 'Manage Users'),
+        ('manage_verifications', 'Manage Verifications'),
+        ('manage_shops', 'Manage Shops'),
+        ('manage_disputes', 'Manage Disputes'),
+        ('manage_reports', 'Manage Reports'),
+        ('view_financial', 'View Financial'),
+        ('manage_tokens', 'Manage Tokens'),
+    ]
+    
     admin_id = models.OneToOneField('accounts.Account', primary_key=True, on_delete=models.CASCADE, related_name='admin_profile')
     profile_photo = models.CharField(max_length=1024, null=True, blank=True)
     contact_number = models.CharField(max_length=50, null=True, blank=True)
     created_by_admin = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='admins_created')
+    permissions = models.JSONField(default=list, blank=True)  # Store permissions as JSON array
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Admin: {self.admin_id.username}"
 
 
 class HeadAdmin(models.Model):
@@ -196,3 +210,16 @@ class TokenPurchase(models.Model):
     payment_method = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=50, null=True, blank=True)
     purchased_at = models.DateTimeField(auto_now_add=True)
+
+
+class VerificationRejection(models.Model):
+    rejection_id = models.AutoField(primary_key=True)
+    account = models.OneToOneField('accounts.Account', on_delete=models.CASCADE, related_name='verification_rejection')
+    rejected_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, related_name='rejections_made')
+    reason = models.TextField(null=True, blank=True)
+    rejected_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-rejected_at']
+
+

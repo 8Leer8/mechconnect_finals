@@ -8,16 +8,21 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 import uuid
 from datetime import datetime, timedelta
+from django.db.models import Sum, Count, Q
 
 from .models import (
     Account, AccountRole, Client, Mechanic, ShopOwner, 
-    Admin, HeadAdmin, PasswordReset, AccountBan
+    Admin, HeadAdmin, PasswordReset, AccountBan, ReportAccount, Notification
 )
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, AccountSerializer,
     PasswordChangeSerializer, PasswordResetRequestSerializer, 
     PasswordResetConfirmSerializer, NotificationSerializer, MechanicDiscoverySerializer
 )
+from bookings.models import Booking, Dispute, RefundedBooking
+from services.models import Service, ServiceCategory
+from shop.models import Shop
+from .permissions import head_admin_required  # Add this import
 
 
 @api_view(['POST'])

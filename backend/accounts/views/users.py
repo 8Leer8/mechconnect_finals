@@ -1,0 +1,387 @@
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+
+from ..models import Account, AccountRole, AccountBan, Notification
+from ..serializers import AccountSerializer, NotificationSerializer, MechanicDiscoverySerializer
+from ..permissions import head_admin_required
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_users(request):
+    """
+    Get list of users (admin functionality)
+    """
+    try:
+        # In production, add proper admin permission check
+        users = Account.objects.all().order_by('-created_at')
+        
+        # Apply filters
+        role = request.GET.get('role')
+        if role:
+            users = users.filter(roles__account_role=role)
+        
+        is_active = request.GET.get('is_active')
+        if is_active is not None:
+            users = users.filter(is_active=is_active.lower() == 'true')
+        
+        is_verified = request.GET.get('is_verified')
+        if is_verified is not None:
+            users = users.filter(is_verified=is_verified.lower() == 'true')
+        
+        # Pagination
+        page_size = int(request.GET.get('page_size', 20))
+        page = int(request.GET.get('page', 1))
+        start = (page - 1) * page_size
+        end = start + page_size
+        
+        total_count = users.count()
+        users_page = users[start:end]
+        
+        serializer = AccountSerializer(users_page, many=True)
+        
+        return Response({
+            'users': serializer.data,
+            'total_count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total_count + page_size - 1) // page_size
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch users',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_by_id(request, user_id):
+    """
+    Get specific user by ID
+    """
+    try:
+        user = get_object_or_404(Account, acc_id=user_id)
+        serializer = AccountSerializer(user)
+        
+        return Response({
+            'user': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch user',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def deactivate_user(request, user_id):
+    """
+    Deactivate a user account (admin functionality)
+    """
+    try:
+        user = get_object_or_404(Account, acc_id=user_id)
+        user.is_active = False
+        user.save()
+        
+        return Response({
+            'message': f'User {user.username} has been deactivated'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to deactivate user',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def activate_user(request, user_id):
+    """
+    Activate a user account (admin functionality)
+    """
+    try:
+        user = get_object_or_404(Account, acc_id=user_id)
+        user.is_active = True
+        user.save()
+        
+        return Response({
+            'message': f'User {user.username} has been activated'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to activate user',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def verify_user(request, user_id):
+    """
+    Verify a user account (admin functionality)
+    """
+    try:
+        user = get_object_or_404(Account, acc_id=user_id)
+        user.is_verified = True
+        user.save()
+        
+        return Response({
+            'message': f'User {user.username} has been verified'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to verify user',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_notifications(request):
+    """
+    Get notifications for a user
+    """
+    try:
+        user_id = request.GET.get('user_id')
+        if not user_id:
+            return Response({
+                'error': 'User ID required in query params'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = get_object_or_404(Account, acc_id=user_id)
+        notifications = user.notifications.all().order_by('-created_at')
+        
+        # Filter by read status
+        is_read = request.GET.get('is_read')
+        if is_read is not None:
+            notifications = notifications.filter(is_read=is_read.lower() == 'true')
+        
+        # Filter by type
+        notification_type = request.GET.get('type')
+        if notification_type:
+            notifications = notifications.filter(type=notification_type)
+        
+        serializer = NotificationSerializer(notifications, many=True)
+        
+        return Response({
+            'notifications': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch notifications',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, notification_id):
+    """
+    Mark a notification as read
+    """
+    try:
+        from ..models import Notification
+        notification = get_object_or_404(Notification, notification_id=notification_id)
+        notification.is_read = True
+        notification.save()
+        
+        return Response({
+            'message': 'Notification marked as read'
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to mark notification as read',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def discover_mechanics(request):
+    """
+    Get all available mechanics for discovery page
+    """
+    try:
+        # Get all accounts with mechanic role
+        mechanic_accounts = Account.objects.filter(
+            roles__account_role=AccountRole.ROLE_MECHANIC,
+            is_active=True,
+            is_verified=True
+        ).select_related(
+            'mechanic_profile', 'address'
+        ).prefetch_related('roles').order_by('-mechanic_profile__average_rating')
+        
+        # Apply filters if provided
+        city = request.GET.get('city')
+        if city:
+            mechanic_accounts = mechanic_accounts.filter(
+                address__city_municipality__icontains=city
+            )
+        
+        ranking = request.GET.get('ranking')
+        if ranking:
+            mechanic_accounts = mechanic_accounts.filter(
+                mechanic_profile__ranking=ranking
+            )
+        
+        status_filter = request.GET.get('status')
+        if status_filter:
+            mechanic_accounts = mechanic_accounts.filter(
+                mechanic_profile__status=status_filter
+            )
+        
+        # Check if any mechanics found
+        if not mechanic_accounts.exists():
+            return Response({
+                'message': 'No mechanic available',
+                'mechanics': [],
+                'total_count': 0
+            }, status=status.HTTP_200_OK)
+        
+        # Pagination
+        page_size = int(request.GET.get('page_size', 10))
+        page = int(request.GET.get('page', 1))
+        start = (page - 1) * page_size
+        end = start + page_size
+        
+        total_count = mechanic_accounts.count()
+        mechanics_page = mechanic_accounts[start:end]
+        
+        serializer = MechanicDiscoverySerializer(mechanics_page, many=True)
+        
+        return Response({
+            'message': 'Mechanics found' if total_count > 0 else 'No mechanic available',
+            'mechanics': serializer.data,
+            'total_count': total_count,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': (total_count + page_size - 1) // page_size
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch mechanics',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_users(request):
+    """
+    Get all users for head admin user management
+    """
+    try:
+        users = Account.objects.all().prefetch_related('roles', 'ban').order_by('-created_at')
+        
+        users_data = []
+        for user in users:
+            users_data.append({
+                'id': user.acc_id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.firstname,
+                'last_name': user.lastname,
+                'is_active': user.is_active,
+                'is_banned': hasattr(user, 'ban'),
+                'date_joined': user.created_at.isoformat(),
+                'roles': [{'account_role': role.account_role} for role in user.roles.all()]
+            })
+        
+        return Response(users_data, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch users',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def ban_user(request):
+    """
+    Ban a user account
+    """
+    try:
+        admin_id = request.data.get('admin_id')
+        user_id = request.data.get('user_id')
+        
+        if not admin_id or not user_id:
+            return Response({
+                'error': 'admin_id and user_id are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = get_object_or_404(Account, acc_id=user_id)
+        admin = get_object_or_404(Account, acc_id=admin_id)
+        
+        # Check if already banned
+        if hasattr(user, 'ban'):
+            return Response({
+                'error': 'User is already banned'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create ban record
+        AccountBan.objects.create(
+            acc_ban_id=user,
+            reason_ban='Banned by head admin'
+        )
+        
+        return Response({
+            'message': 'User banned successfully'
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to ban user',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def unban_user(request):
+    """
+    Unban a user account
+    """
+    try:
+        admin_id = request.data.get('admin_id')
+        user_id = request.data.get('user_id')
+        
+        if not admin_id or not user_id:
+            return Response({
+                'error': 'admin_id and user_id are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = get_object_or_404(Account, acc_id=user_id)
+        
+        # Check if not banned
+        if not hasattr(user, 'ban'):
+            return Response({
+                'error': 'User is not banned'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Delete ban record
+        user.ban.delete()
+        
+        return Response({
+            'message': 'User unbanned successfully'
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to unban user',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
