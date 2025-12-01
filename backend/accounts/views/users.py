@@ -279,6 +279,34 @@ def discover_mechanics(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def mechanic_detail(request, mechanic_id):
+    """
+    Get detailed information about a specific mechanic
+    """
+    try:
+        mechanic = get_object_or_404(
+            Account,
+            acc_id=mechanic_id,
+            roles__account_role=AccountRole.ROLE_MECHANIC,
+            is_active=True,
+            is_verified=True
+        )
+        
+        serializer = MechanicDiscoverySerializer(mechanic)
+        
+        return Response({
+            'mechanic': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch mechanic details',
+            'details': str(e)
+        }, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_all_users(request):
     """
     Get all users for head admin user management
