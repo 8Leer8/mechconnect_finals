@@ -1,0 +1,137 @@
+.head-admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  background: white;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1) !important;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  --box-shadow: none !important;
+}
+
+.head-admin-sidebar::before,
+.head-admin-sidebar::after {
+  display: none !important;
+}
+
+.head-admin-sidebar * {
+  box-shadow: none !important;
+}
+
+.head-admin-sidebar ion-header,
+.head-admin-sidebar ion-toolbar,
+.head-admin-sidebar ion-content,
+.head-admin-sidebar ion-list {
+  box-shadow: none !important;
+  --box-shadow: none !important;
+}
+
+.head-admin-sidebar ion-content::part(scroll),
+.head-admin-sidebar ion-content::part(background) {
+  box-shadow: none !important;
+}
+
+/* Override any Ionic shadow variables */
+.head-admin-sidebar {
+  --ion-item-box-shadow: none !important;
+  --ion-toolbar-box-shadow: none !important;
+}
+
+.head-admin-sidebar ion-header {
+  flex-shrink: 0;
+}
+
+.head-admin-sidebar ion-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+}
+
+.menu-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: white;
+  padding: 4px;
+}
+
+.sidebar-list {
+  padding: 16px 8px;
+  background: transparent;
+}
+
+.sidebar-item {
+  --background: transparent;
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --inner-padding-end: 0;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.2s ease;
+  --box-shadow: none;
+  --ripple-color: transparent;
+}
+
+.sidebar-item:focus,
+.sidebar-item:active {
+  --box-shadow: none !important;
+  outline: none;
+}
+
+.sidebar-item::part(native) {
+  box-shadow: none !important;
+}
+
+.sidebar-item:hover {
+  --background: rgba(255, 107, 53, 0.08);
+  color: #ff6b35;
+}
+
+.sidebar-item.active {
+  --background: #ff6b35;
+  color: white;
+  font-weight: 600;
+}
+
+.sidebar-item.active ion-icon {
+  color: white;
+}
+
+.sidebar-item ion-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  color: #94a3b8;
+}
+
+.sidebar-item.active ion-icon,
+.sidebar-item:hover ion-icon {
+  color: inherit;
+}
+
+.sidebar-item ion-label {
+  font-size: 14px;
+}
+
+.sidebar-item.disabled {
+  opacity: 0.4;
+  cursor: default !important;
+}
+
+.sidebar-item.disabled:hover {
+  --background: transparent;
+  color: #64748b;
+}

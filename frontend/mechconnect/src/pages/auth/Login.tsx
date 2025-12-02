@@ -43,20 +43,32 @@ const Login: React.FC = () => {
         setToastColor('success');
         setShowToast(true);
         
-        // Store authentication token
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('authToken', data.token);
-        }
-        
-        // Store user data if needed
+        // Store user data
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('userId', data.user.acc_id);
         }
         
-        // Navigate to client home page
+        // Role-based routing
+        const roles = data.user.roles || [];
+        const userRoles = roles.map((r: any) => r.account_role);
+        
+        // Redirect based on role priority: head_admin > admin > shop_owner > mechanic > client
         setTimeout(() => {
-          history.push('/client/home');
+          if (userRoles.includes('head_admin')) {
+            history.push('/headadmin/dashboard');
+          } else if (userRoles.includes('admin')) {
+            history.push('/admin/dashboard');
+          } else if (userRoles.includes('shop_owner')) {
+            history.push('/shopowner/home');
+          } else if (userRoles.includes('mechanic')) {
+            history.push('/mechanic/home');
+          } else if (userRoles.includes('client')) {
+            history.push('/client/home');
+          } else {
+            // Default fallback
+            history.push('/client/home');
+          }
         }, 1000);
       } else {
         setToastMessage(data.error || 'Login failed. Please check your credentials.');
@@ -97,7 +109,7 @@ const Login: React.FC = () => {
                 type="email"
                 value={email}
                 onIonInput={(e) => setEmail(e.detail.value!)}
-                placeholder="Email"
+                placeholder="Email or Username"
                 className="auth-input"
               />
             </div>

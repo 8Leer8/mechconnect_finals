@@ -1,0 +1,299 @@
+.financial-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--ion-color-dark);
+}
+
+.page-subtitle {
+  font-size: 16px;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+/* Metric Cards */
+.metric-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.metric-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.revenue-card .metric-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.success-card .metric-icon {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.warning-card .metric-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.danger-card .metric-icon {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  color: white;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--ion-color-dark);
+}
+
+.metric-label {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.metric-details {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.detail-item {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Commission Rates */
+.commission-summary-card {
+  margin: 24px 0;
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.commission-rates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.rate-box {
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rate-icon {
+  font-size: 32px;
+}
+
+.rate-icon.default {
+  color: var(--ion-color-medium);
+}
+
+.rate-icon.bronze {
+  color: #cd7f32;
+}
+
+.rate-icon.silver {
+  color: #c0c0c0;
+}
+
+.rate-icon.gold {
+  color: #ffd700;
+}
+
+.rate-icon.shop {
+  color: var(--ion-color-primary);
+}
+
+.rate-box h4 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ion-color-dark);
+}
+
+.rate-box p {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+/* Filters */
+.filter-card {
+  margin: 24px 0;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Table */
+.financial-table {
+  overflow-x: auto;
+}
+
+.financial-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px;
+}
+
+.financial-table th {
+  text-align: left;
+  padding: 16px 12px;
+  background: var(--ion-color-light);
+  color: var(--ion-color-dark);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--ion-color-light-shade);
+}
+
+.financial-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--ion-color-light);
+  font-size: 14px;
+}
+
+.financial-table tbody tr:hover {
+  background: var(--ion-color-light);
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.username {
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.email {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.amount-cell,
+.commission-cell {
+  font-weight: 600;
+  color: var(--ion-color-success);
+}
+
+.service-name {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-results {
+  text-align: center;
+  padding: 48px;
+  color: var(--ion-color-medium);
+}
+
+.no-results ion-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+/* Modals */
+.settings-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.save-button {
+  margin-top: 24px;
+}
+
+.transaction-details .email {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 400px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .financial-container {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 22px;
+  }
+}
