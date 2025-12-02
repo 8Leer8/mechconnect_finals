@@ -149,48 +149,86 @@ def commission_settings(request):
             
             if commission_setting:
                 return Response({
-                    'rate': float(commission_setting.rate),
+                    'default_commission_rate': float(commission_setting.default_commission_rate),
+                    'mechanic_bronze_rate': float(commission_setting.mechanic_bronze_rate),
+                    'mechanic_silver_rate': float(commission_setting.mechanic_silver_rate),
+                    'mechanic_gold_rate': float(commission_setting.mechanic_gold_rate),
+                    'shop_commission_rate': float(commission_setting.shop_commission_rate),
                     'updated_at': commission_setting.updated_at.isoformat() if hasattr(commission_setting, 'updated_at') else None
                 }, status=status.HTTP_200_OK)
             else:
-                # Return default if not set
+                # Return default if not set - create default settings
+                default_settings = CommissionSettings.objects.create()
                 return Response({
-                    'rate': 15.0,
-                    'updated_at': None,
-                    'message': 'Using default commission rate'
+                    'default_commission_rate': float(default_settings.default_commission_rate),
+                    'mechanic_bronze_rate': float(default_settings.mechanic_bronze_rate),
+                    'mechanic_silver_rate': float(default_settings.mechanic_silver_rate),
+                    'mechanic_gold_rate': float(default_settings.mechanic_gold_rate),
+                    'shop_commission_rate': float(default_settings.shop_commission_rate),
+                    'updated_at': default_settings.updated_at.isoformat()
                 }, status=status.HTTP_200_OK)
         
         elif request.method == 'PUT':
-            # Update commission rate
-            new_rate = request.data.get('rate')
-            
-            if new_rate is None:
-                return Response({
-                    'error': 'Commission rate is required'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            try:
-                new_rate = float(new_rate)
-                if new_rate < 0 or new_rate > 100:
-                    return Response({
-                        'error': 'Commission rate must be between 0 and 100'
-                    }, status=status.HTTP_400_BAD_REQUEST)
-            except ValueError:
-                return Response({
-                    'error': 'Invalid commission rate format'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Update or create commission settings
+            # Update commission rates
             commission_setting = CommissionSettings.objects.first()
-            if commission_setting:
-                commission_setting.rate = new_rate
-                commission_setting.save()
-            else:
-                CommissionSettings.objects.create(rate=new_rate)
+            if not commission_setting:
+                commission_setting = CommissionSettings.objects.create()
+            
+            # Update fields if provided
+            if 'default_commission_rate' in request.data:
+                try:
+                    rate = float(request.data['default_commission_rate'])
+                    if rate < 0 or rate > 100:
+                        return Response({'error': 'Default commission rate must be between 0 and 100'}, status=status.HTTP_400_BAD_REQUEST)
+                    commission_setting.default_commission_rate = rate
+                except ValueError:
+                    return Response({'error': 'Invalid default commission rate format'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if 'mechanic_bronze_rate' in request.data:
+                try:
+                    rate = float(request.data['mechanic_bronze_rate'])
+                    if rate < 0 or rate > 100:
+                        return Response({'error': 'Bronze mechanic rate must be between 0 and 100'}, status=status.HTTP_400_BAD_REQUEST)
+                    commission_setting.mechanic_bronze_rate = rate
+                except ValueError:
+                    return Response({'error': 'Invalid bronze mechanic rate format'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if 'mechanic_silver_rate' in request.data:
+                try:
+                    rate = float(request.data['mechanic_silver_rate'])
+                    if rate < 0 or rate > 100:
+                        return Response({'error': 'Silver mechanic rate must be between 0 and 100'}, status=status.HTTP_400_BAD_REQUEST)
+                    commission_setting.mechanic_silver_rate = rate
+                except ValueError:
+                    return Response({'error': 'Invalid silver mechanic rate format'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if 'mechanic_gold_rate' in request.data:
+                try:
+                    rate = float(request.data['mechanic_gold_rate'])
+                    if rate < 0 or rate > 100:
+                        return Response({'error': 'Gold mechanic rate must be between 0 and 100'}, status=status.HTTP_400_BAD_REQUEST)
+                    commission_setting.mechanic_gold_rate = rate
+                except ValueError:
+                    return Response({'error': 'Invalid gold mechanic rate format'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if 'shop_commission_rate' in request.data:
+                try:
+                    rate = float(request.data['shop_commission_rate'])
+                    if rate < 0 or rate > 100:
+                        return Response({'error': 'Shop commission rate must be between 0 and 100'}, status=status.HTTP_400_BAD_REQUEST)
+                    commission_setting.shop_commission_rate = rate
+                except ValueError:
+                    return Response({'error': 'Invalid shop commission rate format'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            commission_setting.save()
             
             return Response({
-                'message': 'Commission rate updated successfully',
-                'rate': new_rate
+                'message': 'Commission settings updated successfully',
+                'default_commission_rate': float(commission_setting.default_commission_rate),
+                'mechanic_bronze_rate': float(commission_setting.mechanic_bronze_rate),
+                'mechanic_silver_rate': float(commission_setting.mechanic_silver_rate),
+                'mechanic_gold_rate': float(commission_setting.mechanic_gold_rate),
+                'shop_commission_rate': float(commission_setting.shop_commission_rate)
             }, status=status.HTTP_200_OK)
     
     except Exception as e:

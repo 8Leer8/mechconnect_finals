@@ -23,6 +23,7 @@ Recommended steps on Windows (cmd.exe):
    pip install --upgrade pip
    pip install -r requirements.txt
    ```
+   pip install djangorestframework-simplejwt
 
 3. Run migrations and start the development server:
 
