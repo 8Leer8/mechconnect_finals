@@ -187,3 +187,25 @@
   font-size: 20px;
   color: #64748b;
 }
+
+/* Registered State Styles */
+.application-card.registered {
+  border: 2px solid #22c55e;
+  background: #f0fdf4;
+}
+
+.application-card.registered .card-title {
+  color: #166534;
+}
+
+.application-card.registered .card-description {
+  color: #15803d;
+}
+
+.application-card.registered .card-arrow {
+  background: #22c55e;
+}
+
+.application-card.registered .card-arrow .material-icons-round {
+  color: white;
+}

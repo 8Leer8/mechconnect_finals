@@ -23,27 +23,12 @@ const Profile: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
 
   useEffect(() => {
     loadUserProfile();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showRoleDropdown) {
-        const target = event.target as HTMLElement;
-        if (!target.closest('.list-item') && !target.closest('[data-dropdown]')) {
-          setShowRoleDropdown(false);
-        }
-      }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showRoleDropdown]);
 
   const loadUserProfile = () => {
     // Get user from localStorage (set during login)
@@ -87,75 +72,10 @@ const Profile: React.FC = () => {
   };
 
   const handleSwitchRoles = () => {
-    setShowRoleDropdown(!showRoleDropdown);
+    history.push('/auth/switch-account');
   };
 
-  const switchToRole = (role: string) => {
-    setShowRoleDropdown(false);
-    
-    // Update current role in stored user data
-    if (userProfile) {
-      const updatedUser = { ...userProfile, currentRole: role };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    }
-    
-    // Redirect based on role
-    switch (role) {
-      case 'mechanic':
-        history.push('/mechanic/home');
-        break;
-      case 'shop_owner':
-        history.push('/shopowner/home');
-        break;
-      default:
-        history.push('/client/home');
-    }
-  };
 
-  const registerAsRole = (role: string) => {
-    setShowRoleDropdown(false);
-    
-    // Navigate to role registration
-    switch (role) {
-      case 'mechanic':
-        history.push('/register/mechanic');
-        break;
-      case 'shop_owner':
-        history.push('/register/shopowner');
-        break;
-    }
-  };
-
-  const hasProfile = (profileType: string): boolean => {
-    if (!userProfile) return false;
-    
-    switch (profileType) {
-      case 'mechanic':
-        return !!userProfile.mechanic_profile;
-      case 'shop_owner':
-        return !!userProfile.shop_owner_profile;
-      default:
-        return false;
-    }
-  };
-
-  const getRoleOptions = () => {
-    const options = [];
-    
-    if (hasProfile('mechanic')) {
-      options.push({ label: 'Switch to Mechanic', action: () => switchToRole('mechanic'), type: 'switch' });
-    } else {
-      options.push({ label: 'Register as Mechanic', action: () => registerAsRole('mechanic'), type: 'register' });
-    }
-    
-    if (hasProfile('shop_owner')) {
-      options.push({ label: 'Switch to Shopowner', action: () => switchToRole('shop_owner'), type: 'switch' });
-    } else {
-      options.push({ label: 'Register as Shopowner', action: () => registerAsRole('shop_owner'), type: 'register' });
-    }
-    
-    return options;
-  };
 
   return (
     <IonPage>
@@ -192,64 +112,18 @@ const Profile: React.FC = () => {
             
             <div className="divider"></div>
             
-            <div style={{ position: 'relative' }}>
-              <button className="list-item" onClick={handleSwitchRoles}>
-                <div className="item-icon icon-secondary">
-                  <span className="material-icons-round">switch_account</span>
-                </div>
-                <div className="item-content">
-                  <div className="item-label">Switch Roles</div>
-                  <div className="item-description">Change to another role</div>
-                </div>
-                <div className="item-arrow">
-                  <span className="material-icons-round">chevron_right</span>
-                </div>
-              </button>
-              
-              {showRoleDropdown && (
-                <div 
-                  data-dropdown
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: '0',
-                    right: '0',
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    zIndex: 1000,
-                    overflow: 'hidden'
-                  }}>
-                  {getRoleOptions().map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={option.action}
-                      style={{
-                        width: '100%',
-                        padding: '16px 20px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        borderBottom: index < getRoleOptions().length - 1 ? '1px solid #f1f5f9' : 'none',
-                        fontSize: '16px',
-                        color: '#374151',
-                        transition: 'background-color 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.target as HTMLElement).style.backgroundColor = '#f8fafc';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <button className="list-item" onClick={handleSwitchRoles}>
+              <div className="item-icon icon-secondary">
+                <span className="material-icons-round">switch_account</span>
+              </div>
+              <div className="item-content">
+                <div className="item-label">Switch Roles</div>
+                <div className="item-description">Change to another role</div>
+              </div>
+              <div className="item-arrow">
+                <span className="material-icons-round">chevron_right</span>
+              </div>
+            </button>
           </div>
 
           {/* Favorites Section */}

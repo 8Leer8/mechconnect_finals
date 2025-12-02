@@ -246,3 +246,59 @@ def password_reset_confirm(request):
         'error': 'Validation failed',
         'details': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_user_roles(request):
+    """
+    Check if a user has mechanic or shop owner profiles registered
+    """
+    try:
+        user_id = request.GET.get('user_id')
+        if not user_id:
+            return Response({
+                'error': 'User ID required in query parameters'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = get_object_or_404(Account, acc_id=user_id)
+        
+        # Check if user has different role profiles
+        has_mechanic = hasattr(user, 'mechanic_profile') and user.mechanic_profile is not None
+        has_shop_owner = hasattr(user, 'shop_owner_profile') and user.shop_owner_profile is not None
+        
+        # Get role information
+        roles = user.roles.all()
+        role_list = [role.account_role for role in roles]
+        
+        return Response({
+            'user_id': user.acc_id,
+            'full_name': f"{user.firstname} {user.lastname}",
+            'has_mechanic_profile': has_mechanic,
+            'has_shop_owner_profile': has_shop_owner,
+            'roles': role_list,
+            'mechanic_status': {
+                'registered': has_mechanic,
+                'verified': user.mechanic_profile.is_verified if has_mechanic else False,
+                'status': user.mechanic_profile.status if has_mechanic else None
+            } if has_mechanic else {
+                'registered': False,
+                'verified': False,
+                'status': None
+            },
+            'shop_owner_status': {
+                'registered': has_shop_owner,
+                'verified': user.shop_owner_profile.is_verified if has_shop_owner else False,
+                'status': user.shop_owner_profile.status if has_shop_owner else None
+            } if has_shop_owner else {
+                'registered': False,
+                'verified': False,
+                'status': None
+            }
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to check user roles',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

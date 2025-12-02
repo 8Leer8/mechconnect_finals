@@ -1,11 +1,77 @@
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, IonLoading, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './SwitchAccount.css';
+
+interface UserRoles {
+  user_id: number;
+  full_name: string;
+  has_mechanic_profile: boolean;
+  has_shop_owner_profile: boolean;
+  roles: string[];
+  mechanic_status: {
+    registered: boolean;
+    verified: boolean;
+    status: string | null;
+  };
+  shop_owner_status: {
+    registered: boolean;
+    verified: boolean;
+    status: string | null;
+  };
+}
 
 const SwitchAccount: React.FC = () => {
   const history = useHistory();
+  const [loading, setLoading] = useState(true);
+  const [userRoles, setUserRoles] = useState<UserRoles | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchUserRoles();
+  }, []);
+
+  const fetchUserRoles = async () => {
+    try {
+      setLoading(true);
+      
+      // Get user ID from localStorage (you might need to adjust this based on your auth implementation)
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        setError('User not found. Please login again.');
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+      const userId = user.acc_id || user.id || 10; // fallback to 10 for testing
+
+      const response = await fetch(`http://localhost:8000/api/accounts/check-roles/?user_id=${userId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setUserRoles(data);
+      } else {
+        setError(data.error || 'Failed to fetch user roles');
+      }
+    } catch (err) {
+      setError('Network error occurred');
+      console.error('Error fetching user roles:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const goBack = () => history.goBack();
+
+  const handleSwitchToMechanic = () => {
+    // Navigate to mechanic dashboard
+    history.push('/mechanic/home');
+  };
+
+  const handleSwitchToShopOwner = () => {
+    // Navigate to shop owner dashboard  
+    history.push('/shopowner/home');
+  };
 
   const handleApplyMechanic = () => {
     history.push('/mechanic-signup');
@@ -29,51 +95,119 @@ const SwitchAccount: React.FC = () => {
 
         {/* Content Container */}
         <div className="switch-account-container">
-          <div className="info-card">
-            <div className="info-icon">
-              <span className="material-icons-round">info</span>
+          {!loading && !error && userRoles && (
+            <div className="info-card">
+              <div className="info-icon">
+                <span className="material-icons-round">person</span>
+              </div>
+              <p className="info-text">
+                Hello {userRoles.full_name}! {userRoles.has_mechanic_profile || userRoles.has_shop_owner_profile 
+                  ? 'Switch between your roles or apply for new ones.' 
+                  : 'Want to offer your services? Apply to become a mechanic or shop owner on our platform.'}
+              </p>
             </div>
-            <p className="info-text">
-              Want to offer your services? Apply to become a mechanic or shop owner on our platform.
-            </p>
-          </div>
+          )}
 
-          {/* Application Options */}
-          <div className="application-options">
-            {/* Apply for Mechanic */}
-            <button className="application-card mechanic" onClick={handleApplyMechanic}>
-              <div className="card-icon">
-                <span className="material-icons-round">build</span>
+          {error && (
+            <div className="info-card">
+              <div className="info-icon">
+                <span className="material-icons-round">error</span>
               </div>
-              <div className="card-content">
-                <h3 className="card-title">Apply for Mechanic</h3>
-                <p className="card-description">
-                  Offer your automotive repair services as an independent mechanic
-                </p>
-              </div>
-              <div className="card-arrow">
-                <span className="material-icons-round">arrow_forward</span>
-              </div>
-            </button>
+              <p className="info-text" style={{color: '#dc2626'}}>
+                {error}
+              </p>
+            </div>
+          )}
 
-            {/* Apply for Shop Owner */}
-            <button className="application-card shop" onClick={handleApplyShopOwner}>
-              <div className="card-icon">
-                <span className="material-icons-round">store</span>
-              </div>
-              <div className="card-content">
-                <h3 className="card-title">Apply for Shop Owner</h3>
-                <p className="card-description">
-                  Register your automotive shop and manage mechanics
-                </p>
-              </div>
-              <div className="card-arrow">
-                <span className="material-icons-round">arrow_forward</span>
-              </div>
-            </button>
-          </div>
+          {/* Role Options */}
+          {!loading && !error && userRoles && (
+            <div className="application-options">
+              {/* Mechanic Role Option */}
+              {userRoles.has_mechanic_profile ? (
+                <button className="application-card mechanic registered" onClick={handleSwitchToMechanic}>
+                  <div className="card-icon">
+                    <span className="material-icons-round">build</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Switch to Mechanic</h3>
+                    <p className="card-description">
+                      {userRoles.mechanic_status.verified ? 
+                        `Status: ${userRoles.mechanic_status.status || 'Active'} • Verified` :
+                        'Registration pending verification'
+                      }
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">launch</span>
+                  </div>
+                </button>
+              ) : (
+                <button className="application-card mechanic" onClick={handleApplyMechanic}>
+                  <div className="card-icon">
+                    <span className="material-icons-round">build</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Apply for Mechanic</h3>
+                    <p className="card-description">
+                      Offer your automotive repair services as an independent mechanic
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">arrow_forward</span>
+                  </div>
+                </button>
+              )}
+
+              {/* Shop Owner Role Option */}
+              {userRoles.has_shop_owner_profile ? (
+                <button className="application-card shop registered" onClick={handleSwitchToShopOwner}>
+                  <div className="card-icon">
+                    <span className="material-icons-round">store</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Switch to Shop Owner</h3>
+                    <p className="card-description">
+                      {userRoles.shop_owner_status.verified ? 
+                        `Status: ${userRoles.shop_owner_status.status || 'Active'} • Verified` :
+                        'Registration pending verification'
+                      }
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">launch</span>
+                  </div>
+                </button>
+              ) : (
+                <button className="application-card shop" onClick={handleApplyShopOwner}>
+                  <div className="card-icon">
+                    <span className="material-icons-round">store</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Apply for Shop Owner</h3>
+                    <p className="card-description">
+                      Register your automotive shop and manage mechanics
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">arrow_forward</span>
+                  </div>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </IonContent>
+
+      <IonLoading isOpen={loading} message="Loading user roles..." />
+      
+      <IonToast
+        isOpen={!!error}
+        onDidDismiss={() => setError(null)}
+        message={error || ''}
+        duration={3000}
+        color="danger"
+        position="top"
+      />
     </IonPage>
   );
 };

@@ -29,7 +29,7 @@ const Booking: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
 
   // Client ID - In a real app, this would come from authentication context
-  const [clientId, setClientId] = useState<number>(1); // Default to 1 for testing
+  const [clientId, setClientId] = useState<number>(10); // Default to 10 for testing
 
   const goToNotifications = () => history.push('/client/notifications');
   
