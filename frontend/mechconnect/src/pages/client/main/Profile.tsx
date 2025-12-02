@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonLoading, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BottomNav from '../../../components/BottomNav';
+import { clearAuthData } from '../../../utils/auth';
 import './Profile.css';
 
 // API Configuration
@@ -66,19 +67,15 @@ const Profile: React.FC = () => {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      // Clear all stored data
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      sessionStorage.clear();
+      // Clear all stored data using utility function
+      clearAuthData();
       
       setToastMessage('Logged out successfully');
       setToastColor('success');
       setShowToast(true);
       
-      setTimeout(() => {
-        history.push('/login');
-      }, 1000);
+      // Immediate redirect to prevent blank screen
+      history.replace('/login');
     } catch (error) {
       console.error('Logout error:', error);
       setToastMessage('Error during logout');

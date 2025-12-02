@@ -1,10 +1,70 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
+from django.contrib.auth import authenticate
 from .models import (
     Account, AccountAddress, AccountRole, Client, Mechanic, 
     ShopOwner, Admin, HeadAdmin, PasswordReset, Notification
 )
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'username'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'] = serializers.CharField()
+        self.fields['password'] = serializers.CharField()
+    
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        
+        # Add custom claims
+        token['acc_id'] = user.acc_id
+        token['email'] = user.email
+        token['username'] = user.username
+        token['firstname'] = user.firstname
+        token['lastname'] = user.lastname
+        token['is_active'] = user.is_active
+        token['is_verified'] = user.is_verified
+        
+        # Add role information
+        primary_role = user.get_primary_role()
+        token['role'] = primary_role
+        
+        return token
+    
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+        
+        if username and password:
+            # Authenticate using the custom Account model
+            try:
+                user = Account.objects.get(username=username)
+                if user.check_password(password):
+                    if not user.is_active:
+                        raise serializers.ValidationError('User account is disabled.')
+                    
+                    # Check if user is banned
+                    if hasattr(user, 'ban'):
+                        raise serializers.ValidationError(f'Account is banned: {user.ban.reason_ban}')
+                    
+                    refresh = self.get_token(user)
+                    
+                    return {
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token),
+                        'user': AccountSerializer(user).data
+                    }
+                else:
+                    raise serializers.ValidationError('Invalid credentials.')
+            except Account.DoesNotExist:
+                raise serializers.ValidationError('Invalid credentials.')
+        else:
+            raise serializers.ValidationError('Must include username and password.')
 
 
 class AccountAddressSerializer(serializers.ModelSerializer):

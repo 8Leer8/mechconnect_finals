@@ -43,6 +43,12 @@ const Login: React.FC = () => {
         setToastColor('success');
         setShowToast(true);
         
+        // Store authentication token
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('authToken', data.token);
+        }
+        
         // Store user data if needed
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));

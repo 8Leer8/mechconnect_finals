@@ -6,7 +6,7 @@ const ShopMechanicProfile: React.FC = () => {
   const history = useHistory();
 
   const goBack = () => history.goBack();
-  const handleCustomRequest = () => history.push('/client/custom-request');
+  const handleCustomRequest = () => history.push(`/client/custom-request?provider_id=${id}`);
   const goToShopDetail = (id: string) => history.push(`/client/shop-detail/${id}`);
 
   return (

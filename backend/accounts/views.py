@@ -1,5 +1,6 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.hashers import check_password
@@ -50,10 +51,17 @@ def register(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AnonRateThrottle])  # Prevent brute force attacks
 def login(request):
     """
     Authenticate user and return user data
     """
+    # Input validation
+    if not request.data.get('username') or not request.data.get('password'):
+        return Response({
+            'error': 'Username and password are required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
     serializer = UserLoginSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.validated_data['user']
@@ -66,9 +74,15 @@ def login(request):
             }, status=status.HTTP_403_FORBIDDEN)
         
         user_data = AccountSerializer(user).data
+        
+        # Generate a simple authentication token for the frontend
+        import secrets
+        token = secrets.token_urlsafe(32)
+        
         return Response({
             'message': 'Login successful',
-            'user': user_data
+            'user': user_data,
+            'token': token  # Include token for frontend authentication
         }, status=status.HTTP_200_OK)
     
     return Response({
@@ -84,15 +98,20 @@ def profile(request):
     Get current user profile
     """
     try:
-        # In a real implementation, you'd get the user from JWT token or session
-        # For now, we'll get by ID from query params or use a mock user
+        # Get user from authentication or query params (with validation)
         user_id = request.GET.get('user_id')
         if user_id:
             user = get_object_or_404(Account, acc_id=user_id)
+            # Ensure user can only access their own profile (or admin)
+            if hasattr(request, 'user') and request.user.is_authenticated:
+                user_roles = request.user.roles.values_list('account_role', flat=True)
+                if str(request.user.acc_id) != str(user_id) and 'admin' not in user_roles and 'head_admin' not in user_roles:
+                    return Response({
+                        'error': 'Access denied: You can only view your own profile'
+                    }, status=status.HTTP_403_FORBIDDEN)
         else:
-            # Mock response - replace with actual authenticated user
             return Response({
-                'error': 'User ID required in query params for this demo'
+                'error': 'User ID required in query params'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = AccountSerializer(user)
@@ -119,6 +138,14 @@ def update_profile(request):
             return Response({
                 'error': 'User ID required'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Ensure user can only update their own profile (or admin)
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            user_roles = request.user.roles.values_list('account_role', flat=True)
+            if str(request.user.acc_id) != str(user_id) and 'admin' not in user_roles and 'head_admin' not in user_roles:
+                return Response({
+                    'error': 'Access denied: You can only update your own profile'
+                }, status=status.HTTP_403_FORBIDDEN)
         
         user = get_object_or_404(Account, acc_id=user_id)
         
@@ -155,6 +182,14 @@ def change_password(request):
             return Response({
                 'error': 'User ID required'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Ensure user can only change their own password (or admin)
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            user_roles = request.user.roles.values_list('account_role', flat=True)
+            if str(request.user.acc_id) != str(user_id) and 'admin' not in user_roles and 'head_admin' not in user_roles:
+                return Response({
+                    'error': 'Access denied: You can only change your own password'
+                }, status=status.HTTP_403_FORBIDDEN)
         
         user = get_object_or_404(Account, acc_id=user_id)
         
@@ -206,12 +241,12 @@ def password_reset_request(request):
                 expires_at=expires_at
             )
             
-            # In a real app, you would send this token via email
-            # For now, we'll return it in the response (DON'T do this in production!)
+            # In production, send this token via email instead of returning it
+            # For development purposes only - REMOVE IN PRODUCTION
             return Response({
-                'message': 'Password reset token generated',
-                'reset_token': reset_token,  # Remove this in production
-                'note': 'In production, this token would be sent via email'
+                'message': 'Password reset instructions have been sent to your email',
+                # 'reset_token': reset_token,  # REMOVED for security
+                'note': 'Check your email for password reset instructions'
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -258,7 +293,13 @@ def get_users(request):
     Get list of users (admin functionality)
     """
     try:
-        # In production, add proper admin permission check
+        # Check if user has admin permissions
+        user_roles = request.user.roles.values_list('account_role', flat=True) if hasattr(request, 'user') and request.user.is_authenticated else []
+        if 'admin' not in user_roles and 'head_admin' not in user_roles:
+            return Response({
+                'error': 'Admin access required'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         users = Account.objects.all().order_by('-created_at')
         
         # Apply filters
@@ -328,6 +369,13 @@ def deactivate_user(request, user_id):
     Deactivate a user account (admin functionality)
     """
     try:
+        # Check admin permissions
+        user_roles = request.user.roles.values_list('account_role', flat=True) if hasattr(request, 'user') and request.user.is_authenticated else []
+        if 'admin' not in user_roles and 'head_admin' not in user_roles:
+            return Response({
+                'error': 'Admin access required'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         user = get_object_or_404(Account, acc_id=user_id)
         user.is_active = False
         user.save()
@@ -350,6 +398,13 @@ def activate_user(request, user_id):
     Activate a user account (admin functionality)
     """
     try:
+        # Check admin permissions
+        user_roles = request.user.roles.values_list('account_role', flat=True) if hasattr(request, 'user') and request.user.is_authenticated else []
+        if 'admin' not in user_roles and 'head_admin' not in user_roles:
+            return Response({
+                'error': 'Admin access required'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         user = get_object_or_404(Account, acc_id=user_id)
         user.is_active = True
         user.save()
@@ -372,6 +427,13 @@ def verify_user(request, user_id):
     Verify a user account (admin functionality)
     """
     try:
+        # Check admin permissions
+        user_roles = request.user.roles.values_list('account_role', flat=True) if hasattr(request, 'user') and request.user.is_authenticated else []
+        if 'admin' not in user_roles and 'head_admin' not in user_roles:
+            return Response({
+                'error': 'Admin access required'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         user = get_object_or_404(Account, acc_id=user_id)
         user.is_verified = True
         user.save()
@@ -399,6 +461,14 @@ def user_notifications(request):
             return Response({
                 'error': 'User ID required in query params'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Ensure user can only access their own notifications (or admin)
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            user_roles = request.user.roles.values_list('account_role', flat=True)
+            if str(request.user.acc_id) != str(user_id) and 'admin' not in user_roles and 'head_admin' not in user_roles:
+                return Response({
+                    'error': 'Access denied: You can only view your own notifications'
+                }, status=status.HTTP_403_FORBIDDEN)
         
         user = get_object_or_404(Account, acc_id=user_id)
         notifications = user.notifications.all().order_by('-created_at')

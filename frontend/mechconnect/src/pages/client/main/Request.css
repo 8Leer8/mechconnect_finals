@@ -1,7 +1,7 @@
 /* Request Page Styles */
 .request-content {
   --background: hsl(40, 20%, 98%);
-  padding-bottom: 160px;
+  padding-bottom: 140px;
 }
 
 /* Header */
@@ -42,6 +42,43 @@
 /* Request Section */
 .request-section {
   padding: 0 20px 20px;
+}
+
+/* Request Summary */
+.request-summary {
+  margin: 12px 0;
+  padding: 8px 0;
+  color: hsl(25, 15%, 40%);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Loading and Error States */
+.loading-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: hsl(25, 15%, 50%);
+  font-size: 16px;
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #d32f2f;
+  font-size: 16px;
+  background: #ffebee;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.no-requests-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: hsl(25, 15%, 50%);
+  font-size: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Tabs */
@@ -110,6 +147,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 100px;
 }
 
 /* Request Card */
@@ -265,9 +303,10 @@
   bottom: 80px;
   left: 0;
   right: 0;
-  padding: 0 20px 20px;
-  background: linear-gradient(to top, hsl(40, 20%, 98%) 60%, transparent);
+  padding: 20px 20px 20px;
+  background: linear-gradient(to top, hsl(40, 20%, 98%) 80%, rgba(255, 255, 255, 0.8) 50%, transparent);
   pointer-events: none;
+  z-index: 10;
 }
 
 .custom-request-btn {

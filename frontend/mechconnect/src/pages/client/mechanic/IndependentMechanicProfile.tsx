@@ -52,7 +52,7 @@ const IndependentMechanicProfile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const goBack = () => history.goBack();
-  const handleCustomRequest = () => history.push('/client/custom-request');
+  const handleCustomRequest = () => history.push(`/client/custom-request?provider_id=${id}`);
   const goToServiceDetail = (serviceId: number) => history.push(`/client/service-detail/${serviceId}`);
   const goToShopDetail = (shopId: number) => history.push(`/client/shop-detail/${shopId}`);
 
