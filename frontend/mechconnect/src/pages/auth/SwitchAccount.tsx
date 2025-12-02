@@ -74,11 +74,11 @@ const SwitchAccount: React.FC = () => {
   };
 
   const handleApplyMechanic = () => {
-    history.push('/mechanic-signup');
+    history.push('/mechanicsignup');
   };
 
   const handleApplyShopOwner = () => {
-    history.push('/shop-owner-signup');
+    history.push('/shopownersignup');
   };
 
   return (
@@ -122,7 +122,7 @@ const SwitchAccount: React.FC = () => {
           {/* Role Options */}
           {!loading && !error && userRoles && (
             <div className="application-options">
-              {/* Mechanic Role Option */}
+              {/* Show Mechanic options */}
               {userRoles.has_mechanic_profile ? (
                 <button className="application-card mechanic registered" onClick={handleSwitchToMechanic}>
                   <div className="card-icon">
@@ -158,7 +158,7 @@ const SwitchAccount: React.FC = () => {
                 </button>
               )}
 
-              {/* Shop Owner Role Option */}
+              {/* Show Shop Owner options */}
               {userRoles.has_shop_owner_profile ? (
                 <button className="application-card shop registered" onClick={handleSwitchToShopOwner}>
                   <div className="card-icon">

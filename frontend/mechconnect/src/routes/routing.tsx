@@ -7,6 +7,8 @@ import Login from '../pages/auth/Login';
 import Signup from '../pages/auth/Signup';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import SwitchAccount from '../pages/auth/SwitchAccount';
+import MechanicSignup from '../pages/auth/MechanicSignup';
+import ShopOwnerSignup from '../pages/auth/ShopOwnerSignup';
 
 // Head Admin Pages
 import HeadAdminDashboard from '../pages/headadmin/dashboard';
@@ -52,6 +54,8 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/signup" component={Signup} />
       <Route exact path="/forgot-password" component={ForgotPassword} />
       <Route exact path="/auth/switch-account" component={SwitchAccount} />
+      <Route exact path="/mechanicsignup" component={MechanicSignup} />
+      <Route exact path="/shopownersignup" component={ShopOwnerSignup} />
       
       {/* Protected Client Routes */}
       <AuthGuard exact path="/client/home">
