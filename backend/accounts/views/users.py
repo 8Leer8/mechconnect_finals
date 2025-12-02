@@ -385,3 +385,144 @@ def unban_user(request):
             'error': 'Failed to unban user',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def mechanic_detail(request, mechanic_id):
+    """
+    Get detailed information about a specific mechanic
+    """
+    try:
+        # Get the mechanic account
+        mechanic_account = Account.objects.select_related(
+            'mechanic_profile', 'address'
+        ).prefetch_related(
+            'roles', 'mechanic_profile__specialties'
+        ).get(
+            acc_id=mechanic_id,
+            roles__account_role=AccountRole.ROLE_MECHANIC,
+            is_active=True
+        )
+        
+        # Get mechanic profile
+        mechanic_profile = mechanic_account.mechanic_profile
+        
+        # Prepare full name early since it's used in multiple places
+        full_name_parts = [mechanic_account.firstname, mechanic_account.middlename, mechanic_account.lastname]
+        full_name = ' '.join(part for part in full_name_parts if part)
+        
+        # Get location from address
+        location = "Location not specified"
+        if hasattr(mechanic_account, 'address') and mechanic_account.address:
+            address_parts = []
+            if mechanic_account.address.city_municipality:
+                address_parts.append(mechanic_account.address.city_municipality)
+            if mechanic_account.address.province:
+                address_parts.append(mechanic_account.address.province)
+            location = ", ".join(address_parts) if address_parts else "Location not specified"
+        
+        # Get specialties through the intermediate model
+        specialties = []
+        if mechanic_profile:
+            from specialties.models import MechanicSpecialty
+            mechanic_specialties = MechanicSpecialty.objects.filter(
+                mechanic=mechanic_profile
+            ).select_related('specialty')
+            specialties = [ms.specialty.name for ms in mechanic_specialties]
+        
+        # Get mechanic's services based on whether they work for a shop or are independent
+        from services.models import Service, MechanicService, ShopService, ShopServiceMechanic
+        from shop.models import Shop
+        
+        services_data = []
+        shop_info = None
+        
+        if mechanic_profile and mechanic_profile.is_working_for_shop and mechanic_profile.shop:
+            # Mechanic works for a shop - get services assigned to this mechanic by the shop
+            shop = mechanic_profile.shop
+            shop_info = {
+                'shop_id': shop.shop_id,
+                'shop_name': shop.shop_name,
+                'description': shop.description,
+                'service_banner': shop.service_banner,
+            }
+            
+            # Get shop services assigned to this mechanic
+            shop_service_mechanic_assignments = ShopServiceMechanic.objects.filter(
+                mechanic=mechanic_profile
+            ).select_related('shop_service__service__service_category')
+            
+            for assignment in shop_service_mechanic_assignments:
+                service = assignment.shop_service.service
+                services_data.append({
+                    'service_id': service.service_id,
+                    'name': service.name,
+                    'description': service.description,
+                    'price': str(service.price),
+                    'service_banner': service.service_banner,
+                    'category_name': service.service_category.name if service.service_category else 'Service',
+                    'provider_type': 'Shop',
+                    'provider_name': shop.shop_name,
+                    'provider_id': shop.shop_id,
+                    'average_rating': '4.5',  # Calculate this based on actual ratings later
+                    'total_bookings': 50,  # Calculate this based on actual bookings later
+                })
+        else:
+            # Independent mechanic - get their own services
+            mechanic_service_ids = MechanicService.objects.filter(
+                mechanic=mechanic_profile
+            ).values_list('service_id', flat=True)
+            
+            services = Service.objects.filter(
+                service_id__in=mechanic_service_ids
+            ).select_related('service_category')[:10]  # Limit to 10 services
+            
+            for service in services:
+                services_data.append({
+                    'service_id': service.service_id,
+                    'name': service.name,
+                    'description': service.description,
+                    'price': str(service.price),
+                    'service_banner': service.service_banner,
+                    'category_name': service.service_category.name if service.service_category else 'Service',
+                    'provider_type': 'Independent Mechanic',
+                    'provider_name': full_name,
+                    'provider_id': mechanic_account.acc_id,
+                    'average_rating': '4.5',  # Calculate this based on actual ratings later
+                    'total_bookings': 50,  # Calculate this based on actual bookings later
+                })
+        
+        # Prepare response data
+        mechanic_data = {
+            'acc_id': mechanic_account.acc_id,
+            'full_name': full_name,
+            'email': mechanic_account.email,
+            'profile_photo': mechanic_profile.profile_photo if mechanic_profile else None,
+            'contact_number': mechanic_profile.contact_number if mechanic_profile else None,
+            'bio': mechanic_profile.bio if mechanic_profile else 'Professional mechanic',
+            'average_rating': str(mechanic_profile.average_rating) if mechanic_profile and mechanic_profile.average_rating else '0.0',
+            'ranking': mechanic_profile.ranking if mechanic_profile else 'standard',
+            'location': location,
+            'total_jobs': 0,  # This field doesn't exist in the model, set to 0 for now
+            'date_joined': mechanic_account.created_at.strftime('%B %Y') if mechanic_account.created_at else 'Recently',
+            'status': mechanic_profile.status if mechanic_profile else 'available',
+            'is_working_for_shop': mechanic_profile.is_working_for_shop if mechanic_profile else False,
+            'shop_info': shop_info,
+            'specialties': specialties,
+            'services': services_data,
+        }
+        
+        return Response({
+            'message': 'Mechanic details retrieved successfully',
+            'mechanic': mechanic_data
+        }, status=status.HTTP_200_OK)
+        
+    except Account.DoesNotExist:
+        return Response({
+            'error': 'Mechanic not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': f'An error occurred: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

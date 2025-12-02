@@ -26,6 +26,9 @@ urlpatterns = [
 
     # Discovery endpoints
     path('discover/mechanics/', users.discover_mechanics, name='discover_mechanics'),
+    
+    # Mechanic detail endpoint
+    path('mechanic/<int:mechanic_id>/', users.mechanic_detail, name='mechanic_detail'),
 
     # Head Admin Dashboard
     path('head-admin/dashboard/stats/', dashboard.head_admin_dashboard_stats, name='head_admin_dashboard_stats'),
