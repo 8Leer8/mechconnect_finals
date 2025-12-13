@@ -128,6 +128,7 @@ WSGI_APPLICATION = 'mechconnect_backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 online = True  # Change niyo tu to false if localhost gamitin nio
 if online:
     # Supabase 
