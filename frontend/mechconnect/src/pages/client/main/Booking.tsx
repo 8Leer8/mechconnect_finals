@@ -35,6 +35,7 @@ const Booking: React.FC = () => {
   
   // Navigation to specific booking detail pages
   const goToBookingDetail = (bookingId: number, status: string) => {
+    console.log('Navigating to booking detail:', bookingId, status); // Debug log
     switch (status) {
       case 'active':
         history.push(`/client/active-booking/${bookingId}`);
@@ -48,9 +49,6 @@ const Booking: React.FC = () => {
       case 'back_jobs':
         history.push(`/client/backjobs-booking/${bookingId}`);
         break;
-      case 'rejected':
-        history.push(`/client/rejected-booking/${bookingId}`);
-        break;
       case 'cancelled':
         history.push(`/client/canceled-booking/${bookingId}`);
         break;
@@ -61,6 +59,7 @@ const Booking: React.FC = () => {
         history.push(`/client/refunded-booking/${bookingId}`);
         break;
       default:
+        console.log('Unknown status, defaulting to active:', status);
         history.push(`/client/active-booking/${bookingId}`);
     }
   };
@@ -125,30 +124,23 @@ const Booking: React.FC = () => {
   };
   
   const handleTabBackJobs = () => {
-    setActiveTab('back-jobs');
+    setActiveTab('back_jobs');
     if (bookings.length === 0 && !loading) {
-      fetchBookings('back-jobs');
-    }
-  };
-  
-  const handleTabRejected = () => {
-    setActiveTab('rejected');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('rejected');
+      fetchBookings('back_jobs');
     }
   };
   
   const handleTabCanceled = () => {
-    setActiveTab('canceled');
+    setActiveTab('cancelled');
     if (bookings.length === 0 && !loading) {
-      fetchBookings('canceled');
+      fetchBookings('cancelled');
     }
   };
   
   const handleTabDisputed = () => {
-    setActiveTab('disputed');
+    setActiveTab('dispute');
     if (bookings.length === 0 && !loading) {
-      fetchBookings('disputed');
+      fetchBookings('dispute');
     }
   };
   
@@ -225,9 +217,13 @@ const Booking: React.FC = () => {
     }
 
     if (bookings.length === 0) {
+      const displayStatus = activeTab === 'back_jobs' ? 'back jobs' : 
+                           activeTab === 'cancelled' ? 'canceled' : 
+                           activeTab === 'dispute' ? 'disputed' : 
+                           activeTab;
       return (
         <div className="no-bookings-message">
-          No {activeTab} bookings found
+          No {displayStatus} bookings found
         </div>
       );
     }
@@ -240,6 +236,7 @@ const Booking: React.FC = () => {
           </span>
           {booking.status === 'back_jobs' ? 'Back Jobs' : 
            booking.status === 'cancelled' ? 'Canceled' : 
+           booking.status === 'dispute' ? 'Disputed' :
            booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
         </span>
         
@@ -319,25 +316,20 @@ const Booking: React.FC = () => {
                 Rescheduled
               </button>
               <button 
-                className={`tab-button ${activeTab === 'back-jobs' ? 'active' : ''}`}
+                className={`tab-button ${activeTab === 'back_jobs' ? 'active' : ''}`}
                 onClick={handleTabBackJobs}
               >
                 Back Jobs
               </button>
+
               <button 
-                className={`tab-button ${activeTab === 'rejected' ? 'active' : ''}`}
-                onClick={handleTabRejected}
-              >
-                Rejected
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'canceled' ? 'active' : ''}`}
+                className={`tab-button ${activeTab === 'cancelled' ? 'active' : ''}`}
                 onClick={handleTabCanceled}
               >
                 Canceled
               </button>
               <button 
-                className={`tab-button ${activeTab === 'disputed' ? 'active' : ''}`}
+                className={`tab-button ${activeTab === 'dispute' ? 'active' : ''}`}
                 onClick={handleTabDisputed}
               >
                 Disputed

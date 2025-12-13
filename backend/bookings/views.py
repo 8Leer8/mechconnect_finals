@@ -129,6 +129,101 @@ def completed_booking_detail(request, booking_id):
 
 
 @api_view(['GET'])
+def rescheduled_booking_detail(request, booking_id):
+    """Get detailed information about a rescheduled booking"""
+    try:
+        rescheduled_booking = RescheduledBooking.objects.select_related(
+            'booking',
+            'booking__request',
+            'booking__request__client',
+            'booking__request__client__client_id',
+            'booking__request__provider'
+        ).get(booking__booking_id=booking_id)
+        
+        serializer = RescheduledBookingSerializer(rescheduled_booking)
+        return Response(serializer.data)
+        
+    except RescheduledBooking.DoesNotExist:
+        return Response({'error': 'Rescheduled booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def cancelled_booking_detail(request, booking_id):
+    """Get detailed information about a cancelled booking"""
+    try:
+        cancelled_booking = CancelledBooking.objects.select_related(
+            'booking',
+            'booking__request',
+            'booking__request__client',
+            'booking__request__client__client_id',
+            'booking__request__provider'
+        ).get(booking__booking_id=booking_id)
+        
+        serializer = CancelledBookingSerializer(cancelled_booking)
+        return Response(serializer.data)
+        
+    except CancelledBooking.DoesNotExist:
+        return Response({'error': 'Cancelled booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def back_jobs_booking_detail(request, booking_id):
+    """Get detailed information about a back jobs booking"""
+    try:
+        back_jobs_booking = BackJobsBooking.objects.select_related(
+            'booking',
+            'booking__request',
+            'booking__request__client',
+            'booking__request__client__client_id',
+            'booking__request__provider'
+        ).get(booking__booking_id=booking_id)
+        
+        serializer = BackJobsBookingSerializer(back_jobs_booking)
+        return Response(serializer.data)
+        
+    except BackJobsBooking.DoesNotExist:
+        return Response({'error': 'Back jobs booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def disputed_booking_detail(request, booking_id):
+    """Get detailed information about a disputed booking"""
+    try:
+        disputed_booking = Dispute.objects.select_related(
+            'booking',
+            'booking__request',
+            'booking__request__client',
+            'booking__request__client__client_id',
+            'booking__request__provider'
+        ).get(booking__booking_id=booking_id)
+        
+        serializer = DisputeSerializer(disputed_booking)
+        return Response(serializer.data)
+        
+    except Dispute.DoesNotExist:
+        return Response({'error': 'Disputed booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def refunded_booking_detail(request, booking_id):
+    """Get detailed information about a refunded booking"""
+    try:
+        refunded_booking = RefundedBooking.objects.select_related(
+            'booking',
+            'booking__request',
+            'booking__request__client',
+            'booking__request__client__client_id',
+            'booking__request__provider'
+        ).get(booking__booking_id=booking_id)
+        
+        serializer = RefundedBookingSerializer(refunded_booking)
+        return Response(serializer.data)
+        
+    except RefundedBooking.DoesNotExist:
+        return Response({'error': 'Refunded booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
 def rescheduled_bookings_list(request):
     """Get list of rescheduled bookings for a client"""
     client_id = request.GET.get('client_id')

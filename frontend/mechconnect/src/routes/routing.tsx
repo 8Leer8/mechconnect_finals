@@ -40,6 +40,16 @@ import QuotedRequest from '../pages/client/side/QuotedRequest';
 import AcceptedRequest from '../pages/client/side/AcceptedRequest';
 import RejectedRequest from '../pages/client/side/RejectedRequest';
 
+// Client Booking Detail Pages
+import ActiveBooking from '../pages/client/side/ActiveBooking';
+import CompletedBooking from '../pages/client/side/CompletedBooking';
+import CanceledBooking from '../pages/client/side/CanceledBooking';
+import BackJobsBooking from '../pages/client/side/BackJobsBooking';
+import DisputedBooking from '../pages/client/side/DisputedBooking';
+import RescheduledBooking from '../pages/client/side/RescheduledBooking';
+import RejectedBooking from '../pages/client/side/RejectedBooking';
+import RefundedBooking from '../pages/client/side/RefundedBooking';
+
 // Shop Owner Pages
 import Dashboard from '../pages/shopowner/main/dashboard';
 import Mechanic from '../pages/shopowner/main/mechanic';
@@ -101,6 +111,32 @@ const AppRoutes: React.FC = () => {
       </AuthGuard>
       <AuthGuard exact path="/client/rejected-request/:id?">
         <RejectedRequest />
+      </AuthGuard>
+      
+      {/* Client Booking Detail Routes */}
+      <Route exact path="/client/active-booking/:id">
+        <ActiveBooking />
+      </Route>
+      <AuthGuard exact path="/client/completed-booking/:id">
+        <CompletedBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/canceled-booking/:id">
+        <CanceledBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/backjobs-booking/:id">
+        <BackJobsBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/disputed-booking/:id">
+        <DisputedBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/rescheduled-booking/:id">
+        <RescheduledBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/rejected-booking/:id">
+        <RejectedBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/refunded-booking/:id">
+        <RefundedBooking />
       </AuthGuard>
       
       {/* Protected Shop Owner Routes */}

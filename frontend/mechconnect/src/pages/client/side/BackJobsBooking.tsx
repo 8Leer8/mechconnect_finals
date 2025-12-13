@@ -1,11 +1,33 @@
 import { IonContent, IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import { useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './BackJobsBooking.css';
+
+interface BookingData {
+  booking_id: number;
+  status: string;
+  amount_fee: number;
+  booked_at: string;
+  service_time: string;
+  client_name: string;
+  provider_name: string;
+  provider_contact: string;
+  request_summary: string;
+  request_type: string;
+  service_details: {
+    service_name: string;
+    includes?: string;
+    addons?: string;
+  };
+}
 
 const BackJobsBooking: React.FC = () => {
   const history = useHistory();
+  const { id } = useParams<{ id: string }>();
   const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [bookingData, setBookingData] = useState<BookingData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const goBack = () => {
     history.goBack();
@@ -23,6 +45,78 @@ const BackJobsBooking: React.FC = () => {
     setIsLocationOpen(!isLocationOpen);
   };
 
+  // Fetch booking details from API
+  const fetchBookingDetails = async () => {
+    if (!id) {
+      setError('Booking ID not provided');
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/bookings/back-jobs/${id}/`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setBookingData(data);
+      } else {
+        setError(data.error || 'Failed to load booking details');
+      }
+    } catch (err) {
+      setError('Network error occurred');
+      console.error('Error fetching booking details:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookingDetails();
+  }, [id]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <IonPage>
+        <IonContent className="backjobs-booking-content">
+          <div className="loading-container">
+            <div className="loading-message">Loading booking details...</div>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  // Show error state
+  if (error || !bookingData) {
+    return (
+      <IonPage>
+        <IonContent className="backjobs-booking-content">
+          <div className="error-container">
+            <div className="error-message">{error || 'Booking not found'}</div>
+            <button className="retry-button" onClick={fetchBookingDetails}>
+              Try Again
+            </button>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
+
   return (
     <IonPage>
       <IonContent className="backjobs-booking-content">
@@ -37,17 +131,17 @@ const BackJobsBooking: React.FC = () => {
         <div className="booking-container">
           <div className="booking-card">
             <div className="booking-id-badge backjobs">
-              <span className="booking-id">#BK-2841</span>
+              <span className="booking-id">#BK-{bookingData.booking_id}</span>
             </div>
 
             <div className="booking-section">
               <div className="detail-row">
                 <span className="detail-label">Provider:</span>
-                <span className="detail-value provider-name">Mike Johnson</span>
+                <span className="detail-value provider-name">{bookingData.provider_name}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Contact number:</span>
-                <span className="detail-value">+63 912 345 6789</span>
+                <span className="detail-value">{bookingData.provider_contact || 'Not available'}</span>
               </div>
             </div>
 
@@ -56,7 +150,7 @@ const BackJobsBooking: React.FC = () => {
             <div className="booking-section">
               <h3 className="section-title">Service Details</h3>
               <div className="service-item">
-                <span className="service-name">Engine Diagnostics</span>
+                <span className="service-name">{bookingData.service_details?.service_name || bookingData.request_summary}</span>
               </div>
             </div>
 

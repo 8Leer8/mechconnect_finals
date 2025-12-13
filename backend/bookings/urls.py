@@ -12,6 +12,11 @@ urlpatterns = [
     # Specific booking types
     path('active/<int:booking_id>/', views.active_booking_detail, name='active_booking_detail'),
     path('completed/<int:booking_id>/', views.completed_booking_detail, name='completed_booking_detail'),
+    path('rescheduled/<int:booking_id>/', views.rescheduled_booking_detail, name='rescheduled_booking_detail'),
+    path('cancelled/<int:booking_id>/', views.cancelled_booking_detail, name='cancelled_booking_detail'),
+    path('back-jobs/<int:booking_id>/', views.back_jobs_booking_detail, name='back_jobs_booking_detail'),
+    path('disputed/<int:booking_id>/', views.disputed_booking_detail, name='disputed_booking_detail'),
+    path('refunded/<int:booking_id>/', views.refunded_booking_detail, name='refunded_booking_detail'),
     
     # Lists by status (alternative endpoints for specific statuses)
     path('rescheduled/', views.rescheduled_bookings_list, name='rescheduled_bookings_list'),

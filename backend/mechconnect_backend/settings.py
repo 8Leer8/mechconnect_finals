@@ -128,17 +128,31 @@ WSGI_APPLICATION = 'mechconnect_backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.tsokmagrbtfuuzlemufw',
-        'PASSWORD': 'Mechconnect221',
-        'HOST': 'aws-1-ap-southeast-1.pooler.supabase.com',
-        'PORT': '5432',
+online = True  # Change niyo tu to false if localhost gamitin nio
+if online:
+    # Supabase 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres.tsokmagrbtfuuzlemufw',
+            'PASSWORD': 'Mechconnect221',
+            'HOST': 'aws-1-ap-southeast-1.pooler.supabase.com',
+            'PORT': '5432',
+        }
     }
-}
+else:
+    # Localhost
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'mechconnect_db', 
+            'USER': 'root',
+            'PASSWORD': '',  
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+        }
+    }
 
 
 # Password validation

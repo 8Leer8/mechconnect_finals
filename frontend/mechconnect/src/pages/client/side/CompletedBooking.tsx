@@ -1,9 +1,32 @@
 import { IonContent, IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './CompletedBooking.css';
+
+interface BookingData {
+  booking_id: number;
+  status: string;
+  amount_fee: number;
+  booked_at: string;
+  completed_at: string;
+  client_name: string;
+  provider_name: string;
+  provider_contact: string;
+  request_summary: string;
+  request_type: string;
+  service_details: {
+    service_name: string;
+    includes?: string;
+    addons?: string;
+  };
+}
 
 const CompletedBooking: React.FC = () => {
   const history = useHistory();
+  const { id } = useParams<{ id: string }>();
+  const [bookingData, setBookingData] = useState<BookingData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const goBack = () => {
     history.goBack();
@@ -16,6 +39,78 @@ const CompletedBooking: React.FC = () => {
   const handleRequestBackJob = () => {
     history.push('/client/back-jobs-form');
   };
+
+  // Fetch booking details from API
+  const fetchBookingDetails = async () => {
+    if (!id) {
+      setError('Booking ID not provided');
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/bookings/completed/${id}/`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setBookingData(data);
+      } else {
+        setError(data.error || 'Failed to load booking details');
+      }
+    } catch (err) {
+      setError('Network error occurred');
+      console.error('Error fetching booking details:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookingDetails();
+  }, [id]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <IonPage>
+        <IonContent className="completed-booking-content">
+          <div className="loading-container">
+            <div className="loading-message">Loading booking details...</div>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  // Show error state
+  if (error || !bookingData) {
+    return (
+      <IonPage>
+        <IonContent className="completed-booking-content">
+          <div className="error-container">
+            <div className="error-message">{error || 'Booking not found'}</div>
+            <button className="retry-button" onClick={fetchBookingDetails}>
+              Try Again
+            </button>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
 
   return (
     <IonPage>
