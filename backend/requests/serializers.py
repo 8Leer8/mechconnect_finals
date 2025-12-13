@@ -151,11 +151,13 @@ class RequestListSerializer(serializers.ModelSerializer):
     client_name = serializers.SerializerMethodField()
     provider_name = serializers.SerializerMethodField()
     request_summary = serializers.SerializerMethodField()
+    status = serializers.CharField(source='request_status', read_only=True)  # Add status field
+    booked_at = serializers.DateTimeField(source='created_at', read_only=True)  # Add booked_at field
     
     class Meta:
         model = Request
         fields = [
-            'request_id', 'request_type', 'request_status', 'created_at',
+            'request_id', 'request_type', 'status', 'booked_at',
             'client_name', 'provider_name', 'request_summary'
         ]
     
