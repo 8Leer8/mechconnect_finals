@@ -58,7 +58,13 @@ import Shop from '../pages/shopowner/main/shop';
 
 // Mechanic Pages
 import MechanicHome from '../pages/mechanic/home';
+import MechanicMap from '../pages/mechanic/map';
 import MechanicJobs from '../pages/mechanic/jobs';
+import MechanicJobDetail from '../pages/mechanic/job-detail';
+import MechanicEarnings from '../pages/mechanic/earnings';
+import MechanicProfile from '../pages/mechanic/profile';
+import MechanicNotifications from '../pages/mechanic/notifications';
+import MechanicReviews from '../pages/mechanic/reviews';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -164,6 +170,24 @@ const AppRoutes: React.FC = () => {
       <AuthGuard exact path="/mechanic/jobs">
         <MechanicJobs />
       </AuthGuard>
+      <AuthGuard exact path="/mechanic/map">
+        <MechanicMap />
+      </AuthGuard>
+      <AuthGuard exact path="/mechanic/job-detail/:id">
+        <MechanicJobDetail />
+      </AuthGuard>
+      <AuthGuard exact path="/mechanic/earnings">
+        <MechanicEarnings />
+      </AuthGuard>
+      <AuthGuard exact path="/mechanic/profile">
+        <MechanicProfile />
+      </AuthGuard>
+      <AuthGuard exact path="/mechanic/notifications">
+        <MechanicNotifications />
+      </AuthGuard>
+      <AuthGuard exact path="/mechanic/reviews">
+        <MechanicReviews />
+      </AuthGuard>
       
       {/* Default Route */}
       
@@ -199,6 +223,13 @@ const AppRoutes: React.FC = () => {
       {/* Mechanic Routes */}
       <Route exact path="/mechanic/home" component={MechanicHome} />
       <Route exact path="/mechanic/jobs" component={MechanicJobs} />
+      <Route exact path="/mechanic/map" component={MechanicMap} />
+      <Route exact path="/mechanic/job-detail/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/active-job/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/completed-job/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/cancelled-job/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/earnings" component={MechanicEarnings} />
+      <Route exact path="/mechanic/profile" component={MechanicProfile} />
       
       {/* Default Route */}
       <Route exact path="/">

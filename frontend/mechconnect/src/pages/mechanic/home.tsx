@@ -14,7 +14,7 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="mechanic-home-content" fullscreen scrollY>
+      <IonContent className="mechanic-home-content" scrollY>
         {/* Header */}
         <div className="mechanic-home-header">
           <h1 className="mechanic-home-title">Home</h1>
@@ -24,9 +24,7 @@ const Home: React.FC = () => {
           >
             <span className="material-icons-round">notifications</span>
           </button>
-        </div>
-
-        {/* Welcome Section */}
+        </div>        {/* Welcome Section */}
         <div className="mechanic-home-section">
           <div className="welcome-card">
             <h2 className="welcome-title">Welcome back, Mechanic!</h2>
@@ -114,7 +112,7 @@ const Home: React.FC = () => {
               <div className="mechanic-job-time">Started 2 hours ago</div>
               <button
                 className="mechanic-btn-details"
-                onClick={() => history.push('/mechanic/job/12345')}
+                onClick={() => history.push('/mechanic/job-detail/12345?type=active')}
               >
                 <span className="material-icons-round icon-sm">visibility</span>
                 View Details
@@ -127,7 +125,10 @@ const Home: React.FC = () => {
         <div className="mechanic-home-section">
           <h2 className="mechanic-section-title">Recent Activity</h2>
           <div className="mechanic-activity-list">
-            <div className="mechanic-activity-item">
+            <div
+              className="mechanic-activity-item clickable"
+              onClick={() => history.push('/mechanic/completed-job/12346')}
+            >
               <div className="mechanic-activity-icon">
                 <span className="material-icons-round">check_circle</span>
               </div>
@@ -138,7 +139,10 @@ const Home: React.FC = () => {
               <div className="mechanic-activity-amount">+₱850</div>
             </div>
 
-            <div className="mechanic-activity-item">
+            <div
+              className="mechanic-activity-item clickable"
+              onClick={() => history.push('/mechanic/active-job/12345')}
+            >
               <div className="mechanic-activity-icon">
                 <span className="material-icons-round">schedule</span>
               </div>
