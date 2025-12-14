@@ -15,9 +15,6 @@ const Dashboard: React.FC = () => {
         {/* Header */}
         <div className="dashboard-header">
           <div className="header-left">
-            <button className="menu-button">
-              <span className="material-icons-round">menu</span>
-            </button>
             <h1 className="header-title">MechConnect</h1>
           </div>
           <div className="header-right">

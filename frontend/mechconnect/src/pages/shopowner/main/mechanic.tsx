@@ -2,6 +2,7 @@ import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import BottomNavShop from '../../../components/bottomnavshop';
+import InviteMechanicModal from '../modal/InviteMechanicModal';
 import './mechanic.css';
 
 interface MechanicData {
@@ -32,6 +33,7 @@ const Mechanic: React.FC = () => {
   const history = useHistory();
   const [activeFilter, setActiveFilter] = useState<'All' | 'Active' | 'Invited'>('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const goToNotifications = () => history.push('/shopowner/notifications');
   const goToProfile = () => history.push('/shopowner/profile');
@@ -148,9 +150,6 @@ const Mechanic: React.FC = () => {
         {/* Header */}
         <div className="mechanic-header">
           <div className="header-left">
-            <button className="menu-button">
-              <span className="material-icons-round">menu</span>
-            </button>
             <h1 className="header-title">MechConnect</h1>
           </div>
           <div className="header-right">
@@ -222,7 +221,7 @@ const Mechanic: React.FC = () => {
                   Invited
                 </button>
               </div>
-              <button className="invite-button">
+                <button className="invite-button" onClick={() => setIsInviteModalOpen(true)}>
                 <span className="material-icons-round">person_add</span>
                 Invite Mechanic
               </button>
@@ -289,6 +288,7 @@ const Mechanic: React.FC = () => {
           </div>
         </div>
       </IonContent>
+      <InviteMechanicModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
       <BottomNavShop />
     </IonPage>
   );

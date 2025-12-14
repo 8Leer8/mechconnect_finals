@@ -1,0 +1,171 @@
+.reject-booking-modal::part(content) {
+  --background: transparent;
+  --box-shadow: none;
+}
+
+.reject-modal-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.25);
+  padding: 20px;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reject-modal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-label {
+  margin: 0 0 12px 0;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.booking-info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.booking-info-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.booking-info-header p {
+  margin: 2px 0 0 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.priority-pill {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.priority-pill.high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.booking-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.mini-label {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.mini-value {
+  margin: 4px 0 0 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.mini-value.cost {
+  color: hsl(25, 85%, 55%);
+}
+
+.modal-description {
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.reason-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reason-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.reject-notes {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 80px;
+  resize: none;
+  font-size: 14px;
+  color: #0f172a;
+  background: white;
+  outline: none;
+}
+
+.reject-notes::placeholder {
+  color: #94a3b8;
+}
+
+.reject-notes:focus {
+  border-color: hsl(25, 85%, 55%);
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+}
+
+.char-count {
+  align-self: flex-end;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.reject-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.reject-actions button {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reject-actions .secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.reject-actions .danger {
+  background: #ef4444;
+  color: white;
+}
+
+.reject-actions .danger:disabled {
+  background: #fecaca;
+  cursor: not-allowed;
+}
+
+.close-icon {
+  border: none;
+  background: #f1f5f9;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  cursor: pointer;
+}
+

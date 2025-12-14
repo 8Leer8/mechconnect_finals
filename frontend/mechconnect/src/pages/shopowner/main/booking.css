@@ -358,6 +358,11 @@
   font-weight: 600;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
 .secondary-button {
@@ -365,14 +370,32 @@
   color: #475569;
 }
 
+.secondary-button:hover {
+  background: #e2e8f0;
+}
+
 .primary-button {
   background: linear-gradient(90deg, #fb923c, #f97316);
   color: white;
 }
 
+.primary-button:hover {
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.3);
+}
+
 .danger-button {
   background: #ef4444;
   color: white;
+}
+
+.danger-button:hover {
+  background: #dc2626;
+}
+
+.secondary-button .material-icons-round,
+.primary-button .material-icons-round,
+.danger-button .material-icons-round {
+  font-size: 18px;
 }
 
 .action-group {
