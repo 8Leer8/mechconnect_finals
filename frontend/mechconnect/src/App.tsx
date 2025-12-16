@@ -1,5 +1,6 @@
 import { IonApp, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { useEffect } from 'react';
 import AppRoutes from './routes/routing';
 
 /* Core CSS required for Ionic components to work properly */
@@ -23,12 +24,29 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <AppRoutes />
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  useEffect(() => {
+    // Set mock authentication data for demo purposes
+    if (!localStorage.getItem('authToken')) {
+      localStorage.setItem('authToken', 'demo-token-12345');
+    }
+    if (!localStorage.getItem('user')) {
+      localStorage.setItem('user', JSON.stringify({
+        id: 5,
+        name: 'John Mechanic',
+        email: 'john.mechanic@example.com',
+        role: 'mechanic'
+      }));
+    }
+  }, []);
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <AppRoutes />
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

@@ -12,7 +12,8 @@ from .serializers import (
     RequestSerializer, CreateCustomRequestSerializer, RequestListSerializer,
     CustomRequestSerializer, DirectRequestSerializer, EmergencyRequestSerializer
 )
-from accounts.models import Account, Client, AccountAddress
+from accounts.models import Account, Client, AccountAddress, Mechanic
+from bookings.models import Booking
 
 
 @csrf_exempt
@@ -372,6 +373,39 @@ def assign_provider_to_request(request, request_id):
             'error': 'Failed to assign provider',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    return Response({'message': 'Request deleted successfully'})
+
+
+@api_view(['GET'])
+def get_mechanic_available_requests(request):
+    """Get available requests for a mechanic (quoted/accepted but not booked)"""
+    mechanic_id = request.GET.get('mechanic_id')
+
+    if not mechanic_id:
+        return Response({'error': 'Mechanic ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        mechanic = Mechanic.objects.get(mechanic_id=mechanic_id)
+    except Mechanic.DoesNotExist:
+        return Response({'error': 'Mechanic not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Get requests that are assigned to this mechanic and are quoted/accepted but not booked
+    requests = Request.objects.filter(
+        provider=mechanic.mechanic_id.acc_id,
+        request_status__in=['quoted', 'accepted']
+    ).exclude(
+        # Exclude requests that already have bookings
+        request_id__in=Booking.objects.values_list('request_id', flat=True)
+    ).select_related('client').order_by('-created_at')
+
+    # Serialize the requests
+    serializer = RequestListSerializer(requests, many=True)
+    return Response({
+        'requests': serializer.data,
+        'total': len(serializer.data)
+    })
 
 
 @api_view(['GET'])

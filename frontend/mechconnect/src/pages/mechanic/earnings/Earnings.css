@@ -1,0 +1,334 @@
+/* Earnings Page Styles */
+.mechanic-earnings-content {
+  --background: hsl(40, 20%, 98%);
+  --padding-bottom: 64px;
+}
+
+/* Loading and Error States */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-message, .error-message {
+  font-size: 16px;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 20px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Header */
+.mechanic-earnings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.mechanic-earnings-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.notification-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.notification-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.notification-button:active {
+  transform: scale(0.95);
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 16px;
+  padding: 0 20px;
+}
+
+/* Earnings Overview */
+.earnings-overview-section {
+  padding: 20px 0;
+}
+
+.earnings-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 0 20px;
+}
+
+.earnings-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.earnings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.earnings-card.total-card {
+  background: linear-gradient(135deg, hsl(25, 85%, 55%), hsl(25, 85%, 45%));
+  color: white;
+}
+
+.earnings-card.total-card .earnings-label,
+.earnings-card.total-card .earnings-amount {
+  color: white;
+}
+
+.earnings-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: hsl(25, 85%, 95%);
+  color: hsl(25, 85%, 55%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.earnings-card.total-card .earnings-icon {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.earnings-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.earnings-label {
+  font-size: 12px;
+  color: hsl(25, 15%, 45%);
+  font-weight: 500;
+}
+
+.earnings-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: hsl(25, 85%, 55%);
+}
+
+/* Transactions Section */
+.transactions-section {
+  padding: 20px 0;
+}
+
+.transactions-list {
+  padding: 0 20px;
+}
+
+.transaction-item {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transaction-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.transaction-item:active {
+  transform: scale(0.98);
+}
+
+.transaction-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: hsl(120, 60%, 95%);
+  color: hsl(120, 60%, 45%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-job-id {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.transaction-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: hsl(25, 85%, 55%);
+}
+
+.transaction-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.transaction-client {
+  font-size: 13px;
+  color: hsl(25, 15%, 25%);
+  font-weight: 500;
+}
+
+.transaction-service {
+  font-size: 12px;
+  color: hsl(25, 15%, 45%);
+}
+
+.transaction-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.transaction-date {
+  font-size: 11px;
+  color: hsl(25, 15%, 45%);
+}
+
+.transaction-status {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.status-completed {
+  background: hsl(120, 60%, 95%);
+  color: hsl(120, 60%, 35%);
+}
+
+.status-active {
+  background: hsl(45, 85%, 95%);
+  color: hsl(25, 85%, 35%);
+}
+
+.transaction-arrow {
+  color: hsl(25, 15%, 45%);
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .mechanic-earnings-header {
+    padding: 16px;
+  }
+
+  .earnings-cards {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+  }
+
+  .earnings-card {
+    padding: 12px;
+  }
+
+  .transactions-list {
+    padding: 0 16px;
+  }
+
+  .transaction-item {
+    padding: 12px;
+  }
+}

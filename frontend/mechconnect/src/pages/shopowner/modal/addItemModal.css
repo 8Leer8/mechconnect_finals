@@ -1,0 +1,165 @@
+.add-item-modal::part(content) {
+  --background: transparent;
+  --box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-item-modal-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.25);
+  padding: 24px;
+  max-width: 520px;
+  width: 140%;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.add-item-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-item-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.close-icon {
+  border: none;
+  background: #f1f5f9;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.close-icon:hover {
+  background: #e2e8f0;
+}
+
+.add-item-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #0f172a;
+  background: white;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: hsl(25, 85%, 55%);
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.add-item-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.add-item-actions button {
+  flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+.add-btn {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.add-btn:hover {
+  background: hsl(25, 85%, 50%);
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.3);
+}
+
+.add-btn:disabled {
+  background: #fed7aa;
+  cursor: not-allowed;
+}
+
+.add-btn .material-icons-round {
+  font-size: 18px;
+}
+
+@media (max-width: 520px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

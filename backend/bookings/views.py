@@ -349,6 +349,50 @@ def refunded_bookings_list(request):
     return Response({'refunded_bookings': serializer.data})
 
 
+from accounts.models import Client, Mechanic
+
+
+@api_view(['GET'])
+def mechanic_bookings_list(request):
+    """Get bookings for a specific mechanic filtered by status"""
+    mechanic_id = request.GET.get('mechanic_id')
+    booking_status = request.GET.get('status', 'active')
+
+    if not mechanic_id:
+        return Response({'error': 'Mechanic ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        mechanic = Mechanic.objects.get(mechanic_id=mechanic_id)
+    except Mechanic.DoesNotExist:
+        return Response({'error': 'Mechanic not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Map frontend status to backend status
+    status_mapping = {
+        'active': 'active',
+        'completed': 'completed',
+        'cancelled': 'cancelled',
+        'rescheduled': 'rescheduled',
+        'back-jobs': 'back_jobs',
+        'disputed': 'dispute',
+        'refunded': 'refunded'
+    }
+
+    backend_status = status_mapping.get(booking_status, 'active')
+
+    # Get bookings for this mechanic with the specified status
+    bookings = Booking.objects.filter(
+        request__provider=mechanic.mechanic_id.acc_id,
+        status=backend_status
+    ).select_related('request__client', 'request').order_by('-booked_at')
+
+    # Serialize the bookings
+    serializer = BookingListSerializer(bookings, many=True)
+    return Response({
+        'bookings': serializer.data,
+        'total': len(serializer.data)
+    })
+
+
 @api_view(['GET'])
 def health_check(request):
     """Health check endpoint for bookings API"""

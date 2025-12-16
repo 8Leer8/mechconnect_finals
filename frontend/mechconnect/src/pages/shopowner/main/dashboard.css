@@ -6,7 +6,7 @@
 }
 
 .dashboard-content::part(scroll) {
-  padding-bottom: 16px;
+  padding-bottom: 80px;
 }
 
 /* Material Icons */
@@ -141,6 +141,10 @@
 /* Dashboard Sections */
 .dashboard-section {
   padding: 0 20px 20px;
+}
+
+.dashboard-section:last-child {
+  padding-bottom: 100px;
 }
 
 /* Performance Overview Card */

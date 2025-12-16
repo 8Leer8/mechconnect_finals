@@ -8,6 +8,7 @@ urlpatterns = [
     # Request management
     path('client/', views.get_client_requests, name='get_client_requests'),
     path('provider/', views.get_provider_requests, name='get_provider_requests'),
+    path('mechanic/available/', views.get_mechanic_available_requests, name='get_mechanic_available_requests'),
     path('<int:request_id>/', views.get_request_detail, name='get_request_detail'),
     path('<int:request_id>/status/', views.update_request_status, name='update_request_status'),
     path('<int:request_id>/delete/', views.delete_request, name='delete_request'),
