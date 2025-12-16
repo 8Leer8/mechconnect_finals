@@ -37,7 +37,22 @@ const ShopServiceDetail: React.FC = () => {
       history.push(`/client/shop-detail/${serviceData.provider_id}`);
     }
   };
-  const handleBookNow = () => history.push('/client/direct-request');
+  const handleBookNow = () => {
+    if (serviceData) {
+      // Pass service data via state to Direct Request page
+      history.push({
+        pathname: '/client/direct-request',
+        state: {
+          serviceId: serviceData.service_id,
+          serviceName: serviceData.service_name,
+          servicePrice: serviceData.price,
+          providerId: serviceData.provider_id,
+          providerName: serviceData.provider_name,
+          providerType: 'shop'
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     fetchServiceDetails();

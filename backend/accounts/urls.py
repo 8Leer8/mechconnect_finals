@@ -29,6 +29,9 @@ urlpatterns = [
     
     # Mechanic detail endpoint
     path('mechanic/<int:mechanic_id>/', users.mechanic_detail, name='mechanic_detail'),
+    
+    # Client address endpoint
+    path('client/<int:client_id>/address/', users.get_client_address, name='get_client_address'),
 
     # Head Admin Dashboard
     path('head-admin/dashboard/stats/', dashboard.head_admin_dashboard_stats, name='head_admin_dashboard_stats'),

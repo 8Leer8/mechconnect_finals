@@ -526,3 +526,52 @@ def mechanic_detail(request, mechanic_id):
         return Response({
             'error': f'An error occurred: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_client_address(request, client_id):
+    """
+    Get saved address for a specific client
+    """
+    try:
+        from ..models import Client, AccountAddress
+        
+        # Check if client exists
+        try:
+            client = Client.objects.get(client_id=client_id)
+        except Client.DoesNotExist:
+            return Response({
+                'error': 'Client not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Try to get client address
+        try:
+            address = AccountAddress.objects.get(acc_add_id=client.client_id)
+            address_data = {
+                'house_building_number': address.house_building_number or '',
+                'street_name': address.street_name or '',
+                'subdivision_village': address.subdivision_village or '',
+                'barangay': address.barangay or '',
+                'city_municipality': address.city_municipality or '',
+                'province': address.province or '',
+                'region': address.region or '',
+                'postal_code': address.postal_code or ''
+            }
+            
+            return Response({
+                'message': 'Address found',
+                'address': address_data
+            }, status=status.HTTP_200_OK)
+            
+        except AccountAddress.DoesNotExist:
+            return Response({
+                'message': 'No saved address',
+                'address': None
+            }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to get client address',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

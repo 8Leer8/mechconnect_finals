@@ -274,6 +274,32 @@
   background-color: #cbd5e1;
 }
 
+.btn-back-job {
+  height: 36px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0 16px;
+  background-color: hsl(25, 85%, 55%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-back-job:hover {
+  background-color: hsl(25, 85%, 50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-back-job:active {
+  background-color: hsl(25, 85%, 45%);
+  transform: scale(0.98);
+}
+
 .icon-sm {
   font-size: 16px;
   width: 16px;

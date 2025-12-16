@@ -1,6 +1,7 @@
 import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
+import { requestsAPI, geolocationAPI } from '../../../utils/api';
 import './CustomRequest.css';
 
 interface LocationData {
@@ -91,76 +92,60 @@ const CustomRequest: React.FC = () => {
   }, [isCalendarOpen]);
 
   // Geolocation functions
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by this browser');
-      setShowToast(true);
-      return;
-    }
-
+  const getCurrentLocation = async () => {
     setIsLocationLoading(true);
     
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          
-          // Try to get address from coordinates using reverse geocoding
-          const address = await reverseGeocode(latitude, longitude);
-          
-          setLocationData(prev => ({
-            ...prev,
-            latitude,
-            longitude,
-            formattedAddress: address,
-            // Try to parse address into components if possible
-            streetName: address.split(',')[0] || '',
-            cityMunicipality: address.split(',')[1]?.trim() || '',
-            province: address.split(',')[2]?.trim() || ''
-          }));
-          
-          setSuccessMessage('Location set successfully!');
-          setShowToast(true);
-        } catch (error) {
-          console.error('Error getting address:', error);
-          setError('Could not get address from location');
-          setShowToast(true);
-        } finally {
-          setIsLocationLoading(false);
-        }
-      },
-      (error) => {
-        console.error('Error getting location:', error);
-        setError('Could not get your location. Please check permissions.');
-        setShowToast(true);
-        setIsLocationLoading(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
-    );
-  };
-
-  // Simple reverse geocoding using a free service
-  const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     try {
-      // Using a free geocoding service (you might want to use Google Maps API with your own key)
-      const response = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
-      );
+      // Get current position using the geolocation API utility
+      const position = await geolocationAPI.getCurrentPosition();
+      const { latitude, longitude } = position.coords;
       
-      if (response.ok) {
-        const data = await response.json();
-        return data.display_name || `${data.locality}, ${data.city}, ${data.principalSubdivision}`;
+      // Try to get address from coordinates using reverse geocoding
+      const address = await geolocationAPI.reverseGeocode(latitude, longitude);
+      
+      setLocationData(prev => ({
+        ...prev,
+        latitude,
+        longitude,
+        formattedAddress: address,
+        // Try to parse address into components if possible
+        streetName: address.split(',')[0] || '',
+        cityMunicipality: address.split(',')[1]?.trim() || '',
+        province: address.split(',')[2]?.trim() || ''
+      }));
+      
+      setSuccessMessage('Location set successfully!');
+      setShowToast(true);
+    } catch (error: any) {
+      console.error('Geolocation error details:', {
+        code: error.code,
+        message: error.message,
+        errorObject: error
+      });
+      
+      // Provide more specific error messages based on the error code
+      let errorMessage = 'Could not get your location. ';
+      
+      if (error.code === 1) {
+        // PERMISSION_DENIED
+        errorMessage += 'Please allow location access in your browser settings.';
+      } else if (error.code === 2) {
+        // POSITION_UNAVAILABLE
+        errorMessage += 'Location services unavailable. Try: 1) Enable location services in Windows Settings 2) Use a browser with location support 3) Check your internet connection 4) Disable VPN if active';
+      } else if (error.code === 3) {
+        // TIMEOUT
+        errorMessage += 'Location request timed out. Please try again.';
+      } else if (error.message) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += 'Please check permissions and try again.';
       }
-    } catch (error) {
-      console.error('Geocoding error:', error);
+      
+      setError(errorMessage);
+      setShowToast(true);
+    } finally {
+      setIsLocationLoading(false);
     }
-    
-    // Fallback to coordinates if geocoding fails
-    return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
   };
 
   // Save current location for future use

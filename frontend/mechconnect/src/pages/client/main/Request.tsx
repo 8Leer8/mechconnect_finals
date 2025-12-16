@@ -2,18 +2,8 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNav from '../../../components/BottomNav';
+import { requestsAPI, formatTimeAgo, getInitials, RequestListItem } from '../../../utils/api';
 import './Request.css';
-
-// Interface for request data from API
-interface RequestData {
-  request_id: number;
-  request_type: string;
-  request_status: string;
-  created_at: string;
-  client_name: string;
-  provider_name: string;
-  request_summary: string;
-}
 
 const Request: React.FC = () => {
   const history = useHistory();
@@ -22,13 +12,13 @@ const Request: React.FC = () => {
   const [isScrollable, setIsScrollable] = useState(false);
 
   // Data states
-  const [requests, setRequests] = useState<RequestData[]>([]);
+  const [requests, setRequests] = useState<RequestListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
-  // Client ID - In a real app, this would come from authentication context
-  const [clientId, setClientId] = useState<number>(1); // Default to 1 for testing
+  // Client ID - TODO: Get from authentication context
+  const [clientId] = useState<number>(1); // Default to 1 for testing
 
   const goToNotifications = () => history.push('/client/notifications');
   const goToCustomRequest = () => history.push('/client/custom-request');
@@ -56,18 +46,22 @@ const Request: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const url = `http://localhost:8000/api/requests/client/?client_id=${clientId}&status=${status === 'quoted' ? 'qouted' : status}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      // Map frontend status to backend status (quoted -> qouted in backend)
+      const backendStatus = status === 'quoted' ? 'qouted' : status;
+      const result = await requestsAPI.getClientRequests(clientId, backendStatus);
       
-      if (response.ok) {
-        setRequests(data.requests || []);
-      } else {
-        setError(data.error || 'Failed to load requests');
+      if (result.error) {
+        setError(result.error);
+        setShowToast(true);
+        setRequests([]);
+      } else if (result.data) {
+        setRequests(result.data.requests || []);
       }
     } catch (err) {
-      setError('Network error occurred');
+      setError('Failed to load requests');
+      setShowToast(true);
       console.error('Error fetching requests:', err);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -115,29 +109,6 @@ const Request: React.FC = () => {
     if (requests.length === 0 && !loading) {
       fetchRequests('rejected');
     }
-  };
-
-  // Helper functions
-  const getInitials = (fullName: string) => {
-    if (!fullName) return 'UN';
-    return fullName
-      .split(' ')
-      .map(name => name.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
   };
 
   const getStatusIcon = (status: string) => {
@@ -188,7 +159,7 @@ const Request: React.FC = () => {
           <span className="material-icons-round" style={{fontSize: '12px'}}>
             {getStatusIcon(request.request_status)}
           </span>
-          {request.request_status === 'qouted' ? 'Quoted' : request.request_status.charAt(0).toUpperCase() + request.request_status.slice(1)}
+          {request.request_status === 'qouted' ? 'Quotation' : request.request_status.charAt(0).toUpperCase() + request.request_status.slice(1)}
         </span>
         
         <div className="request-header">
@@ -230,79 +201,98 @@ const Request: React.FC = () => {
     ));
   };
 
-  return (
-    <IonPage>
-      <IonContent className="request-content" style={{ paddingBottom: '80px' }}>
-        {/* Header */}
-        <div className="request-header-top">
-          <h1 className="request-title">Request</h1>
-          <button 
-            className="notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
-        </div>
+  // Wrap entire component in error boundary try-catch
+  try {
+    return (
+      <IonPage>
+        <IonContent className="request-content" style={{ paddingBottom: '80px' }}>
+          {/* Header */}
+          <div className="request-header-top">
+            <h1 className="request-title">Request</h1>
+            <button 
+              className="notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
 
-        {/* Tabs */}
-        <div className="request-section">
-          <div className={`tabs-container ${isScrollable ? 'scrollable' : ''}`}>
-            <div className="tabs" ref={tabsRef}>
-              <button 
-                className={`tab-button ${activeTab === 'pending' ? 'active' : ''}`}
-                onClick={handleTabPending}
-              >
-                Pending
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'quoted' ? 'active' : ''}`}
-                onClick={handleTabQuoted}
-              >
-                Quoted
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'accepted' ? 'active' : ''}`}
-                onClick={handleTabAccepted}
-              >
-                Accepted
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'rejected' ? 'active' : ''}`}
-                onClick={handleTabRejected}
-              >
-                Rejected
-              </button>
+          {/* Tabs */}
+          <div className="request-section">
+            <div className={`tabs-container ${isScrollable ? 'scrollable' : ''}`}>
+              <div className="tabs" ref={tabsRef}>
+                <button 
+                  className={`tab-button ${activeTab === 'pending' ? 'active' : ''}`}
+                  onClick={handleTabPending}
+                >
+                  Pending
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'quoted' ? 'active' : ''}`}
+                  onClick={handleTabQuoted}
+                >
+                  Quotation
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'accepted' ? 'active' : ''}`}
+                  onClick={handleTabAccepted}
+                >
+                  Accepted
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'rejected' ? 'active' : ''}`}
+                  onClick={handleTabRejected}
+                >
+                  Rejected
+                </button>
+              </div>
+            </div>
+
+            {/* Dynamic Request Cards */}
+            <div className="cards-container">
+              {renderRequestCards()}
             </div>
           </div>
 
-          {/* Dynamic Request Cards */}
-          <div className="cards-container">
-            {renderRequestCards()}
+          {/* Custom Request Button */}
+          <div className="custom-request-section">
+            <button className="custom-request-btn" onClick={goToCustomRequest}>
+              <span className="material-icons-round">add_circle</span>
+              Custom Request
+            </button>
           </div>
-        </div>
 
-        {/* Custom Request Button */}
-        <div className="custom-request-section">
-          <button className="custom-request-btn" onClick={goToCustomRequest}>
-            <span className="material-icons-round">add_circle</span>
-            Custom Request
-          </button>
-        </div>
+          {/* Toast Notifications */}
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={error || ''}
+            duration={3000}
+            color="danger"
+            position="top"
+          />
+        </IonContent>
 
-        {/* Toast Notifications */}
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={error || ''}
-          duration={3000}
-          color="danger"
-          position="top"
-        />
-      </IonContent>
-
-      <BottomNav />
-    </IonPage>
-  );
+        <BottomNav />
+      </IonPage>
+    );
+  } catch (err) {
+    console.error('Request page render error:', err);
+    return (
+      <IonPage>
+        <IonContent className="request-content">
+          <div className="error-message" style={{margin: '20px'}}>
+            <h2>Error Loading Page</h2>
+            <p>Something went wrong. Please try refreshing the page.</p>
+            <button onClick={() => window.location.reload()} style={{padding: '10px 20px', marginTop: '10px'}}>
+              Refresh Page
+            </button>
+          </div>
+        </IonContent>
+        <BottomNav />
+      </IonPage>
+    );
+  }
 };
 
 export default Request;

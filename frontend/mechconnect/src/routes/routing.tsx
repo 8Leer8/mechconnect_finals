@@ -35,6 +35,8 @@ import ShopServiceDetail from '../pages/client/service/ShopServiceDetail';
 
 // Client Request Pages
 import CustomRequest from '../pages/client/request/CustomRequest';
+import DirectRequest from '../pages/client/request/DirectRequest';
+import EmergencyRequest from '../pages/client/request/EmergencyRequest';
 import PendingRequest from '../pages/client/side/PendingRequest';
 import QuotedRequest from '../pages/client/side/QuotedRequest';
 import AcceptedRequest from '../pages/client/side/AcceptedRequest';
@@ -45,6 +47,7 @@ import ActiveBooking from '../pages/client/side/ActiveBooking';
 import CompletedBooking from '../pages/client/side/CompletedBooking';
 import CanceledBooking from '../pages/client/side/CanceledBooking';
 import BackJobsBooking from '../pages/client/side/BackJobsBooking';
+import BackJobsForm from '../pages/client/side/BackJobsForm';
 import DisputedBooking from '../pages/client/side/DisputedBooking';
 import RescheduledBooking from '../pages/client/side/RescheduledBooking';
 import RejectedBooking from '../pages/client/side/RejectedBooking';
@@ -104,6 +107,12 @@ const AppRoutes: React.FC = () => {
       <AuthGuard exact path="/client/custom-request">
         <CustomRequest />
       </AuthGuard>
+      <AuthGuard exact path="/client/direct-request">
+        <DirectRequest />
+      </AuthGuard>
+      <AuthGuard exact path="/client/emergency-request">
+        <EmergencyRequest />
+      </AuthGuard>
       <AuthGuard exact path="/client/pending-request/:id?">
         <PendingRequest />
       </AuthGuard>
@@ -129,6 +138,9 @@ const AppRoutes: React.FC = () => {
       </AuthGuard>
       <AuthGuard exact path="/client/backjobs-booking/:id">
         <BackJobsBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/backjobs-form">
+        <BackJobsForm />
       </AuthGuard>
       <AuthGuard exact path="/client/disputed-booking/:id">
         <DisputedBooking />

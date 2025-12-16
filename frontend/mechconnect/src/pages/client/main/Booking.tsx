@@ -2,19 +2,8 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNav from '../../../components/BottomNav';
+import { bookingsAPI, formatTimeAgo, getInitials, BookingListItem } from '../../../utils/api';
 import './Booking.css';
-
-// Interface for booking data from API
-interface BookingData {
-  booking_id: number;
-  status: string;
-  amount_fee: number;
-  booked_at: string;
-  client_name: string;
-  provider_name: string;
-  request_summary: string;
-  request_type: string;
-}
 
 const Booking: React.FC = () => {
   const history = useHistory();
@@ -23,13 +12,29 @@ const Booking: React.FC = () => {
   const [isScrollable, setIsScrollable] = useState(false);
 
   // Data states
-  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [bookings, setBookings] = useState<BookingListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
-  // Client ID - In a real app, this would come from authentication context
-  const [clientId, setClientId] = useState<number>(10); // Default to 10 for testing
+  // Client ID from authentication
+  const [clientId, setClientId] = useState<number>(1);
+
+  // Get client ID from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('user');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        const id = userData.acc_id || userData.account_id || 1;
+        setClientId(id);
+        console.log('Booking - User data:', userData);
+        console.log('Booking - Using client ID:', id);
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+  }, []);
 
   const goToNotifications = () => history.push('/client/notifications');
   
@@ -69,18 +74,20 @@ const Booking: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const url = `http://localhost:8000/api/bookings/client/?client_id=${clientId}&status=${status}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      const result = await bookingsAPI.getClientBookings(clientId, status);
       
-      if (response.ok) {
-        setBookings(data.bookings || []);
-      } else {
-        setError(data.error || 'Failed to load bookings');
+      if (result.error) {
+        setError(result.error);
+        setShowToast(true);
+        setBookings([]);
+      } else if (result.data) {
+        setBookings(result.data.bookings || []);
       }
     } catch (err) {
-      setError('Network error occurred');
+      setError('Failed to load bookings');
+      setShowToast(true);
       console.error('Error fetching bookings:', err);
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -151,28 +158,6 @@ const Booking: React.FC = () => {
     }
   };
 
-  // Helper functions
-  const getInitials = (fullName: string) => {
-    if (!fullName) return 'UN';
-    return fullName
-      .split(' ')
-      .map(name => name.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
-  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -267,102 +252,133 @@ const Booking: React.FC = () => {
           <div className="booking-time">
             Booked {formatTimeAgo(booking.booked_at)}
           </div>
-          <button 
-            className="btn-details" 
-            onClick={() => goToBookingDetail(booking.booking_id, booking.status)}
-          >
-            <span className="material-icons-round icon-sm">visibility</span>
-            See Details
-          </button>
+          <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+            <button 
+              className="btn-details" 
+              onClick={() => goToBookingDetail(booking.booking_id, booking.status)}
+            >
+              <span className="material-icons-round icon-sm">visibility</span>
+              See Details
+            </button>
+            {booking.status === 'completed' && (
+              <button 
+                className="btn-back-job" 
+                onClick={() => history.push(`/client/backjobs-form?booking_id=${booking.booking_id}`)}
+                title="Request a back job if the service needs additional work"
+              >
+                <span className="material-icons-round icon-sm">build_circle</span>
+                Back Job
+              </button>
+            )}
+          </div>
         </div>
       </div>
     ));
   };
 
-  return (
-    <IonPage>
-      <IonContent className="booking-content" style={{ paddingBottom: '80px' }}>
-        {/* Header */}
-        <div className="booking-header-top">
-          <h1 className="booking-title">Booking</h1>
-          <button 
-            className="notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
-        </div>
+  // Wrap entire component in error boundary try-catch
+  try {
+    return (
+      <IonPage>
+        <IonContent className="booking-content" style={{ paddingBottom: '80px' }}>
+          {/* Header */}
+          <div className="booking-header-top">
+            <h1 className="booking-title">Booking</h1>
+            <button 
+              className="notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
 
-        {/* Tabs */}
-        <div className="booking-section">
-          <div className={`tabs-container ${isScrollable ? 'scrollable' : ''}`}>
-            <div className="tabs" ref={tabsRef}>
-              <button 
-                className={`tab-button ${activeTab === 'active' ? 'active' : ''}`}
-                onClick={handleTabActive}
-              >
-                Active
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'completed' ? 'active' : ''}`}
-                onClick={handleTabCompleted}
-              >
-                Completed
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'rescheduled' ? 'active' : ''}`}
-                onClick={handleTabRescheduled}
-              >
-                Rescheduled
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'back_jobs' ? 'active' : ''}`}
-                onClick={handleTabBackJobs}
-              >
-                Back Jobs
-              </button>
+          {/* Tabs */}
+          <div className="booking-section">
+            <div className={`tabs-container ${isScrollable ? 'scrollable' : ''}`}>
+              <div className="tabs" ref={tabsRef}>
+                <button 
+                  className={`tab-button ${activeTab === 'active' ? 'active' : ''}`}
+                  onClick={handleTabActive}
+                >
+                  Active
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'completed' ? 'active' : ''}`}
+                  onClick={handleTabCompleted}
+                >
+                  Completed
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'rescheduled' ? 'active' : ''}`}
+                  onClick={handleTabRescheduled}
+                >
+                  Rescheduled
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'back_jobs' ? 'active' : ''}`}
+                  onClick={handleTabBackJobs}
+                >
+                  Back Jobs
+                </button>
 
-              <button 
-                className={`tab-button ${activeTab === 'cancelled' ? 'active' : ''}`}
-                onClick={handleTabCanceled}
-              >
-                Canceled
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'dispute' ? 'active' : ''}`}
-                onClick={handleTabDisputed}
-              >
-                Disputed
-              </button>
-              <button 
-                className={`tab-button ${activeTab === 'refunded' ? 'active' : ''}`}
-                onClick={handleTabRefunded}
-              >
-                Refunded
-              </button>
+                <button 
+                  className={`tab-button ${activeTab === 'cancelled' ? 'active' : ''}`}
+                  onClick={handleTabCanceled}
+                >
+                  Canceled
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'dispute' ? 'active' : ''}`}
+                  onClick={handleTabDisputed}
+                >
+                  Disputed
+                </button>
+                <button 
+                  className={`tab-button ${activeTab === 'refunded' ? 'active' : ''}`}
+                  onClick={handleTabRefunded}
+                >
+                  Refunded
+                </button>
+              </div>
+            </div>
+
+            {/* Dynamic Booking Cards */}
+            <div className="cards-container">
+              {renderBookingCards()}
             </div>
           </div>
 
-          {/* Dynamic Booking Cards */}
-          <div className="cards-container">
-            {renderBookingCards()}
+          {/* Toast Notifications */}
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={error || ''}
+            duration={3000}
+            color="danger"
+            position="top"
+          />
+        </IonContent>
+
+        <BottomNav />
+      </IonPage>
+    );
+  } catch (err) {
+    console.error('Booking page render error:', err);
+    return (
+      <IonPage>
+        <IonContent className="booking-content">
+          <div className="error-message" style={{margin: '20px'}}>
+            <h2>Error Loading Page</h2>
+            <p>Something went wrong. Please try refreshing the page.</p>
+            <button onClick={() => window.location.reload()} style={{padding: '10px 20px', marginTop: '10px'}}>
+              Refresh Page
+            </button>
           </div>
-        </div>
-
-        {/* Toast Notifications */}
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={error || ''}
-          duration={3000}
-          color="danger"
-          position="top"
-        />
-      </IonContent>
-
-      <BottomNav />
-    </IonPage>
-  );
+        </IonContent>
+        <BottomNav />
+      </IonPage>
+    );
+  }
 };
 
 export default Booking;

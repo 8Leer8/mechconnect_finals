@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     # Request creation
     path('custom/create/', views.create_custom_request, name='create_custom_request'),
+    path('direct/create/', views.create_direct_request, name='create_direct_request'),
+    path('emergency/create/', views.create_emergency_request, name='create_emergency_request'),
     
     # Request management
     path('client/', views.get_client_requests, name='get_client_requests'),

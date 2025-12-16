@@ -6,7 +6,8 @@ from .authentication import (
 from .users import (
     get_users, get_user_by_id, deactivate_user, activate_user, 
     verify_user, user_notifications, mark_notification_read,
-    discover_mechanics, get_all_users, ban_user, unban_user, mechanic_detail
+    discover_mechanics, get_all_users, ban_user, unban_user, mechanic_detail,
+    get_client_address
 )
 from .dashboard import head_admin_dashboard_stats, health_check
 from .verifications import get_verifications, verify_user_verification, reject_verification
@@ -25,6 +26,7 @@ __all__ = [
     'get_users', 'get_user_by_id', 'deactivate_user', 'activate_user', 
     'verify_user', 'user_notifications', 'mark_notification_read',
     'discover_mechanics', 'get_all_users', 'ban_user', 'unban_user', 'mechanic_detail',
+    'get_client_address',
     # Dashboard
     'head_admin_dashboard_stats', 'health_check',
     # Verifications

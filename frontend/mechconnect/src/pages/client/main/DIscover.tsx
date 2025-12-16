@@ -1,5 +1,5 @@
 import { IonContent, IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNav from '../../../components/BottomNav';
 import MechanicDiscoveryFilter, { Filters } from '../../../components/MechanicDiscoveryFilter';
@@ -58,7 +58,19 @@ interface Service {
 
 const Discover: React.FC = () => {
   const history = useHistory();
-  const [activeTab, setActiveTab] = useState('service');
+  const location = useLocation();
+  
+  // Get initial tab from URL parameter
+  const getInitialTab = () => {
+    const params = new URLSearchParams(location.search);
+    const type = params.get('type');
+    if (type === 'mechanic' || type === 'shop' || type === 'service') {
+      return type;
+    }
+    return 'service'; // default
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab());
   const tabsRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
   const [mechanics, setMechanics] = useState<Mechanic[]>([]);

@@ -94,6 +94,7 @@ def booking_detail(request, booking_id):
 def active_booking_detail(request, booking_id):
     """Get detailed information about an active booking"""
     try:
+        # First try to get the ActiveBooking record
         active_booking = ActiveBooking.objects.select_related(
             'booking',
             'booking__request',
@@ -106,7 +107,25 @@ def active_booking_detail(request, booking_id):
         return Response(serializer.data)
         
     except ActiveBooking.DoesNotExist:
-        return Response({'error': 'Active booking not found'}, status=status.HTTP_404_NOT_FOUND)
+        # If no ActiveBooking exists, check if there's a regular booking with status='active'
+        try:
+            booking = Booking.objects.select_related(
+                'request',
+                'request__client',
+                'request__client__client_id',
+                'request__provider'
+            ).prefetch_related(
+                'request__custom_request',
+                'request__direct_request',
+                'request__emergency_request'
+            ).get(booking_id=booking_id, status='active')
+            
+            # Return the booking data using the general BookingSerializer
+            serializer = BookingSerializer(booking)
+            return Response(serializer.data)
+            
+        except Booking.DoesNotExist:
+            return Response({'error': 'Active booking not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -119,7 +138,7 @@ def completed_booking_detail(request, booking_id):
             'booking__request__client',
             'booking__request__client__client_id',
             'booking__request__provider'
-        ).get(booking_id=booking_id)
+        ).get(booking__booking_id=booking_id)
         
         serializer = CompletedBookingSerializer(completed_booking)
         return Response(serializer.data)
@@ -273,9 +292,75 @@ def cancelled_bookings_list(request):
     return Response({'cancelled_bookings': serializer.data})
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def back_jobs_bookings_list(request):
-    """Get list of back jobs bookings for a client"""
+    """Get list of back jobs bookings for a client or create a new back job request"""
+    
+    if request.method == 'POST':
+        # Create a new back job request
+        booking_id = request.data.get('booking_id')
+        client_id = request.data.get('client_id')
+        reason = request.data.get('reason', '')
+        
+        print(f"[BackJob POST] Received: booking_id={booking_id}, client_id={client_id}")
+        
+        if not booking_id:
+            return Response({'error': 'Booking ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not client_id:
+            return Response({'error': 'Client ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            booking = Booking.objects.get(booking_id=booking_id)
+            client = Client.objects.get(client_id=client_id)
+            
+            print(f"[BackJob POST] Booking found: #{booking.booking_id}, belongs to client: {booking.request.client.client_id}")
+            print(f"[BackJob POST] Requesting client: {client_id}")
+            
+            # Verify the booking belongs to this client
+            if booking.request.client.client_id.acc_id != client_id:
+                return Response(
+                    {'error': 'This booking does not belong to you'}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Verify the booking is completed
+            if booking.status != 'completed':
+                return Response(
+                    {'error': 'Can only request back job for completed bookings'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Create the back job request
+            back_job = BackJobsBooking.objects.create(
+                booking=booking,
+                requested_by=client.client_id,
+                reason=reason,
+                status='pending'
+            )
+            
+            print(f"[BackJob POST] Created BackJobsBooking #{back_job.back_jobs_booking_id}")
+            
+            # Update the main booking status to back_jobs
+            booking.status = 'back_jobs'
+            booking.save()
+            
+            print(f"[BackJob POST] Updated booking #{booking.booking_id} status to 'back_jobs'")
+            
+            serializer = BackJobsBookingSerializer(back_job)
+            return Response({
+                'message': 'Back job request created successfully',
+                'back_job': serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Booking.DoesNotExist:
+            return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Client.DoesNotExist:
+            return Response({'error': 'Client not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    # GET request - list back jobs
     client_id = request.GET.get('client_id')
     
     if not client_id:

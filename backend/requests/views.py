@@ -408,6 +408,206 @@ def get_mechanic_available_requests(request):
     })
 
 
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_direct_request(request):
+    """
+    Create a new direct service request
+    """
+    try:
+        print(f"Received direct request data: {request.data}")
+        
+        data = request.data
+        
+        # Validate required fields
+        required_fields = ['client_id', 'provider_id', 'service_id', 'scheduled_date', 'scheduled_time']
+        for field in required_fields:
+            if field not in data:
+                return Response({
+                    'error': f'Missing required field: {field}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        with transaction.atomic():
+            # Get the client
+            try:
+                client = Client.objects.get(client_id=data['client_id'])
+            except Client.DoesNotExist:
+                return Response({
+                    'error': 'Client not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Get provider
+            try:
+                provider = Account.objects.get(acc_id=data['provider_id'])
+            except Account.DoesNotExist:
+                return Response({
+                    'error': 'Provider not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Get service
+            from services.models import Service, ServiceAddOn
+            try:
+                service = Service.objects.get(service_id=data['service_id'])
+            except Service.DoesNotExist:
+                return Response({
+                    'error': 'Service not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Create the main request
+            main_request = Request.objects.create(
+                client=client,
+                provider=provider,
+                request_type='direct',
+                request_status='pending'
+            )
+            
+            # Create the direct request details
+            direct_request = DirectRequest.objects.create(
+                request=main_request,
+                service=service
+            )
+            
+            # Create add-on associations if provided
+            if data.get('selected_addon_ids'):
+                for addon_id in data['selected_addon_ids']:
+                    try:
+                        addon = ServiceAddOn.objects.get(service_add_on_id=addon_id)
+                        from .models import DirectRequestAddOn
+                        DirectRequestAddOn.objects.create(
+                            request=main_request,
+                            service_add_on=addon
+                        )
+                    except ServiceAddOn.DoesNotExist:
+                        print(f"Warning: Addon {addon_id} not found")
+                        continue
+            
+            # Update or create client address if location data provided
+            address_fields = [
+                'house_building_number', 'street_name', 'subdivision_village',
+                'barangay', 'city_municipality', 'province', 'region', 'postal_code'
+            ]
+            
+            address_data = {field: data.get(field, '') for field in address_fields}
+            if any(address_data.values()):
+                address, created = AccountAddress.objects.get_or_create(
+                    acc_add_id=client.client_id,
+                    defaults=address_data
+                )
+                if not created:
+                    for field, value in address_data.items():
+                        if value:
+                            setattr(address, field, value)
+                    address.save()
+            
+            # Store schedule info in service_details (optional for now)
+            # You could extend DirectRequest model to include schedule fields
+            
+            # Return the created request
+            request_serializer = RequestSerializer(main_request)
+            
+            return Response({
+                'message': 'Direct request created successfully',
+                'request': request_serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+    except Exception as e:
+        print(f"Error creating direct request: {str(e)}")
+        return Response({
+            'error': 'Failed to create direct request',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_emergency_request(request):
+    """
+    Create a new emergency request
+    """
+    try:
+        print(f"Received emergency request data: {request.data}")
+        
+        data = request.data
+        
+        # Validate required fields
+        if 'client_id' not in data:
+            return Response({
+                'error': 'client_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'description' not in data or not data['description'].strip():
+            return Response({
+                'error': 'description is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        with transaction.atomic():
+            # Get the client
+            try:
+                client = Client.objects.get(client_id=data['client_id'])
+            except Client.DoesNotExist:
+                return Response({
+                    'error': 'Client not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Get provider if specified (optional for emergency)
+            provider = None
+            if data.get('provider_id'):
+                try:
+                    provider = Account.objects.get(acc_id=data['provider_id'])
+                except Account.DoesNotExist:
+                    pass  # Provider is optional for emergency
+            
+            # Create the main request
+            main_request = Request.objects.create(
+                client=client,
+                provider=provider,
+                request_type='emergency',
+                request_status='pending'
+            )
+            
+            # Create the emergency request details
+            emergency_request = EmergencyRequest.objects.create(
+                request=main_request,
+                description=data['description'],
+                concern_picture=data.get('concern_picture', '')
+            )
+            
+            # Update or create client address if location data provided
+            address_fields = [
+                'house_building_number', 'street_name', 'subdivision_village',
+                'barangay', 'city_municipality', 'province', 'region', 'postal_code'
+            ]
+            
+            address_data = {field: data.get(field, '') for field in address_fields}
+            if any(address_data.values()):
+                address, created = AccountAddress.objects.get_or_create(
+                    acc_add_id=client.client_id,
+                    defaults=address_data
+                )
+                if not created:
+                    for field, value in address_data.items():
+                        if value:
+                            setattr(address, field, value)
+                    address.save()
+            
+            # Return the created request
+            request_serializer = RequestSerializer(main_request)
+            
+            return Response({
+                'message': 'Emergency request created successfully',
+                'request': request_serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+    except Exception as e:
+        print(f"Error creating emergency request: {str(e)}")
+        return Response({
+            'error': 'Failed to create emergency request',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health_check(request):

@@ -10,16 +10,21 @@ from requests.models import Request
 class BookingSerializer(serializers.ModelSerializer):
     client_name = serializers.SerializerMethodField()
     provider_name = serializers.SerializerMethodField()
+    provider_contact = serializers.SerializerMethodField()
     client_address = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
     request_summary = serializers.SerializerMethodField()
     request_type = serializers.CharField(source='request.request_type', read_only=True)
+    service_details = serializers.SerializerMethodField()
+    service_time = serializers.SerializerMethodField()
     
     class Meta:
         model = Booking
         fields = [
             'booking_id', 'request', 'status', 'amount_fee', 'booked_at',
             'updated_at', 'completed_at', 'client_name', 'provider_name',
-            'client_address', 'request_summary', 'request_type'
+            'provider_contact', 'client_address', 'location', 'request_summary', 
+            'request_type', 'service_details', 'service_time'
         ]
         read_only_fields = ['booking_id', 'booked_at', 'updated_at']
     
@@ -32,6 +37,28 @@ class BookingSerializer(serializers.ModelSerializer):
         if obj.request.provider:
             return f"{obj.request.provider.firstname} {obj.request.provider.lastname}"
         return "No Provider Assigned"
+    
+    def get_provider_contact(self, obj):
+        if obj.request.provider:
+            return obj.request.provider.phone_number or "Contact not available"
+        return "Contact not available"
+    
+    def get_location(self, obj):
+        """Get location for the booking detail page"""
+        try:
+            address = AccountAddress.objects.get(acc_add_id=obj.request.client.client_id)
+            return {
+                'house_number': address.house_building_number,
+                'street_name': address.street_name,
+                'subdivision': address.subdivision_village,
+                'barangay': address.barangay,
+                'city': address.city_municipality,
+                'province': address.province,
+                'region': address.region,
+                'postal_code': address.postal_code
+            }
+        except AccountAddress.DoesNotExist:
+            return {}
     
     def get_client_address(self, obj):
         try:
@@ -48,6 +75,51 @@ class BookingSerializer(serializers.ModelSerializer):
             }
         except AccountAddress.DoesNotExist:
             return None
+    
+    def get_service_details(self, obj):
+        """Get service details based on request type"""
+        if obj.request.request_type == 'direct' and hasattr(obj.request, 'direct_request'):
+            direct_req = obj.request.direct_request
+            service_name = direct_req.service.name if direct_req.service else "Unknown Service"
+            
+            # Get addons if any
+            addons = []
+            if hasattr(direct_req, 'selected_addons') and direct_req.selected_addons:
+                addons = [addon.name for addon in direct_req.selected_addons.all()]
+            
+            return {
+                'service_name': service_name,
+                'includes': getattr(direct_req.service, 'description', None) if direct_req.service else None,
+                'addons': ', '.join(addons) if addons else 'None'
+            }
+        elif obj.request.request_type == 'custom' and hasattr(obj.request, 'custom_request'):
+            return {
+                'service_name': 'Custom Service Request',
+                'includes': obj.request.custom_request.description,
+                'addons': 'None'
+            }
+        elif obj.request.request_type == 'emergency' and hasattr(obj.request, 'emergency_request'):
+            return {
+                'service_name': 'Emergency Service',
+                'includes': obj.request.emergency_request.description,
+                'addons': 'None'
+            }
+        return {
+            'service_name': 'Service details unavailable',
+            'addons': 'None'
+        }
+    
+    def get_service_time(self, obj):
+        """Get scheduled service time if available"""
+        if obj.request.request_type == 'direct' and hasattr(obj.request, 'direct_request'):
+            direct_req = obj.request.direct_request
+            if direct_req.scheduled_date and direct_req.scheduled_time:
+                return f"{direct_req.scheduled_date} at {direct_req.scheduled_time}"
+        elif obj.request.request_type == 'custom' and hasattr(obj.request, 'custom_request'):
+            custom_req = obj.request.custom_request
+            if custom_req.scheduled_date and custom_req.scheduled_time:
+                return f"{custom_req.scheduled_date} at {custom_req.scheduled_time}"
+        return "To be scheduled"
     
     def get_request_summary(self, obj):
         """Get a summary of the request based on type"""

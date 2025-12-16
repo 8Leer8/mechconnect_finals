@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Client Authentication</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .label {
+            font-weight: 600;
+            color: #555;
+            margin-top: 15px;
+            display: block;
+        }
+        .value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔐 Client Authentication Checker</h1>
+        <p>This tool helps you verify if you're properly logged in and can access your client ID.</p>
+        
+        <div id="status"></div>
+        <div id="userInfo"></div>
+        
+        <button onclick="checkAuth()">🔍 Check Authentication</button>
+        <button onclick="clearStorage()">🗑️ Clear Storage</button>
+        <button onclick="showRawData()">📄 Show Raw Data</button>
+    </div>
+
+    <script>
+        function checkAuth() {
+            const statusDiv = document.getElementById('status');
+            const userInfoDiv = document.getElementById('userInfo');
+            
+            try {
+                const userStr = localStorage.getItem('user');
+                const userId = localStorage.getItem('userId');
+                
+                if (!userStr) {
+                    statusDiv.innerHTML = '<div class="status error">❌ <strong>Not Logged In</strong><br>No user data found in localStorage. Please log in first.</div>';
+                    userInfoDiv.innerHTML = '';
+                    return;
+                }
+                
+                const user = JSON.parse(userStr);
+                
+                // Try to get client ID using the same logic as the app
+                const clientId = user.client_profile?.client_id?.acc_id || user.acc_id || null;
+                
+                if (clientId) {
+                    statusDiv.innerHTML = '<div class="status success">✅ <strong>Authenticated Successfully!</strong><br>Client ID found and ready to use.</div>';
+                    
+                    userInfoDiv.innerHTML = `
+                        <span class="label">👤 Name:</span><br>
+                        <span class="value">${user.firstname || 'N/A'} ${user.lastname || 'N/A'}</span><br>
+                        
+                        <span class="label">📧 Email:</span><br>
+                        <span class="value">${user.email || 'N/A'}</span><br>
+                        
+                        <span class="label">🆔 Account ID:</span><br>
+                        <span class="value">${user.acc_id || 'N/A'}</span><br>
+                        
+                        <span class="label">👥 Client ID (for requests):</span><br>
+                        <span class="value" style="background: #d4edda; color: #155724; font-weight: bold;">${clientId}</span><br>
+                        
+                        <span class="label">🎭 Roles:</span><br>
+                        <span class="value">${user.roles ? user.roles.map(r => r.account_role).join(', ') : 'N/A'}</span><br>
+                        
+                        <span class="label">✅ Verification Status:</span><br>
+                        <span class="value">${user.is_verified ? '✓ Verified' : '✗ Not Verified'}</span>
+                    `;
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ <strong>Client ID Not Found</strong><br>You are logged in, but no client profile was found. You may not be logged in as a client.</div>';
+                    
+                    userInfoDiv.innerHTML = `
+                        <span class="label">👤 Name:</span><br>
+                        <span class="value">${user.firstname || 'N/A'} ${user.lastname || 'N/A'}</span><br>
+                        
+                        <span class="label">📧 Email:</span><br>
+                        <span class="value">${user.email || 'N/A'}</span><br>
+                        
+                        <span class="label">🎭 Roles:</span><br>
+                        <span class="value">${user.roles ? user.roles.map(r => r.account_role).join(', ') : 'N/A'}</span><br>
+                        
+                        <div class="status info" style="margin-top: 15px;">
+                            <strong>💡 Tip:</strong> You need to log in with a client account to use the emergency request feature.
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ <strong>Error</strong><br>Failed to parse user data: ${error.message}</div>`;
+                userInfoDiv.innerHTML = '';
+                console.error('Error checking auth:', error);
+            }
+        }
+        
+        function clearStorage() {
+            if (confirm('Are you sure you want to clear all stored user data? You will need to log in again.')) {
+                localStorage.removeItem('user');
+                localStorage.removeItem('userId');
+                document.getElementById('status').innerHTML = '<div class="status info">🗑️ Storage cleared. Please refresh and log in again.</div>';
+                document.getElementById('userInfo').innerHTML = '';
+            }
+        }
+        
+        function showRawData() {
+            const userStr = localStorage.getItem('user');
+            const userId = localStorage.getItem('userId');
+            
+            const rawDataDiv = document.getElementById('userInfo');
+            
+            if (!userStr) {
+                rawDataDiv.innerHTML = '<div class="status error">No data in localStorage</div>';
+                return;
+            }
+            
+            rawDataDiv.innerHTML = `
+                <h3>Raw localStorage Data:</h3>
+                <span class="label">userId:</span>
+                <pre>${userId || 'null'}</pre>
+                
+                <span class="label">user object:</span>
+                <pre>${JSON.stringify(JSON.parse(userStr), null, 2)}</pre>
+            `;
+        }
+        
+        // Auto-check on page load
+        window.onload = checkAuth;
+    </script>
+</body>
+</html>

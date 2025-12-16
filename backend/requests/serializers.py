@@ -151,35 +151,44 @@ class RequestListSerializer(serializers.ModelSerializer):
     client_name = serializers.SerializerMethodField()
     provider_name = serializers.SerializerMethodField()
     request_summary = serializers.SerializerMethodField()
-    status = serializers.CharField(source='request_status', read_only=True)  # Add status field
-    booked_at = serializers.DateTimeField(source='created_at', read_only=True)  # Add booked_at field
+    request_status = serializers.CharField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
     
     class Meta:
         model = Request
         fields = [
-            'request_id', 'request_type', 'status', 'booked_at',
+            'request_id', 'request_type', 'request_status', 'created_at',
             'client_name', 'provider_name', 'request_summary'
         ]
     
     def get_client_name(self, obj):
-        if obj.client and obj.client.client_id:
-            return f"{obj.client.client_id.firstname} {obj.client.client_id.lastname}"
+        try:
+            if obj.client and obj.client.client_id:
+                return f"{obj.client.client_id.firstname} {obj.client.client_id.lastname}"
+        except Exception as e:
+            print(f"Error getting client name: {e}")
         return "Unknown Client"
     
     def get_provider_name(self, obj):
-        if obj.provider:
-            return f"{obj.provider.firstname} {obj.provider.lastname}"
+        try:
+            if obj.provider:
+                return f"{obj.provider.firstname} {obj.provider.lastname}"
+        except Exception as e:
+            print(f"Error getting provider name: {e}")
         return "No Provider Assigned"
     
     def get_request_summary(self, obj):
         """Get a summary of the request based on type"""
-        if obj.request_type == 'custom' and hasattr(obj, 'custom_request'):
-            description = obj.custom_request.description or "No description"
-            return description[:100] + "..." if len(description) > 100 else description
-        elif obj.request_type == 'direct' and hasattr(obj, 'direct_request'):
-            service_name = obj.direct_request.service.name if obj.direct_request.service else "Unknown Service"
-            return f"Direct service request: {service_name}"
-        elif obj.request_type == 'emergency' and hasattr(obj, 'emergency_request'):
-            description = obj.emergency_request.description or "Emergency request"
-            return description[:100] + "..." if len(description) > 100 else description
+        try:
+            if obj.request_type == 'custom' and hasattr(obj, 'custom_request'):
+                description = obj.custom_request.description or "No description"
+                return description[:100] + "..." if len(description) > 100 else description
+            elif obj.request_type == 'direct' and hasattr(obj, 'direct_request'):
+                service_name = obj.direct_request.service.name if obj.direct_request.service else "Unknown Service"
+                return f"Direct service request: {service_name}"
+            elif obj.request_type == 'emergency' and hasattr(obj, 'emergency_request'):
+                description = obj.emergency_request.description or "Emergency request"
+                return description[:100] + "..." if len(description) > 100 else description
+        except Exception as e:
+            print(f"Error getting request summary: {e}")
         return "Request details unavailable"

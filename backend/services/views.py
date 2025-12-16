@@ -175,3 +175,45 @@ def service_detail(request, service_id):
             'error': 'Failed to get service details',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_service_addons(request, service_id):
+    """
+    Get all add-ons for a specific service
+    """
+    try:
+        from .models import ServiceAddOn
+        
+        # Check if service exists
+        try:
+            service = Service.objects.get(service_id=service_id)
+        except Service.DoesNotExist:
+            return Response({
+                'error': 'Service not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get all add-ons for this service
+        addons = ServiceAddOn.objects.filter(service=service).order_by('name')
+        
+        addons_data = [{
+            'service_add_on_id': addon.service_add_on_id,
+            'name': addon.name,
+            'description': addon.description,
+            'price': str(addon.price),
+            'created_at': addon.created_at.isoformat() if addon.created_at else None
+        } for addon in addons]
+        
+        return Response({
+            'message': f'Found {len(addons_data)} add-ons',
+            'addons': addons_data,
+            'service_id': service_id,
+            'service_name': service.name
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to get service add-ons',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
