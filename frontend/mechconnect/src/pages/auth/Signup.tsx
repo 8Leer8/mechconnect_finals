@@ -93,7 +93,8 @@ const Signup: React.FC = () => {
         const response = await fetch(`${PSGC_API_BASE}/regions/`);
         if (response.ok) {
           const data = await response.json();
-          setRegionsList(data);
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setRegionsList(sorted);
         }
       } catch (error) {
         console.error('Error fetching regions:', error);
@@ -118,7 +119,8 @@ const Signup: React.FC = () => {
         const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
-          setProvincesList(data);
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setProvincesList(sorted);
         } else {
           console.error('Failed to fetch provinces:', response.status);
           setProvincesList([]);
@@ -146,7 +148,8 @@ const Signup: React.FC = () => {
         const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
-          setCitiesList(data);
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setCitiesList(sorted);
         } else {
           console.error('Failed to fetch cities:', response.status);
           setCitiesList([]);
@@ -174,7 +177,8 @@ const Signup: React.FC = () => {
         const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
-          setBarangaysList(data);
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setBarangaysList(sorted);
         } else {
           console.error('Failed to fetch barangays:', response.status);
           setBarangaysList([]);
