@@ -9,14 +9,18 @@ urlpatterns = [
     # Authentication endpoints
     path('register/', authentication.register, name='register'),
     path('login/', authentication.login, name='login'),
+    path('request-email-verification/', authentication.request_email_verification, name='request_email_verification'),
+    path('verify-email-code/', authentication.verify_email_code, name='verify_email_code'),
+    path('resend-verification-code/', authentication.resend_verification_code, name='resend_verification_code'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', authentication.profile, name='profile'),
     path('profile/update/', authentication.update_profile, name='update_profile'),
     
     # Password management
     path('password/change/', authentication.change_password, name='change_password'),
-    path('password/reset/request/', authentication.password_reset_request, name='password_reset_request'),
-    path('password/reset/confirm/', authentication.password_reset_confirm, name='password_reset_confirm'),
+    path('password/reset/request/', authentication.request_password_reset, name='request_password_reset'),
+    path('password/reset/verify-code/', authentication.verify_password_reset_code, name='verify_password_reset_code'),
+    path('password/reset/confirm/', authentication.reset_password, name='reset_password'),
     
     # Role management
     path('check-roles/', authentication.check_user_roles, name='check_user_roles'),

@@ -46,7 +46,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
                 user = Account.objects.get(username=username)
                 if user.check_password(password):
                     if not user.is_active:
-                        raise serializers.ValidationError('User account is disabled.')
+                        raise serializers.ValidationError('Please verify your email address before logging in. Check your inbox for the verification link.')
                     
                     # Check if user is banned
                     if hasattr(user, 'ban'):
@@ -209,6 +209,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # Hash password
         validated_data['password'] = make_password(validated_data['password'])
         
+        # Set user as inactive until email verification
+        validated_data['is_active'] = False
+        
         # Create account
         account = Account.objects.create(**validated_data)
         
@@ -280,7 +283,7 @@ class UserLoginSerializer(serializers.Serializer):
                     user = Account.objects.get(username=username)
                 
                 if not user.is_active:
-                    raise serializers.ValidationError('Account is deactivated.')
+                    raise serializers.ValidationError('Please verify your email address before logging in. Check your inbox for the verification link.')
                 
                 if not check_password(password, user.password):
                     raise serializers.ValidationError('Invalid credentials.')

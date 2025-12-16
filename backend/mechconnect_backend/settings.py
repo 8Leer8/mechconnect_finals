@@ -236,3 +236,13 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mechconnect.app@gmail.com'
+EMAIL_HOST_PASSWORD = 'vrzatuzbyyxvwszp'
+DEFAULT_FROM_EMAIL = 'MechConnect <mechconnect.app@gmail.com>'
+
+# Email verification token expiry (in seconds) - 24 hours
+EMAIL_VERIFICATION_TIMEOUT = 86400
