@@ -1,11 +1,6 @@
 .mechanic-jobs-content {
   --background: hsl(40, 20%, 98%);
-  --padding-bottom: 96px;
-  overflow-y: auto;
-}
-
-.mechanic-jobs-content::part(scroll) {
-  padding-bottom: 16px;
+  --padding-bottom: 64px;
 }
 
 /* Material Icons */

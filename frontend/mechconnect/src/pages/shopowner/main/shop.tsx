@@ -2,6 +2,7 @@ import { IonContent, IonPage } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import BottomNavShop from '../../../components/bottomnavshop';
+import AddItemModal from '../modal/AddItemModal';
 import './shop.css';
 
 interface ShopItem {
@@ -19,6 +20,7 @@ const Shop: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'details' | 'items'>('details');
   const [itemSearch, setItemSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<'All' | string>('All');
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
   const goToNotifications = () => history.push('/shopowner/notifications');
   const goToProfile = () => history.push('/shopowner/profile');
@@ -54,9 +56,6 @@ const Shop: React.FC = () => {
       <IonContent className="shop-content" fullscreen>
         <div className="shop-header">
           <div className="header-left">
-            <button className="menu-button">
-              <span className="material-icons-round">menu</span>
-            </button>
             <h1 className="header-title">MechConnect</h1>
           </div>
           <div className="header-right">
@@ -183,7 +182,7 @@ const Shop: React.FC = () => {
                 <option value="Electrical">Electrical</option>
                 <option value="Brake System">Brake System</option>
               </select>
-              <button className="add-item-button">
+              <button className="add-item-button" onClick={() => setIsAddItemModalOpen(true)}>
                 <span className="material-icons-round">add</span>
                 Add Item
               </button>
@@ -213,6 +212,7 @@ const Shop: React.FC = () => {
           </div>
         )}
       </IonContent>
+      <AddItemModal isOpen={isAddItemModalOpen} onClose={() => setIsAddItemModalOpen(false)} />
       <BottomNavShop />
     </IonPage>
   );

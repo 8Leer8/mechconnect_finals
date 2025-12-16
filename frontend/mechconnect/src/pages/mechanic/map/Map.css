@@ -1,0 +1,464 @@
+.mechanic-map-content {
+  --background: hsl(40, 20%, 98%);
+  --padding-bottom: 64px;
+}
+
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Header */
+.mechanic-map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.mechanic-map-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.mechanic-notification-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.mechanic-notification-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Map Container */
+.mechanic-map-container {
+  padding: 20px;
+  padding-bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Leaflet Map Container */
+.leaflet-map-container {
+  height: 300px !important;
+  width: 100% !important;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  position: relative;
+}
+
+/* Fix Leaflet default styles for Ionic */
+.leaflet-map-container .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 16px;
+  background: #f0f0f0;
+}
+
+/* Ensure Leaflet controls render properly */
+.leaflet-map-container .leaflet-control-zoom {
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.leaflet-map-container .leaflet-control-zoom a {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: white;
+  color: #333;
+}
+
+.leaflet-map-container .leaflet-control-zoom a:hover {
+  background-color: #f4f4f4;
+}
+
+/* Keep old placeholder styles for reference (can be removed later) */
+.map-placeholder {
+  height: 300px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.map-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
+
+.map-content {
+  text-align: center;
+  color: white;
+  z-index: 1;
+  position: relative;
+}
+
+.map-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.map-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.map-content p {
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  opacity: 0.8;
+}
+
+.current-location {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.location-icon {
+  font-size: 16px;
+}
+
+.location-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Map Actions */
+.mechanic-map-actions {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.map-action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.map-action-button:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.map-action-button span:first-child {
+  font-size: 20px;
+  color: hsl(25, 85%, 55%);
+}
+
+.map-action-button span:last-child {
+  font-size: 12px;
+  font-weight: 500;
+  color: hsl(25, 15%, 25%);
+}
+
+/* Sections */
+.mechanic-map-section {
+  padding: 20px;
+}
+
+.mechanic-map-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 16px 0;
+}
+
+/* Nearby Jobs */
+.nearby-jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Job Card */
+.nearby-job-card {
+  background: white;
+  border-radius: 16px;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.nearby-job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.job-header {
+  padding: 20px 20px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.job-info h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 4px 0;
+}
+
+.job-client {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Urgency Badge */
+.job-urgency {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.urgency-high {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.urgency-medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.urgency-low {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.job-details {
+  padding: 0 20px 16px;
+}
+
+.job-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.job-location .location-icon {
+  font-size: 16px;
+  color: #94a3b8;
+}
+
+.job-location span:last-child {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.job-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-distance {
+  font-size: 12px;
+  color: hsl(25, 85%, 55%);
+  font-weight: 600;
+}
+
+.job-time {
+  font-size: 12px;
+  color: #94a3b8;
+  background: #f8fafc;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.job-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.accept-job-button {
+  flex: 1;
+  height: 40px;
+  background: hsl(25, 85%, 55%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.accept-job-button:hover {
+  background: hsl(25, 75%, 50%);
+}
+
+.view-details-button {
+  flex: 1;
+  height: 40px;
+  background: #f8fafc;
+  color: hsl(25, 15%, 25%);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-details-button:hover {
+  background: #f1f5f9;
+}
+
+/* Legend */
+.mechanic-map-legend {
+  padding: 20px;
+  background: white;
+  margin: 20px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mechanic-map-legend h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 16px 0;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-icon.high-priority {
+  background: #dc2626;
+}
+
+.legend-icon.medium-priority {
+  background: #d97706;
+}
+
+.legend-icon.low-priority {
+  background: #16a34a;
+}
+
+.legend-icon.current-location {
+  background: hsl(25, 85%, 55%);
+}
+
+.legend-item span {
+  font-size: 14px;
+  color: hsl(25, 15%, 25%);
+}
+
+@media (max-width: 400px) {
+  .mechanic-map-actions {
+    flex-wrap: wrap;
+  }
+
+  .map-action-button {
+    min-width: 70px;
+  }
+
+  .job-actions {
+    flex-direction: column;
+  }
+
+  .job-actions button {
+    width: 100%;
+  }
+
+  .legend-items {
+    gap: 8px;
+  }
+
+  .legend-item span {
+    font-size: 13px;
+  }
+}

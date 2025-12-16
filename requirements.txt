@@ -4,3 +4,4 @@ django-cors-headers
 psycopg[binary]>=3.2.0
 python-dotenv==1.0.1
 Pillow==10.4.0
+djangorestframework-simplejwt==5.3.1

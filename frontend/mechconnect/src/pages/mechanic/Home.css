@@ -1,11 +1,6 @@
 .mechanic-home-content {
   --background: hsl(40, 20%, 98%);
-  --padding-bottom: 96px;
-  overflow-y: auto;
-}
-
-.mechanic-home-content::part(scroll) {
-  padding-bottom: 16px;
+  --padding-bottom: 64px;
 }
 
 /* Material Icons */
@@ -309,6 +304,20 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.mechanic-activity-item.clickable {
+  cursor: pointer;
+}
+
+.mechanic-activity-item.clickable:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.mechanic-activity-item.clickable:active {
+  transform: scale(0.98);
 }
 
 .mechanic-activity-icon {

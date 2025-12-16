@@ -2,6 +2,9 @@ import { IonContent, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import BottomNavShop from '../../../components/bottomnavshop';
+import AssignMechanicsModal from '../modal/AssignMechanicsModal';
+import RejectBookingModal from '../modal/RejectBookingModal';
+import ViewBookingModal from '../modal/ViewBookingModal';
 import './booking.css';
 
 interface BookingRequest {
@@ -31,9 +34,18 @@ const ManageBooking: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | BookingRequest['status']>('All');
   const [priorityFilter, setPriorityFilter] = useState<'All' | BookingRequest['priority']>('All');
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingRequest | null>(null);
 
   const goToNotifications = () => history.push('/shopowner/notifications');
   const goToProfile = () => history.push('/shopowner/profile');
+  
+  const handleViewBooking = (booking: BookingRequest) => {
+    setSelectedBooking(booking);
+    setIsViewModalOpen(true);
+  };
 
   const bookings: BookingRequest[] = [
     {
@@ -87,9 +99,6 @@ const ManageBooking: React.FC = () => {
         {/* Header */}
         <div className="booking-header">
           <div className="header-left">
-            <button className="menu-button">
-              <span className="material-icons-round">menu</span>
-            </button>
             <h1 className="header-title">MechConnect</h1>
           </div>
           <div className="header-right">
@@ -221,10 +230,19 @@ const ManageBooking: React.FC = () => {
                   </div>
                 </div>
                 <div className="booking-actions">
-                  <button className="secondary-button">View</button>
+                  <button className="secondary-button" onClick={() => handleViewBooking(booking)}>
+                    <span className="material-icons-round">visibility</span>
+                    View
+                  </button>
                   <div className="action-group">
-                    <button className="primary-button">Accept & Assign</button>
-                    <button className="danger-button">Reject</button>
+                    <button className="primary-button" onClick={() => setIsAssignModalOpen(true)}>
+                      <span className="material-icons-round">check</span>
+                      Accept & Assign
+                    </button>
+                    <button className="danger-button" onClick={() => setIsRejectModalOpen(true)}>
+                      <span className="material-icons-round">close</span>
+                      Reject
+                    </button>
                   </div>
                 </div>
               </div>
@@ -232,6 +250,13 @@ const ManageBooking: React.FC = () => {
           </div>
         </div>
       </IonContent>
+      <ViewBookingModal 
+        isOpen={isViewModalOpen} 
+        onClose={() => setIsViewModalOpen(false)} 
+        booking={selectedBooking}
+      />
+      <AssignMechanicsModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} />
+      <RejectBookingModal isOpen={isRejectModalOpen} onClose={() => setIsRejectModalOpen(false)} />
       <BottomNavShop />
     </IonPage>
   );
