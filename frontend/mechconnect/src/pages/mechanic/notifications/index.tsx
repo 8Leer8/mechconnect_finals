@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Notifications.css';
 
 interface Notification {
@@ -150,14 +151,17 @@ const Notifications: React.FC = () => {
             <span className="material-icons-round">arrow_back</span>
           </button>
           <h1 className="mechanic-notifications-title">Notifications</h1>
-          {unreadCount > 0 && (
-            <button
-              className="mark-all-read-button"
-              onClick={markAllAsRead}
-            >
-              Mark all read
-            </button>
-          )}
+          <div className="header-actions">
+            <Wallet />
+            {unreadCount > 0 && (
+              <button
+                className="mark-all-read-button"
+                onClick={markAllAsRead}
+              >
+                Mark all read
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Notifications List */}

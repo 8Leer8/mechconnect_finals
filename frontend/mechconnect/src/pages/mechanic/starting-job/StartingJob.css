@@ -1,0 +1,180 @@
+/* Starting Job Page Styles */
+.starting-job-content {
+  --background: hsl(0, 0%, 98%);
+  --color: hsl(0, 0%, 10%);
+  --padding-bottom: 64px;
+}
+
+/* Map Container */
+.map-container {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.map-placeholder {
+  background: hsl(0, 0%, 95%);
+  border-radius: 12px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed hsl(0, 0%, 80%);
+}
+
+.map-content {
+  text-align: center;
+  color: hsl(0, 0%, 50%);
+}
+
+.map-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  color: hsl(210, 100%, 50%);
+}
+
+.map-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.map-subtext {
+  font-size: 14px;
+}
+
+/* Status Section */
+.status-section {
+  padding: 0 16px 16px 16px;
+}
+
+.status-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: hsl(0, 0%, 20%);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: hsl(0, 0%, 70%);
+  margin-right: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.status-dot.active {
+  background: hsl(120, 100%, 40%);
+}
+
+.status-text {
+  font-size: 16px;
+  color: hsl(0, 0%, 30%);
+}
+
+/* Action Buttons */
+.action-buttons {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.btn-contact {
+  background: hsl(210, 100%, 50%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-contact:hover {
+  background: hsl(210, 100%, 45%);
+}
+
+.btn-start-travel {
+  background: hsl(45, 100%, 50%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-start-travel:hover {
+  background: hsl(45, 100%, 45%);
+}
+
+.btn-arrived {
+  background: hsl(120, 100%, 40%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-arrived:disabled {
+  background: hsl(120, 100%, 30%);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-complete {
+  background: hsl(120, 100%, 40%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-complete:hover {
+  background: hsl(120, 100%, 35%);
+}
+
+.icon-sm {
+  font-size: 20px;
+}
