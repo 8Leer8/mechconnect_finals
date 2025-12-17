@@ -8,6 +8,17 @@
   padding-bottom: 120px;
 }
 
+/* Transparent Scrollbar */
+.shop-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.shop-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 .shop-header,
 .booking-header {
   display: flex;

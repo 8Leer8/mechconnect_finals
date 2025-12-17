@@ -9,6 +9,17 @@
   padding-bottom: 80px;
 }
 
+/* Transparent Scrollbar */
+.dashboard-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.dashboard-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 /* Material Icons */
 .material-icons-round {
   font-family: 'Material Icons Round';

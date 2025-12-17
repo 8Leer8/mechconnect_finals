@@ -8,6 +8,17 @@
   padding-bottom: 120px;
 }
 
+/* Transparent Scrollbar */
+.booking-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.booking-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 /* Header */
 .booking-header {
   display: flex;
