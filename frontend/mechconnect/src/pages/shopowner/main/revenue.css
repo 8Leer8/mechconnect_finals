@@ -1,21 +1,21 @@
-/* Mechanics Management Page Styles */
-.mechanic-content {
+/* Revenue Analytics Page Styles */
+.revenue-content {
   --background: hsl(40, 20%, 98%);
   --padding-bottom: 96px;
   overflow-y: auto;
 }
 
-.mechanic-content::part(scroll) {
+.revenue-content::part(scroll) {
   padding-bottom: 80px;
 }
 
 /* Transparent Scrollbar */
-.mechanic-content::-webkit-scrollbar {
+.revenue-content::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
 
-.mechanic-content {
+.revenue-content {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -39,7 +39,7 @@
 }
 
 /* Header */
-.mechanic-header {
+.revenue-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,25 +51,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.menu-button {
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: white;
-  color: hsl(25, 15%, 25%);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.menu-button:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .header-title {
@@ -138,33 +119,34 @@
 }
 
 /* Title Section */
-.mechanic-title-section {
+.revenue-title-section {
   padding: 0 20px 20px;
 }
 
-.mechanic-title {
-  font-size: 22px;
+.revenue-title {
+  font-size: 20px;
   font-weight: 600;
   color: hsl(25, 85%, 55%);
   margin: 0 0 8px 0;
 }
 
-.mechanic-subtitle {
+.revenue-subtitle {
   font-size: 14px;
+  font-weight: 400;
   color: #64748b;
   margin: 0;
 }
 
 /* Sections */
-.mechanic-section {
+.revenue-section {
   padding: 0 20px 20px;
 }
 
-.mechanic-section:last-child {
-  padding-bottom: 120px;
+.revenue-section:last-child {
+  padding-bottom: 100px;
 }
 
-/* Summary cards */
+/* Summary Cards */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -215,11 +197,7 @@
 }
 
 .summary-icon-purple {
-  background: #a855f7;
-}
-
-.summary-icon-gold {
-  background: #fbbf24;
+  background: #9333ea;
 }
 
 .summary-content {
@@ -237,6 +215,7 @@
 
 .summary-label {
   font-size: 12px;
+  font-weight: 400;
   color: #64748b;
   margin: 0;
 }
@@ -247,8 +226,8 @@
   margin: 0;
 }
 
-/* Search & Filters */
-.search-filter-card {
+/* Filter Card */
+.revenue-filter-card {
   background: white;
   border-radius: 16px;
   padding: 20px;
@@ -258,14 +237,6 @@
   gap: 16px;
   width: 100%;
   box-sizing: border-box;
-}
-
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: space-between;
 }
 
 .search-container {
@@ -278,7 +249,7 @@
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: #64748b;
   pointer-events: none;
 }
 
@@ -300,16 +271,17 @@
 
 .search-input:focus {
   border-color: hsl(25, 85%, 55%);
-  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.15);
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
 }
 
-.filter-buttons {
-  display: flex;
+.time-period-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 8px;
 }
 
-.filter-button {
-  padding: 8px 16px;
+.period-button {
+  padding: 10px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: white;
@@ -318,54 +290,50 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
-.filter-button:hover {
+.period-button:hover {
   background: #f8fafc;
   border-color: hsl(25, 85%, 55%);
 }
 
-.filter-button.active {
+.period-button.active {
   background: hsl(25, 85%, 55%);
   color: white;
   border-color: hsl(25, 85%, 55%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.invite-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 12px;
-  background: hsl(25, 85%, 55%);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
+/* Transactions Header */
+.transactions-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  margin-bottom: 16px;
 }
 
-.invite-button:hover {
-  background: hsl(25, 85%, 50%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
 }
 
-.invite-button .material-icons-round {
-  font-size: 18px;
+.transaction-count {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
 }
 
-/* Mechanic cards */
-.mechanics-cards-container {
+/* Transactions List */
+.transactions-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.mechanic-profile-card {
+.transaction-card {
   background: white;
   border-radius: 16px;
   padding: 20px;
@@ -373,110 +341,70 @@
   transition: all 0.2s ease;
 }
 
-.mechanic-profile-card:hover {
+.transaction-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
 }
 
-.mechanic-card-header {
+.transaction-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
-.mechanic-card-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: hsl(25, 85%, 55%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
+.transaction-info {
+  flex: 1;
+}
+
+.transaction-service {
+  font-size: 16px;
   font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 4px 0;
 }
 
-.status-badge {
+.transaction-id {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.transaction-status {
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 
-.status-active {
-  background: hsl(140, 60%, 95%);
-  color: hsl(140, 60%, 35%);
+.status-completed {
+  background: hsl(140, 60%, 96%);
+  color: hsl(140, 60%, 45%);
 }
 
-.status-invited {
-  background: #f3e8ff;
-  color: #9333ea;
+.status-pending {
+  background: hsl(39, 100%, 96%);
+  color: hsl(39, 100%, 45%);
 }
 
-.mechanic-card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.status-refunded {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
-.mechanic-card-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.mechanic-card-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: hsl(25, 15%, 25%);
-  margin: 0;
-}
-
-.mechanic-card-specialty {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-}
-
-.mechanic-card-performance {
-  font-size: 13px;
-  color: #94a3b8;
-  margin: 0;
-}
-
-.mechanic-card-meta {
-  text-align: right;
-  min-width: 120px;
-}
-
-.meta-label {
-  font-size: 11px;
-  color: #94a3b8;
-  margin: 0;
-}
-
-.meta-value {
-  font-size: 14px;
-  color: hsl(25, 15%, 25%);
-  margin: 0 0 8px 0;
-}
-
-.mechanic-card-details {
+.transaction-details {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 12px;
 }
 
-.mechanic-card-detail {
+.detail-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  color: #475569;
+  font-size: 14px;
+  color: #64748b;
 }
 
 .detail-icon {
@@ -484,59 +412,75 @@
   color: #94a3b8;
 }
 
-.mechanic-card-revenue {
-  text-align: left;
+.transaction-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
 }
 
-.mechanic-revenue-amount {
-  font-size: 22px;
-  font-weight: 600;
-  color: hsl(25, 15%, 25%);
-  margin: 0;
+.amount-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.mechanic-revenue-label {
+.amount-label {
   font-size: 12px;
   color: #94a3b8;
-  margin: 0;
+  font-weight: 400;
 }
 
-.remove-button {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 14px;
+.amount-value {
+  font-size: 16px;
   font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  margin-top: 12px;
-  width: fit-content;
+  color: hsl(25, 15%, 25%);
 }
 
-.remove-button:hover {
-  background: #fecaca;
+.amount-value.commission {
+  color: hsl(210, 80%, 50%);
 }
 
-.no-mechanics-message {
+.amount-value.payout {
+  color: hsl(140, 60%, 45%);
+}
+
+/* Empty State */
+.empty-state {
   background: white;
   border-radius: 16px;
-  padding: 32px;
+  padding: 60px 20px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  color: #94a3b8;
 }
 
-/* Responsive layout */
+.empty-icon {
+  font-size: 64px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Responsive Design */
 @media (min-width: 768px) {
-  .mechanic-section {
+  .revenue-section {
     max-width: 1200px;
     margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .summary-cards {
@@ -544,48 +488,37 @@
     gap: 20px;
   }
 
-  .mechanics-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 20px;
-  }
-
-  .search-filter-card {
-    max-width: 1000px;
+  .revenue-filter-card {
+    max-width: 800px;
     margin: 0 auto;
-  }
-}
-
-@media (max-width: 767px) {
-  .summary-cards {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-
-  .filter-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-
-  .invite-button {
-    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .summary-cards {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
   .summary-card {
     padding: 16px;
   }
 
-  .search-filter-card {
-    padding: 16px;
+  .time-period-buttons {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .mechanic-profile-card {
+  .transaction-amounts {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-filter-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .transaction-card {
     padding: 16px;
   }
 }

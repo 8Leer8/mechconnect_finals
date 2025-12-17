@@ -461,33 +461,179 @@ def assign_provider_to_request(request, request_id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_mechanic_available_requests(request):
-    """Get available requests for a mechanic (quoted/accepted but not booked)"""
-    mechanic_id = request.GET.get('mechanic_id')
-
-    if not mechanic_id:
-        return Response({'error': 'Mechanic ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+    """
+    Get available requests for the authenticated mechanic.
+    Available = requests that are quoted/accepted but not yet booked.
+    Uses JWT authentication - no mechanic_id parameter needed.
+    Returns empty list if user has no mechanic profile.
+    """
+    # Get the authenticated user
+    user = request.user
+    
+    # Check if user has a mechanic profile
     try:
-        mechanic = Mechanic.objects.get(mechanic_id=mechanic_id)
+        mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
     except Mechanic.DoesNotExist:
-        return Response({'error': 'Mechanic not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        # User has no mechanic profile, return empty list
+        return Response({
+            'jobs': [],
+            'total': 0,
+            'message': 'User has no mechanic profile'
+        }, status=status.HTTP_200_OK)
+    
     # Get requests that are assigned to this mechanic and are quoted/accepted but not booked
-    requests = Request.objects.filter(
-        provider=mechanic.mechanic_id.acc_id,
+    requests_queryset = Request.objects.filter(
+        provider=user.acc_id,
         request_status__in=['quoted', 'accepted']
     ).exclude(
         # Exclude requests that already have bookings
         request_id__in=Booking.objects.values_list('request_id', flat=True)
-    ).select_related('client').order_by('-created_at')
-
+    ).select_related(
+        'client',
+        'client__client_id'
+    ).prefetch_related(
+        'custom_request',
+        'direct_request',
+        'emergency_request'
+    ).order_by('-created_at')
+    
     # Serialize the requests
-    serializer = RequestListSerializer(requests, many=True)
+    serializer = RequestListSerializer(requests_queryset, many=True)
     return Response({
-        'requests': serializer.data,
+        'jobs': serializer.data,
         'total': len(serializer.data)
-    })
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_mechanic_pending_requests(request):
+    """
+    Get pending requests for the authenticated mechanic.
+    Pending = requests specifically assigned to this mechanic that are awaiting response.
+    Uses JWT authentication - no mechanic_id parameter needed.
+    Returns empty list if user has no mechanic profile.
+    """
+    # Get the authenticated user
+    user = request.user
+    
+    # Check if user has a mechanic profile
+    try:
+        mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+    except Mechanic.DoesNotExist:
+        # User has no mechanic profile, return empty list
+        return Response({
+            'jobs': [],
+            'total': 0,
+            'message': 'User has no mechanic profile'
+        }, status=status.HTTP_200_OK)
+    
+    # Get pending requests assigned to this mechanic
+    requests_queryset = Request.objects.filter(
+        provider=user.acc_id,
+        request_status='pending'
+    ).select_related(
+        'client',
+        'client__client_id'
+    ).prefetch_related(
+        'custom_request',
+        'direct_request',
+        'emergency_request'
+    ).order_by('-created_at')
+    
+    # Serialize the requests
+    serializer = RequestListSerializer(requests_queryset, many=True)
+    return Response({
+        'jobs': serializer.data,
+        'total': len(serializer.data)
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def accept_request(request, request_id):
+    """
+    Accept a request as a mechanic.
+    - Validates user is authenticated
+    - Validates user has mechanic role
+    - Validates request is in pending/quoted state
+    - Assigns request to the mechanic
+    - Updates request status to accepted
+    - Creates a booking for the accepted request
+    """
+    try:
+        # Get the authenticated user
+        user = request.user
+        
+        # Check if user has a mechanic profile
+        try:
+            mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+        except Mechanic.DoesNotExist:
+            return Response({
+                'error': 'Access denied. User is not a mechanic.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get the request
+        try:
+            req = Request.objects.select_related(
+                'client', 'provider'
+            ).prefetch_related(
+                'custom_request', 'direct_request', 'emergency_request'
+            ).get(request_id=request_id)
+        except Request.DoesNotExist:
+            return Response({
+                'error': 'Request not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Validate request state - only pending or quoted requests can be accepted
+        if req.request_status not in ['pending', 'qouted']:
+            return Response({
+                'error': f'Cannot accept request. Current status is "{req.request_status}". Only pending or quoted requests can be accepted.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if request is already assigned to another mechanic
+        if req.provider and req.provider.acc_id != user.acc_id:
+            return Response({
+                'error': 'This request is already assigned to another mechanic.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if booking already exists for this request
+        existing_booking = Booking.objects.filter(request=req).first()
+        if existing_booking:
+            return Response({
+                'error': 'A booking already exists for this request.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Use transaction to ensure atomicity
+        with transaction.atomic():
+            # Assign mechanic to request and update status
+            req.provider = user
+            req.request_status = 'accepted'
+            req.save()
+            
+            # Create a booking for this accepted request
+            booking = Booking.objects.create(
+                request=req,
+                status='active',
+                amount_fee=0  # Will be updated later with actual fee
+            )
+            
+            # Serialize and return the updated request
+            serializer = RequestSerializer(req)
+            
+            return Response({
+                'message': 'Request accepted successfully',
+                'request': serializer.data,
+                'booking_id': booking.booking_id
+            }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to accept request',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @csrf_exempt

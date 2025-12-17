@@ -72,6 +72,10 @@ const Profile: React.FC = () => {
   };
 
   const handleSwitchRoles = () => {
+    // Mark this as an intentional switch so SwitchAccount doesn't auto-redirect
+    sessionStorage.setItem('intentional_switch', 'true');
+    // Clear active role to allow user to select a new one
+    localStorage.removeItem('active_role');
     history.push('/auth/switch-account');
   };
 

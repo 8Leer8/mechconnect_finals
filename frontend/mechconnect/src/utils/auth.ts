@@ -25,6 +25,9 @@ export const clearAuthData = (): void => {
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userId');
+    // CRITICAL: Clear active_role to prevent role leakage between accounts
+    localStorage.removeItem('active_role');
     sessionStorage.clear();
   } catch (error) {
     console.error('Error clearing auth data:', error);
@@ -72,6 +75,15 @@ export const getUserId = (): number | null => {
   }
 };
 
+export const getActiveRole = (): string | null => {
+  try {
+    return localStorage.getItem('active_role');
+  } catch (error) {
+    console.error('Error getting active role:', error);
+    return null;
+  }
+};
+
 export const setUserData = (userData: any): void => {
   try {
     if (userData) {
@@ -85,6 +97,14 @@ export const setUserData = (userData: any): void => {
   }
 };
 
+export const setActiveRole = (role: string): void => {
+  try {
+    localStorage.setItem('active_role', role);
+  } catch (error) {
+    console.error('Error setting active role:', error);
+  }
+};
+
 export const updateUserData = (updates: any): void => {
   try {
     const currentUser = getUserData();
@@ -94,5 +114,13 @@ export const updateUserData = (updates: any): void => {
     }
   } catch (error) {
     console.error('Error updating user data:', error);
+  }
+};
+
+export const clearActiveRole = (): void => {
+  try {
+    localStorage.removeItem('active_role');
+  } catch (error) {
+    console.error('Error clearing active role:', error);
   }
 };

@@ -25,7 +25,7 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  // Note: Mock data removed - session is now managed by Login flow only
+  // Authentication is now handled entirely by Login.tsx
   // Real user data comes from backend after successful authentication
   
   return (

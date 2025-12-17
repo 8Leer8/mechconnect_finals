@@ -39,22 +39,7 @@ const Mechanic: React.FC = () => {
   const goToProfile = () => history.push('/shopowner/profile');
 
   // Sample mechanic data
-  const [mechanics] = useState<MechanicData[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      initials: 'JD',
-      email: 'john.doe@example.com',
-      phone: '+1 (555) 123-4567',
-      joinedDate: '1/15/2023',
-      expertise: 'Engine Repair',
-      earnings: '₱3,200',
-      rating: '4.9',
-      bookings: 45,
-      experience: '5 years',
-      status: 'Active'
-    }
-  ]);
+  const [mechanics] = useState<MechanicData[]>([]);
 
   const filteredMechanics = useMemo(() => {
     return mechanics.filter((mechanic) => {
@@ -295,5 +280,3 @@ const Mechanic: React.FC = () => {
 };
 
 export default Mechanic;
-
-

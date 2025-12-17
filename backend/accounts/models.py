@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.hashers import check_password as django_check_password
 
 class Account(models.Model):
     acc_id = models.AutoField(primary_key=True)
@@ -18,6 +19,37 @@ class Account(models.Model):
 
     def __str__(self):
         return f"{self.firstname} {self.lastname} ({self.username})"
+    
+    @property
+    def is_authenticated(self):
+        """
+        Always return True. This is a way to tell if the user has been authenticated.
+        Required by Django REST Framework's IsAuthenticated permission class.
+        """
+        return True
+    
+    @property
+    def is_anonymous(self):
+        """
+        Always return False. This is a way to tell if the user is anonymous.
+        Required by Django's authentication system.
+        """
+        return False
+    
+    def check_password(self, raw_password):
+        """
+        Check if the provided raw password matches the stored hashed password.
+        Required for Django authentication and JWT token generation.
+        """
+        return django_check_password(raw_password, self.password)
+    
+    def get_primary_role(self):
+        """
+        Get the primary role of the user.
+        Returns the first role if multiple roles exist, or None if no roles.
+        """
+        first_role = self.roles.first()
+        return first_role.account_role if first_role else None
 
 
 class AccountAddress(models.Model):
@@ -129,6 +161,11 @@ class Mechanic(models.Model):
         ('available', 'Available'),
         ('working', 'Working'),
     ]
+    APPROVAL_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
 
     mechanic_id = models.OneToOneField('accounts.Account', primary_key=True, on_delete=models.CASCADE, related_name='mechanic_profile')
     profile_photo = models.CharField(max_length=1024, null=True, blank=True)
@@ -140,6 +177,12 @@ class Mechanic(models.Model):
     shop = models.ForeignKey('shop.Shop', on_delete=models.SET_NULL, null=True, blank=True, related_name='mechanics_assigned')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
     token_wallet = models.IntegerField(default=0)
+    
+    # Approval workflow fields
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='mechanics_approved')
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

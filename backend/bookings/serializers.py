@@ -18,6 +18,7 @@ class BookingSerializer(serializers.ModelSerializer):
     service_details = serializers.SerializerMethodField()
     service_time = serializers.SerializerMethodField()
     payment_info = serializers.SerializerMethodField()
+    back_job_reason = serializers.SerializerMethodField()
     
     class Meta:
         model = Booking
@@ -25,7 +26,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'booking_id', 'request', 'status', 'amount_fee', 'booked_at',
             'updated_at', 'completed_at', 'client_name', 'provider_name',
             'provider_contact', 'client_address', 'location', 'request_summary', 
-            'request_type', 'service_details', 'service_time', 'payment_info'
+            'request_type', 'service_details', 'service_time', 'payment_info', 'back_job_reason'
         ]
         read_only_fields = ['booking_id', 'booked_at', 'updated_at']
     
@@ -187,6 +188,14 @@ class BookingSerializer(serializers.ModelSerializer):
                 'amount_paid': '0.00',
                 'remaining_balance': str(obj.amount_fee),
             }
+    
+    def get_back_job_reason(self, obj):
+        """Get the reason for back job if it exists"""
+        try:
+            back_job = obj.back_jobs.latest('created_at')
+            return back_job.reason if back_job.reason else None
+        except:
+            return None
 
 
 class ActiveBookingSerializer(serializers.ModelSerializer):

@@ -3,8 +3,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
-from ..models import Account, Notification, VerificationRejection
+from ..models import Account, Notification, VerificationRejection, Mechanic, AccountRole
 
 
 @api_view(['GET'])
@@ -196,4 +197,201 @@ def reject_verification(request):
         return Response({
             'error': 'Failed to reject verification',
             'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_pending_mechanics(request):
+    """
+    Get all pending mechanic applications for admin review
+    """
+    try:
+        from documents.models import MechanicDocument
+        
+        # Get all mechanics with pending approval status
+        pending_mechanics = Mechanic.objects.filter(
+            approval_status='pending'
+        ).select_related('mechanic_id', 'mechanic_id__address')
+        
+        mechanics_data = []
+        for mechanic in pending_mechanics:
+            user = mechanic.mechanic_id
+            
+            # Get address
+            address = ''
+            if hasattr(user, 'address'):
+                addr = user.address
+                address = f"{addr.city_municipality or ''}, {addr.province or ''}".strip()
+            
+            # Get documents
+            documents_list = []
+            mechanic_docs = MechanicDocument.objects.filter(mechanic=mechanic)
+            for doc in mechanic_docs:
+                documents_list.append({
+                    'id': doc.mechanic_document_id,
+                    'name': doc.document_name,
+                    'type': doc.document_type,
+                    'url': doc.document_file,
+                    'date_issued': doc.date_issued.isoformat() if doc.date_issued else None,
+                    'date_expiry': doc.date_expiry.isoformat() if doc.date_expiry else None,
+                    'uploaded_at': doc.uploaded_at.isoformat()
+                })
+            
+            mechanics_data.append({
+                'mechanic_id': mechanic.mechanic_id.acc_id,
+                'user_id': user.acc_id,
+                'username': user.username,
+                'email': user.email,
+                'full_name': f"{user.firstname} {user.lastname}",
+                'contact_number': mechanic.contact_number,
+                'bio': mechanic.bio,
+                'address': address,
+                'approval_status': mechanic.approval_status,
+                'applied_at': mechanic.created_at.isoformat(),
+                'documents': documents_list
+            })
+        
+        return Response({
+            'mechanics': mechanics_data,
+            'count': len(mechanics_data)
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch pending mechanics',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def approve_mechanic(request):
+    """
+    Approve a mechanic application and assign mechanic role
+    Admin-only endpoint
+    """
+    try:
+        admin_id = request.data.get('admin_id')
+        mechanic_id = request.data.get('mechanic_id')
+        
+        if not admin_id or not mechanic_id:
+            return Response({
+                'error': 'admin_id and mechanic_id are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get admin account
+        admin = get_object_or_404(Account, acc_id=admin_id)
+        
+        # Verify admin has admin role
+        if not admin.roles.filter(account_role__in=['admin', 'head_admin']).exists():
+            return Response({
+                'error': 'Only admins can approve mechanics'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get mechanic profile
+        mechanic = get_object_or_404(Mechanic, mechanic_id=mechanic_id)
+        
+        # Check if already approved
+        if mechanic.approval_status == 'approved':
+            return Response({
+                'error': 'Mechanic is already approved'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update mechanic approval status
+        mechanic.approval_status = 'approved'
+        mechanic.approved_at = timezone.now()
+        mechanic.approved_by = admin
+        mechanic.save()
+        
+        # Assign mechanic role (now that they're approved)
+        AccountRole.objects.get_or_create(
+            acc=mechanic.mechanic_id,
+            account_role=AccountRole.ROLE_MECHANIC
+        )
+        
+        # Create notification
+        Notification.objects.create(
+            receiver=mechanic.mechanic_id,
+            title='Mechanic Application Approved',
+            message='Congratulations! Your mechanic application has been approved. You can now access all mechanic features.',
+            type='info'
+        )
+        
+        return Response({
+            'message': 'Mechanic approved successfully',
+            'mechanic_id': mechanic.mechanic_id.acc_id,
+            'approval_status': mechanic.approval_status,
+            'approved_at': mechanic.approved_at.isoformat()
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        import traceback
+        return Response({
+            'error': 'Failed to approve mechanic',
+            'details': str(e),
+            'traceback': traceback.format_exc()
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reject_mechanic(request):
+    """
+    Reject a mechanic application
+    Admin-only endpoint
+    """
+    try:
+        admin_id = request.data.get('admin_id')
+        mechanic_id = request.data.get('mechanic_id')
+        reason = request.data.get('reason', 'Application requirements not met')
+        
+        if not admin_id or not mechanic_id:
+            return Response({
+                'error': 'admin_id and mechanic_id are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get admin account
+        admin = get_object_or_404(Account, acc_id=admin_id)
+        
+        # Verify admin has admin role
+        if not admin.roles.filter(account_role__in=['admin', 'head_admin']).exists():
+            return Response({
+                'error': 'Only admins can reject mechanics'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get mechanic profile
+        mechanic = get_object_or_404(Mechanic, mechanic_id=mechanic_id)
+        
+        # Check if already approved
+        if mechanic.approval_status == 'approved':
+            return Response({
+                'error': 'Cannot reject an already approved mechanic'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update mechanic approval status
+        mechanic.approval_status = 'rejected'
+        mechanic.save()
+        
+        # Create notification
+        Notification.objects.create(
+            receiver=mechanic.mechanic_id,
+            title='Mechanic Application Rejected',
+            message=f'Your mechanic application has been rejected. Reason: {reason}',
+            type='warning'
+        )
+        
+        return Response({
+            'message': 'Mechanic application rejected',
+            'mechanic_id': mechanic.mechanic_id.acc_id,
+            'approval_status': mechanic.approval_status,
+            'reason': reason
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        import traceback
+        return Response({
+            'error': 'Failed to reject mechanic',
+            'details': str(e),
+            'traceback': traceback.format_exc()
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

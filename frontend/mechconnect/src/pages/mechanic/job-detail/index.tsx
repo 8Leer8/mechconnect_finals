@@ -19,6 +19,7 @@ interface JobData {
   created_at: string;
   updated_at?: string;
   completed_at?: string;
+  back_job_reason?: string;
   client_address?: {
     house_building_number?: string;
     street_name?: string;
@@ -51,6 +52,9 @@ const JobDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  console.log('JobDetail component loaded, id:', id);
+  console.log('Initial loading state:', loading);
 
   // Get job type from URL path or query parameter
   const getJobType = () => {
@@ -94,117 +98,62 @@ const JobDetail: React.FC = () => {
     setError(null);
 
     try {
-      // For demo purposes, skip API call and use mock data directly
-      console.log('Using mock data for job details (backend not available)');
-      throw new Error('Backend not available - using mock data');
-
-      let apiUrl = '';
-      let isBooking = false;
-
-      // Determine API endpoint based on job type
-      if (jobType === 'available') {
-        // For available jobs, we need to fetch from requests API
-        apiUrl = `http://localhost:8000/api/requests/${id}/`;
-        isBooking = false;
-      } else {
-        // For bookings, use bookings API
-        const statusMap: { [key: string]: string } = {
-          'active': 'active',
-          'completed': 'completed',
-          'cancelled': 'cancelled'
-        };
-        const apiStatus = statusMap[jobType] || 'active';
-        apiUrl = `http://localhost:8000/api/bookings/${apiStatus}/${id}/`;
-        isBooking = true;
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setError('Authentication required. Please login.');
+        setLoading(false);
+        return;
       }
 
-      console.log('Fetching from:', apiUrl);
-      const response = await fetch(apiUrl);
+      // Use the general booking detail endpoint for all bookings
+      const apiUrl = `http://localhost:8000/api/bookings/${id}/`;
+      
+      console.log('Fetching booking details from:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Booking not found');
+        } else if (response.status === 401) {
+          throw new Error('Session expired. Please login again.');
+        }
+        throw new Error(`Failed to load booking details (Status: ${response.status})`);
+      }
+
       const data = await response.json();
 
-      if (response.ok) {
-        // Normalize the data structure
-        let normalizedData: JobData;
-
-        if (isBooking) {
-          // Booking data structure
-          normalizedData = {
-            booking_id: data.booking_id,
-            request_id: data.request?.request_id || data.request_id,
-            status: data.status,
-            amount_fee: data.amount_fee,
-            booked_at: data.booked_at,
-            client_name: data.client_name,
-            provider_name: data.provider_name,
-            request_summary: data.request_summary,
-            request_type: data.request_type,
-            created_at: data.booked_at || data.created_at,
-            updated_at: data.updated_at,
-            completed_at: data.completed_at,
-            client_address: data.client_address,
-            service_details: data.service_details
-          };
-        } else {
-          // Request data structure
-          normalizedData = {
-            request_id: data.request?.request_id || data.request_id,
-            status: data.request?.request_status || data.status,
-            client_name: data.client_name || data.request?.client_name,
-            provider_name: data.provider_name || data.request?.provider_name,
-            request_summary: getRequestSummary(data),
-            request_type: data.request?.request_type || data.request_type,
-            created_at: data.request?.created_at || data.created_at,
-            client_address: data.client_address || data.request?.client_address,
-            client_contact: data.client_contact || data.request?.client_contact,
-            custom_request: data.custom_request || data.request?.custom_request,
-            direct_request: data.direct_request || data.request?.direct_request,
-            emergency_request: data.emergency_request || data.request?.emergency_request
-          };
-        }
-
-        setJobData(normalizedData);
-      } else {
-        setError(data.error || 'Failed to load job details');
-      }
-    } catch (err) {
-      // On network error, use mock data
-      console.error('Error fetching job details:', err);
-      
-      // Mock data fallback - use specific data for active job 102 (Pedro Garcia's diagnostic service)
-      const mockJobData: JobData = {
-        booking_id: jobType !== 'available' ? parseInt(id) : undefined,
-        request_id: parseInt(id),
-        status: jobType,
-        amount_fee: jobType !== 'available' ? 3200 : undefined,
-        booked_at: jobType !== 'available' ? new Date(Date.now() - 30 * 60 * 1000).toISOString() : undefined, // 30 minutes ago
-        client_name: id === '102' ? 'Pedro Garcia' : 'John Doe',
-        provider_name: 'John Mechanic',
-        request_summary: id === '102' ? 'Full diagnostic scan and error code reading' : 'Engine oil change and filter replacement',
-        request_type: id === '102' ? 'Diagnostics' : 'Oil Change Service',
-        created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
-        updated_at: jobType === 'completed' ? new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() : undefined,
-        completed_at: jobType === 'completed' ? new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() : undefined,
-        client_address: {
-          house_building_number: id === '102' ? '456' : '123',
-          street_name: id === '102' ? 'Technology Avenue' : 'Main Street',
-          subdivision_village: id === '102' ? 'Cyber Village' : 'Green Village',
-          barangay: id === '102' ? 'Barangay 2' : 'Barangay 1',
-          city_municipality: id === '102' ? 'Taguig City' : 'Makati City',
-          province: 'Metro Manila',
-          region: 'NCR',
-          postal_code: id === '102' ? '1630' : '1200'
-        },
-        service_details: {
-          service_name: id === '102' ? 'Full Diagnostics Service' : 'Oil Change Service',
-          description: id === '102' ? 'Complete engine diagnostic scan with error code reading and analysis' : 'Complete engine oil change with filter replacement',
-          includes: id === '102' ? 'OBD-II scan, error code analysis, diagnostic report' : 'Synthetic oil, oil filter, gasket, disposal of old oil',
-          addons: 'None'
-        },
-        client_contact: id === '102' ? '+63 917 123 4567' : '+63 912 345 6789'
+      // Normalize the booking data structure
+      const normalizedData: JobData = {
+        booking_id: data.booking_id,
+        request_id: data.request,
+        status: data.status,
+        amount_fee: data.amount_fee ? parseFloat(data.amount_fee) : undefined,
+        booked_at: data.booked_at,
+        client_name: data.client_name,
+        provider_name: data.provider_name,
+        request_summary: data.request_summary,
+        request_type: data.request_type,
+        created_at: data.booked_at,
+        updated_at: data.updated_at,
+        completed_at: data.completed_at,
+        back_job_reason: data.back_job_reason,
+        client_address: data.client_address,
       };
-      
-      setJobData(mockJobData);
-      setError(null); // Clear error since we have mock data
+
+      setJobData(normalizedData);
+      setError(null);
+    } catch (err: any) {
+      console.error('Error fetching job details:', err);
+      setError(err.message || 'Failed to load job details. Please try again.');
+      setJobData(null);
     } finally {
       setLoading(false);
     }
@@ -225,8 +174,11 @@ const JobDetail: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log('useEffect triggered, fetching job details...');
     fetchJobDetails();
   }, [id, jobType]);
+
+  console.log('Current state - loading:', loading, 'error:', error, 'jobData:', jobData ? 'exists' : 'null');
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -276,9 +228,56 @@ const JobDetail: React.FC = () => {
     history.push(`/mechanic/start-job/${id}`);
   };
 
-  const handleCompleteJob = () => {
-    // Navigate to completion process
-    history.push(`/mechanic/complete-job/${id}`);
+  const handleCompleteJob = async () => {
+    if (!jobData) return;
+
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setToastMessage('Authentication required');
+        setShowToast(true);
+        return;
+      }
+
+      // Use POST to /api/bookings/{id}/complete/ endpoint
+      const response = await fetch(`http://localhost:8000/api/bookings/${jobData.booking_id}/complete/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update local state with returned booking data
+        if (data.booking) {
+          setJobData({
+            ...jobData,
+            status: data.booking.status,
+            completed_at: data.booking.completed_at
+          });
+        }
+        
+        setToastMessage('Job completed successfully!');
+        setShowToast(true);
+        
+        // Navigate to completed jobs list after 2 seconds
+        setTimeout(() => {
+          history.push('/mechanic/jobs?filter=completed');
+        }, 2000);
+      } else {
+        const data = await response.json();
+        setToastMessage(data.error || 'Failed to complete job');
+        setShowToast(true);
+      }
+    } catch (err) {
+      console.error('Error completing job:', err);
+      setToastMessage('Network error occurred');
+      setShowToast(true);
+    }
   };
 
   const handleContactClient = () => {
@@ -287,13 +286,115 @@ const JobDetail: React.FC = () => {
     setShowToast(true);
   };
 
+  const handleAcceptBackJob = async () => {
+    if (!jobData) return;
+
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setToastMessage('Authentication required');
+        setShowToast(true);
+        return;
+      }
+
+      // Update booking status to active
+      const response = await fetch(`http://localhost:8000/api/bookings/${jobData.booking_id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'active'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        setJobData({
+          ...jobData,
+          status: 'active'
+        });
+        
+        setToastMessage('Back job accepted! Now active.');
+        setShowToast(true);
+        
+        setTimeout(() => {
+          history.push('/mechanic/jobs?filter=active');
+        }, 2000);
+      } else {
+        const data = await response.json();
+        setToastMessage(data.error || 'Failed to accept back job');
+        setShowToast(true);
+      }
+    } catch (err) {
+      console.error('Error accepting back job:', err);
+      setToastMessage('Network error occurred');
+      setShowToast(true);
+    }
+  };
+
+  const handleDeclineBackJob = async () => {
+    if (!jobData) return;
+
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setToastMessage('Authentication required');
+        setShowToast(true);
+        return;
+      }
+
+      // Update booking status to completed
+      const response = await fetch(`http://localhost:8000/api/bookings/${jobData.booking_id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'completed'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        setJobData({
+          ...jobData,
+          status: 'completed',
+          completed_at: new Date().toISOString()
+        });
+        
+        setToastMessage('Back job declined. Marked as completed.');
+        setShowToast(true);
+        
+        setTimeout(() => {
+          history.push('/mechanic/jobs?filter=completed');
+        }, 2000);
+      } else {
+        const data = await response.json();
+        setToastMessage(data.error || 'Failed to decline back job');
+        setShowToast(true);
+      }
+    } catch (err) {
+      console.error('Error declining back job:', err);
+      setToastMessage('Network error occurred');
+      setShowToast(true);
+    }
+  };
+
   // Show loading state
   if (loading) {
     return (
       <IonPage>
         <IonContent className="mechanic-job-detail-content" scrollY>
-          <div className="loading-container">
-            <div className="loading-message">Loading job details...</div>
+          <div className="loading-container" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="loading-spinner"></div>
+            <div className="loading-message" style={{ marginTop: '20px', fontSize: '16px', color: '#333' }}>Loading job details...</div>
           </div>
         </IonContent>
       </IonPage>
@@ -305,9 +406,24 @@ const JobDetail: React.FC = () => {
     return (
       <IonPage>
         <IonContent className="mechanic-job-detail-content" scrollY>
-          <div className="error-container">
-            <div className="error-message">{error || 'Job not found'}</div>
-            <button className="retry-button" onClick={fetchJobDetails}>
+          <div className="error-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <span className="material-icons-round" style={{ fontSize: '64px', color: '#ff6b6b', marginBottom: '20px' }}>error_outline</span>
+            <div className="error-message" style={{ fontSize: '18px', color: '#333', marginBottom: '20px', textAlign: 'center' }}>
+              {error || 'Job not found'}
+            </div>
+            <button 
+              className="retry-button" 
+              onClick={fetchJobDetails}
+              style={{ 
+                padding: '12px 24px', 
+                background: '#ff8c42', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '8px',
+                fontSize: '16px',
+                cursor: 'pointer'
+              }}
+            >
               Try Again
             </button>
           </div>
@@ -399,11 +515,26 @@ const JobDetail: React.FC = () => {
 
             <div className="job-divider"></div>
 
+            {/* Back Job Reason - Show only for back_jobs status */}
+            {jobData.status === 'back_jobs' && jobData.back_job_reason && (
+              <>
+                <div className="job-section">
+                  <h3 className="section-title">Back Job Reason</h3>
+                  <div className="back-job-reason">
+                    <p style={{ fontSize: '13px', color: 'hsl(0, 70%, 45%)', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                      {jobData.back_job_reason}
+                    </p>
+                  </div>
+                </div>
+                <div className="job-divider"></div>
+              </>
+            )}
+
             {/* Service Details */}
             <div className="job-section">
               <h3 className="section-title">Service Details</h3>
               <div className="service-item">
-                <span className="service-name">
+                <span className="service-name" style={{ fontSize: '14px', display: 'block', whiteSpace: 'normal', wordWrap: 'break-word' }}>
                   {jobData.service_details?.service_name ||
                    (jobData.direct_request?.service?.name) ||
                    jobData.request_summary}
@@ -412,25 +543,25 @@ const JobDetail: React.FC = () => {
               {jobData.service_details?.description && (
                 <div className="detail-row">
                   <span className="detail-label">Description:</span>
-                  <span className="detail-value">{jobData.service_details.description}</span>
+                  <span className="detail-value" style={{ fontSize: '13px', whiteSpace: 'normal', wordWrap: 'break-word' }}>{jobData.service_details.description}</span>
                 </div>
               )}
               {jobData.custom_request?.description && (
                 <div className="detail-row">
                   <span className="detail-label">Description:</span>
-                  <span className="detail-value">{jobData.custom_request.description}</span>
+                  <span className="detail-value" style={{ fontSize: '13px', whiteSpace: 'normal', wordWrap: 'break-word' }}>{jobData.custom_request.description}</span>
                 </div>
               )}
               {jobData.emergency_request?.description && (
                 <div className="detail-row">
                   <span className="detail-label">Emergency Details:</span>
-                  <span className="detail-value">{jobData.emergency_request.description}</span>
+                  <span className="detail-value" style={{ fontSize: '13px', whiteSpace: 'normal', wordWrap: 'break-word' }}>{jobData.emergency_request.description}</span>
                 </div>
               )}
               {jobData.service_details?.includes && (
                 <div className="detail-row">
                   <span className="detail-label">Includes:</span>
-                  <span className="detail-value">{jobData.service_details.includes}</span>
+                  <span className="detail-value" style={{ fontSize: '13px', whiteSpace: 'normal', wordWrap: 'break-word' }}>{jobData.service_details.includes}</span>
                 </div>
               )}
               <div className="detail-row">
@@ -536,12 +667,29 @@ const JobDetail: React.FC = () => {
 
             <div className="job-divider"></div>
 
-            {/* Pricing */}
-            {jobData.amount_fee && (
+            {/* Pricing Section */}
+            {jobData.amount_fee !== undefined && jobData.amount_fee !== null && (
               <>
-                <div className="total-section">
-                  <span className="total-label">Total Amount</span>
-                  <span className="total-amount">₱{jobData.amount_fee.toFixed(2)}</span>
+                <div className="job-divider"></div>
+                <div className="pricing-section">
+                  <div className="pricing-header">
+                    <h3>Payment Summary</h3>
+                  </div>
+                  <div className="pricing-breakdown">
+                    <div className="pricing-row">
+                      <span className="pricing-label">Service Fee:</span>
+                      <span className="pricing-value">
+                        ₱{typeof jobData.amount_fee === 'number' ? jobData.amount_fee.toFixed(2) : parseFloat(jobData.amount_fee || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pricing-divider"></div>
+                  <div className="pricing-total">
+                    <span className="total-label">Total Amount:</span>
+                    <span className="total-amount">
+                      ₱{typeof jobData.amount_fee === 'number' ? jobData.amount_fee.toFixed(2) : parseFloat(jobData.amount_fee || 0).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
                 <div className="job-divider"></div>
               </>
@@ -549,12 +697,9 @@ const JobDetail: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="action-buttons">
-              {jobType === 'available' && (
+              {/* Show Accept button for pending/quoted requests that haven't been booked yet */}
+              {(jobData.status === 'pending' || jobData.status === 'quoted') && !jobData.booking_id && (
                 <>
-                  <button className="btn-contact" onClick={handleContactClient}>
-                    <span className="material-icons-round icon-sm">phone</span>
-                    Contact Client
-                  </button>
                   <button className="btn-accept" onClick={handleAcceptJob}>
                     <span className="material-icons-round icon-sm">check_circle</span>
                     Accept Job
@@ -562,20 +707,32 @@ const JobDetail: React.FC = () => {
                 </>
               )}
 
-              {jobType === 'active' && (
+              {/* Show Complete button for active bookings */}
+              {jobData.status === 'active' && (
                 <>
-                  <button className="btn-contact" onClick={handleContactClient}>
-                    <span className="material-icons-round icon-sm">phone</span>
-                    Contact Client
-                  </button>
-                  <button className="btn-start" onClick={handleStartJob}>
-                    <span className="material-icons-round icon-sm">play_arrow</span>
-                    Start Job
+                  <button className="btn-complete" onClick={handleCompleteJob}>
+                    <span className="material-icons-round icon-sm">check_circle</span>
+                    Complete Job
                   </button>
                 </>
               )}
 
-              {jobType === 'completed' && (
+              {/* Show Accept and Decline buttons for back_jobs */}
+              {jobData.status === 'back_jobs' && (
+                <>
+                  <button className="btn-accept" onClick={handleAcceptBackJob}>
+                    <span className="material-icons-round icon-sm">check_circle</span>
+                    Accept
+                  </button>
+                  <button className="btn-decline" onClick={handleDeclineBackJob}>
+                    <span className="material-icons-round icon-sm">cancel</span>
+                    Decline
+                  </button>
+                </>
+              )}
+
+              {/* Show contact button for completed jobs */}
+              {jobData.status === 'completed' && (
                 <button className="btn-contact" onClick={handleContactClient}>
                   <span className="material-icons-round icon-sm">phone</span>
                   Contact Client

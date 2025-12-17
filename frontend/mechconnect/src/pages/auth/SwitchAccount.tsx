@@ -28,6 +28,10 @@ const SwitchAccount: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // FIXED: Never auto-redirect based on active_role
+    // User came here explicitly, so clear intentional_switch flag and fetch roles
+    sessionStorage.removeItem('intentional_switch');
+    
     fetchUserRoles();
   }, []);
 
@@ -35,7 +39,7 @@ const SwitchAccount: React.FC = () => {
     try {
       setLoading(true);
       
-      // Get user ID from localStorage (you might need to adjust this based on your auth implementation)
+      // Get user data from localStorage - ensure it's from the CURRENT login
       const storedUser = localStorage.getItem('user');
       if (!storedUser) {
         setError('User not found. Please login again.');
@@ -44,11 +48,12 @@ const SwitchAccount: React.FC = () => {
       }
 
       const user = JSON.parse(storedUser);
-      const userId = user.acc_id || user.account_id;
+      const userId = user.acc_id || user.account_id || user.id;
       
       if (!userId) {
         setError('Invalid user data. Please login again.');
-        setLoading(false);
+        localStorage.clear(); // Clear invalid state
+        history.push('/auth/login');
         return;
       }
 
@@ -58,6 +63,10 @@ const SwitchAccount: React.FC = () => {
 
       if (response.ok) {
         setUserRoles(data);
+        
+        // REMOVED: Auto-redirect for single-role clients
+        // Let new users see the SwitchAccount page to apply for mechanic/shop owner
+        // Even if they only have client role, they should be able to apply
       } else {
         setError(data.error || 'Failed to fetch user roles');
       }
@@ -72,13 +81,24 @@ const SwitchAccount: React.FC = () => {
   const goBack = () => history.goBack();
 
   const handleSwitchToMechanic = () => {
+    // Store active role in localStorage
+    localStorage.setItem('active_role', 'mechanic');
     // Navigate to mechanic dashboard
     history.push('/mechanic/home');
   };
 
   const handleSwitchToShopOwner = () => {
+    // Store active role in localStorage
+    localStorage.setItem('active_role', 'shop_owner');
     // Navigate to shop owner dashboard  
     history.push('/shopowner/home');
+  };
+  
+  const handleSwitchToClient = () => {
+    // Store active role in localStorage
+    localStorage.setItem('active_role', 'client');
+    // Navigate to client home
+    history.push('/client/home');
   };
 
   const handleApplyMechanic = () => {
@@ -198,6 +218,24 @@ const SwitchAccount: React.FC = () => {
                   </div>
                   <div className="card-arrow">
                     <span className="material-icons-round">arrow_forward</span>
+                  </div>
+                </button>
+              )}
+              
+              {/* Show Client option if user has other roles */}
+              {(userRoles.has_mechanic_profile || userRoles.has_shop_owner_profile) && userRoles.roles.includes('client') && (
+                <button className="application-card client registered" onClick={handleSwitchToClient} style={{borderColor: '#10b981'}}>
+                  <div className="card-icon" style={{backgroundColor: '#d1fae5', color: '#10b981'}}>
+                    <span className="material-icons-round">person</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Back to Client</h3>
+                    <p className="card-description">
+                      Return to your client dashboard
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">launch</span>
                   </div>
                 </button>
               )}

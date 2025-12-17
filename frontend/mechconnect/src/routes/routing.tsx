@@ -71,12 +71,15 @@ import Dashboard from '../pages/shopowner/main/dashboard';
 import Mechanic from '../pages/shopowner/main/mechanic';
 import ManageBooking from '../pages/shopowner/main/booking';
 import Shop from '../pages/shopowner/main/shop';
+import Revenue from '../pages/shopowner/main/revenue';
+import ShopOwnerProfile from '../pages/shopowner/main/profile';
 
 // Mechanic Pages
 import MechanicHome from '../pages/mechanic/home';
 import MechanicMap from '../pages/mechanic/map';
 import MechanicJobs from '../pages/mechanic/jobs';
 import MechanicJobDetail from '../pages/mechanic/job-detail';
+import RequestDetail from '../pages/mechanic/request-detail';
 import CompletedJobDetail from '../pages/mechanic/completed-job-detail';
 import BackjobDetail from '../pages/mechanic/backjob-detail';
 import MechanicEarnings from '../pages/mechanic/earnings';
@@ -223,6 +226,9 @@ const AppRoutes: React.FC = () => {
       <AuthGuard exact path="/shopowner/shop">
         <Shop />
       </AuthGuard>
+      <AuthGuard exact path="/shopowner/profile">
+        <ShopOwnerProfile />
+      </AuthGuard>
       
       {/* Protected Mechanic Routes */}
       <AuthGuard exact path="/mechanic/home">
@@ -280,12 +286,16 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/shopowner/mechanics" component={Mechanic} />
       <Route exact path="/shopowner/manage-bookings" component={ManageBooking} />
       <Route exact path="/shopowner/shop" component={Shop} />
+      <Route exact path="/shopowner/revenue" component={Revenue} />
+      <Route exact path="/shopowner/profile" component={ShopOwnerProfile} />
       
       {/* Mechanic Routes */}
       <Route exact path="/mechanic/home" component={MechanicHome} />
       <Route exact path="/mechanic/jobs" component={MechanicJobs} />
       <Route exact path="/mechanic/map" component={MechanicMap} />
       <Route exact path="/mechanic/job-detail/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/request-detail/:id" component={RequestDetail} />
+      <Route exact path="/mechanic/available-job/:id" component={RequestDetail} />
       <Route exact path="/mechanic/start-job/:id" component={StartingJob} />
       <Route exact path="/mechanic/working-job/:id" component={WorkingJob} />
       <Route exact path="/mechanic/active-job/:id" component={MechanicJobDetail} />
@@ -298,7 +308,7 @@ const AppRoutes: React.FC = () => {
       
       {/* Default Route */}
       <Route exact path="/">
-        <Redirect to="/login" />
+        <Redirect to="/shopowner/dashboard" />
       </Route>
     </IonRouterOutlet>
   );

@@ -15,7 +15,7 @@ from ..models import Account, PasswordReset, AccountAddress, Client
 from ..serializers import (
     UserRegistrationSerializer, UserLoginSerializer, AccountSerializer,
     PasswordChangeSerializer, PasswordResetRequestSerializer, 
-    PasswordResetConfirmSerializer
+    PasswordResetConfirmSerializer, MyTokenObtainPairSerializer
 )
 from ..utils import send_verification_email, send_email_verification_otp, verify_email_otp, is_email_verified, send_password_reset_otp, verify_password_reset_otp, is_password_reset_verified
 
@@ -129,7 +129,7 @@ def register(request):
 @permission_classes([AllowAny])
 def login(request):
     """
-    Authenticate user and return user data
+    Authenticate user and return user data with JWT tokens
     """
     serializer = UserLoginSerializer(data=request.data)
     if serializer.is_valid():
@@ -142,10 +142,22 @@ def login(request):
                 'reason': user.ban.reason_ban
             }, status=status.HTTP_403_FORBIDDEN)
         
+        # Generate JWT tokens
+        token_serializer = MyTokenObtainPairSerializer()
+        refresh = token_serializer.get_token(user)
+        
         user_data = AccountSerializer(user).data
+        
+        # Add explicit profile flags to prevent role leakage
+        user_data['has_mechanic_profile'] = hasattr(user, 'mechanic_profile') and user.mechanic_profile is not None
+        user_data['has_shop_owner_profile'] = hasattr(user, 'shop_owner_profile') and user.shop_owner_profile is not None
+        user_data['has_client_profile'] = hasattr(user, 'client_profile') and user.client_profile is not None
+        
         return Response({
             'message': 'Login successful',
-            'user': user_data
+            'user': user_data,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
         }, status=status.HTTP_200_OK)
     
     return Response({
@@ -387,16 +399,20 @@ def check_user_roles(request):
             'roles': role_list,
             'mechanic_status': {
                 'registered': has_mechanic,
-                'verified': user.mechanic_profile.is_verified if has_mechanic else False,
+                'approval_status': user.mechanic_profile.approval_status if has_mechanic else None,
+                'can_switch': has_mechanic and user.mechanic_profile.approval_status == 'approved',
+                'verified': user.is_verified if has_mechanic else False,
                 'status': user.mechanic_profile.status if has_mechanic else None
             } if has_mechanic else {
                 'registered': False,
+                'approval_status': None,
+                'can_switch': False,
                 'verified': False,
                 'status': None
             },
             'shop_owner_status': {
                 'registered': has_shop_owner,
-                'verified': user.shop_owner_profile.is_verified if has_shop_owner else False,
+                'verified': user.is_verified if has_shop_owner else False,
                 'status': user.shop_owner_profile.status if has_shop_owner else None
             } if has_shop_owner else {
                 'registered': False,
@@ -532,8 +548,8 @@ def resend_verification_code(request):
         # Get user
         user = Account.objects.get(acc_id=user_id)
         
-        # Check if already verified
-        if user.is_active:
+        # Check if already verified (check is_verified instead of is_active)
+        if user.is_verified:
             return Response({
                 'error': 'Account is already verified'
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -730,5 +746,199 @@ def reset_password(request):
         print(f"Traceback: {traceback.format_exc()}")
         return Response({
             'error': f'An error occurred while resetting password: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def mechanic_register(request):
+    """
+    Register an existing CLIENT user as a MECHANIC (role extension).
+    
+    This endpoint does NOT create a new account - it adds the mechanic role
+    and creates a mechanic profile linked to an existing user account.
+    
+    Expected POST data:
+        - user_id: ID of the existing user account
+        - use_existing_address: boolean (if True, reuses client's address)
+        - address: optional dict with address fields (if use_existing_address is False)
+        - profile_photo: optional base64 encoded image
+        - bio: mechanic bio text
+        - documents: array of document objects with:
+            - name: document name
+            - type: document type (license, certification, ID, others)
+            - file: base64 encoded file
+            - date_issued: optional date
+            - date_expiry: optional date
+    
+    Returns:
+        - Success message with mechanic profile data
+        - Error if user not found, already a mechanic, or validation fails
+    """
+    try:
+        from ..models import AccountRole, AccountAddress, Mechanic
+        from documents.models import MechanicDocument
+        from datetime import datetime
+        
+        # Get user_id from request
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({
+                'error': 'User ID is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get existing user account
+        try:
+            user = Account.objects.get(acc_id=user_id)
+        except Account.DoesNotExist:
+            return Response({
+                'error': 'User account not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if user is verified
+        if not user.is_verified:
+            return Response({
+                'error': 'Please verify your email first'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if user already has mechanic role
+        existing_role = AccountRole.objects.filter(
+            acc=user,
+            account_role=AccountRole.ROLE_MECHANIC
+        ).exists()
+        
+        if existing_role:
+            return Response({
+                'error': 'User already has a mechanic profile'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if mechanic profile already exists
+        if hasattr(user, 'mechanic_profile'):
+            return Response({
+                'error': 'Mechanic profile already exists for this user'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate required fields
+        use_existing_address = request.data.get('use_existing_address', True)
+        bio = request.data.get('bio', '').strip()
+        documents = request.data.get('documents', [])
+        
+        if not bio:
+            return Response({
+                'error': 'Bio is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not documents or len(documents) == 0:
+            return Response({
+                'error': 'At least one document is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Start transaction
+        with transaction.atomic():
+            # Handle address
+            mechanic_address_id = None
+            
+            if use_existing_address:
+                # Use client's existing address
+                if not hasattr(user, 'address'):
+                    return Response({
+                        'error': 'User does not have an existing address'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                mechanic_address_id = user.address
+            else:
+                # Create new address for mechanic
+                address_data = request.data.get('address', {})
+                
+                # Validate required address fields
+                required_fields = ['region', 'province', 'city_municipality', 'barangay']
+                missing_fields = [field for field in required_fields if not address_data.get(field)]
+                
+                if missing_fields:
+                    return Response({
+                        'error': f'Missing required address fields: {", ".join(missing_fields)}'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Create a temporary account entry for the new address (mechanic-specific address)
+                # Note: Since AccountAddress uses OneToOne with Account as primary key,
+                # we need to create a separate address entry linked to the mechanic profile
+                # This will be handled after creating the Mechanic profile
+                new_address = AccountAddress.objects.create(
+                    acc_add_id=user,  # This will be the mechanic's address
+                    house_building_number=address_data.get('house_building_number', ''),
+                    street_name=address_data.get('street_name', ''),
+                    subdivision_village=address_data.get('subdivision_village', ''),
+                    barangay=address_data.get('barangay'),
+                    city_municipality=address_data.get('city_municipality'),
+                    province=address_data.get('province'),
+                    region=address_data.get('region'),
+                    postal_code=address_data.get('postal_code', '')
+                )
+                mechanic_address_id = new_address
+            
+            # Create mechanic profile
+            # Extract contact_number from request data (not from address)
+            contact_number = request.data.get('contact_number')
+            
+            mechanic_profile = Mechanic.objects.create(
+                mechanic_id=user,
+                profile_photo=request.data.get('profile_photo'),
+                contact_number=contact_number,
+                bio=bio,
+                ranking='standard',  # Default ranking
+                is_working_for_shop=False,
+                status='available',
+                approval_status='pending'  # Set to pending - requires admin approval
+            )
+            
+            # DO NOT add mechanic role yet - only after admin approval
+            # AccountRole will be created when admin approves the mechanic
+            
+            # Create documents
+            for doc in documents:
+                doc_name = doc.get('name', '').strip()
+                doc_type = doc.get('type', 'others')
+                doc_file = doc.get('file')
+                
+                if not doc_name or not doc_file:
+                    continue  # Skip invalid documents
+                
+                # Parse dates if provided
+                date_issued = None
+                date_expiry = None
+                
+                if doc.get('date_issued'):
+                    try:
+                        date_issued = datetime.strptime(doc['date_issued'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
+                if doc.get('date_expiry'):
+                    try:
+                        date_expiry = datetime.strptime(doc['date_expiry'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
+                MechanicDocument.objects.create(
+                    mechanic=mechanic_profile,
+                    document_name=doc_name,
+                    document_type=doc_type,
+                    document_file=doc_file,
+                    date_issued=date_issued,
+                    date_expiry=date_expiry
+                )
+            
+            return Response({
+                'message': 'Mechanic application submitted successfully. Pending admin approval.',
+                'mechanic_id': mechanic_profile.mechanic_id.acc_id,
+                'approval_status': mechanic_profile.approval_status,
+                'note': 'You will be notified once your application is reviewed.'
+            }, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        import traceback
+        print(f"Mechanic registration error: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return Response({
+            'error': f'An error occurred during mechanic registration: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
