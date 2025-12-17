@@ -146,6 +146,12 @@ def login(request):
         refresh = token_serializer.get_token(user)
         
         user_data = AccountSerializer(user).data
+        
+        # Add explicit profile flags to prevent role leakage
+        user_data['has_mechanic_profile'] = hasattr(user, 'mechanic_profile') and user.mechanic_profile is not None
+        user_data['has_shop_owner_profile'] = hasattr(user, 'shop_owner_profile') and user.shop_owner_profile is not None
+        user_data['has_client_profile'] = hasattr(user, 'client_profile') and user.client_profile is not None
+        
         return Response({
             'message': 'Login successful',
             'user': user_data,

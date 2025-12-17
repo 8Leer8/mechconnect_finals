@@ -13,13 +13,14 @@ class BookingSerializer(serializers.ModelSerializer):
     client_address = serializers.SerializerMethodField()
     request_summary = serializers.SerializerMethodField()
     request_type = serializers.CharField(source='request.request_type', read_only=True)
+    back_job_reason = serializers.SerializerMethodField()
     
     class Meta:
         model = Booking
         fields = [
             'booking_id', 'request', 'status', 'amount_fee', 'booked_at',
             'updated_at', 'completed_at', 'client_name', 'provider_name',
-            'client_address', 'request_summary', 'request_type'
+            'client_address', 'request_summary', 'request_type', 'back_job_reason'
         ]
         read_only_fields = ['booking_id', 'booked_at', 'updated_at']
     
@@ -61,6 +62,14 @@ class BookingSerializer(serializers.ModelSerializer):
             description = obj.request.emergency_request.description or "Emergency request"
             return description[:100] + "..." if len(description) > 100 else description
         return "Booking details unavailable"
+    
+    def get_back_job_reason(self, obj):
+        """Get the reason for back job if it exists"""
+        try:
+            back_job = obj.back_jobs.latest('created_at')
+            return back_job.reason if back_job.reason else None
+        except:
+            return None
 
 
 class ActiveBookingSerializer(serializers.ModelSerializer):

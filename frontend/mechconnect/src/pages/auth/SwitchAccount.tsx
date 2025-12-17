@@ -28,33 +28,8 @@ const SwitchAccount: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Don't auto-redirect if user intentionally came here to switch roles
-    // Only redirect if active_role exists AND user didn't come from a "switch" action
-    const activeRole = localStorage.getItem('active_role');
-    const intentionalSwitch = sessionStorage.getItem('intentional_switch');
-    
-    if (activeRole && !intentionalSwitch) {
-      // User has an active role and didn't intentionally come to switch -> redirect back
-      switch(activeRole) {
-        case 'mechanic':
-          history.replace('/mechanic/home');
-          return;
-        case 'shop_owner':
-          history.replace('/shopowner/home');
-          return;
-        case 'client':
-          history.replace('/client/home');
-          return;
-        case 'admin':
-          history.replace('/admin/dashboard');
-          return;
-        case 'head_admin':
-          history.replace('/headadmin/dashboard');
-          return;
-      }
-    }
-    
-    // Clear the intentional switch flag
+    // FIXED: Never auto-redirect based on active_role
+    // User came here explicitly, so clear intentional_switch flag and fetch roles
     sessionStorage.removeItem('intentional_switch');
     
     fetchUserRoles();
@@ -64,7 +39,7 @@ const SwitchAccount: React.FC = () => {
     try {
       setLoading(true);
       
-      // Get user ID from localStorage (you might need to adjust this based on your auth implementation)
+      // Get user data from localStorage - ensure it's from the CURRENT login
       const storedUser = localStorage.getItem('user');
       if (!storedUser) {
         setError('User not found. Please login again.');
@@ -72,7 +47,14 @@ const SwitchAccount: React.FC = () => {
       }
 
       const user = JSON.parse(storedUser);
-      const userId = user.acc_id || user.id || 10; // fallback to 10 for testing
+      const userId = user.acc_id || user.id;
+      
+      if (!userId) {
+        setError('Invalid user data. Please login again.');
+        localStorage.clear(); // Clear invalid state
+        history.push('/auth/login');
+        return;
+      }
 
       const response = await fetch(`http://localhost:8000/api/accounts/check-roles/?user_id=${userId}`);
       const data = await response.json();
@@ -80,13 +62,9 @@ const SwitchAccount: React.FC = () => {
       if (response.ok) {
         setUserRoles(data);
         
-        // If user only has client role and no other profiles, redirect to client home
-        if (!data.has_mechanic_profile && !data.has_shop_owner_profile && 
-            data.roles.length === 1 && data.roles[0] === 'client') {
-          localStorage.setItem('active_role', 'client');
-          history.replace('/client/home');
-          return;
-        }
+        // REMOVED: Auto-redirect for single-role clients
+        // Let new users see the SwitchAccount page to apply for mechanic/shop owner
+        // Even if they only have client role, they should be able to apply
       } else {
         setError(data.error || 'Failed to fetch user roles');
       }

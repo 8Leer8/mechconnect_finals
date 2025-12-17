@@ -25,21 +25,9 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  useEffect(() => {
-    // Set mock authentication data for demo purposes
-    if (!localStorage.getItem('authToken')) {
-      localStorage.setItem('authToken', 'demo-token-12345');
-    }
-    if (!localStorage.getItem('user')) {
-      localStorage.setItem('user', JSON.stringify({
-        id: 5,
-        name: 'John Mechanic',
-        email: 'john.mechanic@example.com',
-        role: 'mechanic'
-      }));
-    }
-  }, []);
-
+  // REMOVED: Mock data that was overriding real user data
+  // Authentication is now handled entirely by Login.tsx
+  
   return (
     <IonApp>
       <IonReactRouter>

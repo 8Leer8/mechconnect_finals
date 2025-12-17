@@ -48,24 +48,23 @@ const Jobs: React.FC = () => {
   const goToNotifications = () => history.push('/mechanic/notifications');
 
   // Navigation to job detail pages
-  const goToJobDetail = (jobId: number, status: string) => {
+  const goToJobDetail = (job: JobData) => {
+    const jobId = job.booking_id || job.request_id;
+    const status = job.status;
+    
     console.log('Navigating to job detail:', jobId, status);
     
-    // Use specific routes for different job types
+    // Use request-detail for pending requests, otherwise use unified job-detail
     let route = '/mechanic/job-detail';
-    if (status === 'active') {
-      route = '/mechanic/active-job/102'; // Always go to active job 102 (Pedro Garcia's diagnostic service) for demo
-    } else if (status === 'completed') {
-      route = `/mechanic/completed-job/${jobId}`;
-    } else if (status === 'backjob') {
-      route = `/mechanic/backjob-detail/${jobId}`;
-    } else if (status === 'cancelled') {
-      route = `/mechanic/cancelled-job/${jobId}`;
+    if (status === 'pending') {
+      route = `/mechanic/request-detail/${jobId}`;
     } else {
-      route = `${route}/${jobId}`;
+      // All other statuses (active, completed, cancelled, etc.) use the same job detail page
+      route = `/mechanic/job-detail/${jobId}`;
     }
     
-    history.push(route);
+    // Pass the job data and status via state for optimistic rendering
+    history.push(route, { job, status });
   };
 
   // Fetch jobs from API based on tab
@@ -201,10 +200,10 @@ const Jobs: React.FC = () => {
     window.addEventListener('resize', checkScrollable);
 
     // Fetch jobs when component mounts or tab changes
-    fetchJobs();
+    fetchJobs(activeTab);
 
     return () => window.removeEventListener('resize', checkScrollable);
-  }, [activeTab]);
+  }, [activeTab, location.key]); // Added location.key to refetch on navigation
 
   const tabs = [
     { id: 'all', label: 'All', count: activeTab === 'all' ? jobs.length : undefined },
@@ -338,7 +337,7 @@ const Jobs: React.FC = () => {
                 <div
                   key={job.booking_id || job.request_id}
                   className="mechanic-job-card"
-                  onClick={() => goToJobDetail(job.booking_id || job.request_id, job.status)}
+                  onClick={() => goToJobDetail(job)}
                 >
                   <div className="mechanic-job-header">
                     <div className="mechanic-job-info">

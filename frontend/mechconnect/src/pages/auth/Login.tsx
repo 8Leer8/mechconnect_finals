@@ -25,6 +25,15 @@ const Login: React.FC = () => {
 
     setLoading(true);
     try {
+      // CRITICAL FIX: Clear ALL state BEFORE login to prevent state leakage
+      localStorage.removeItem('user');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('active_role');
+      localStorage.removeItem('authToken');
+      sessionStorage.clear();
+
       const response = await fetch(`${API_BASE_URL}/login/`, {
         method: 'POST',
         headers: {
@@ -61,27 +70,10 @@ const Login: React.FC = () => {
         const roles = data.user.roles || [];
         const userRoles = roles.map((r: any) => r.account_role);
         
-        // Check if user has a previously stored active_role
-        const storedActiveRole = localStorage.getItem('active_role');
-        
         setTimeout(() => {
-          // Priority 1: Restore last active role if it's still valid
-          if (storedActiveRole && userRoles.includes(storedActiveRole)) {
-            const roleRoutes: Record<string, string> = {
-              'head_admin': '/headadmin/dashboard',
-              'admin': '/admin/dashboard',
-              'shop_owner': '/shopowner/home',
-              'mechanic': '/mechanic/home',
-              'client': '/client/home'
-            };
-            const route = roleRoutes[storedActiveRole];
-            if (route) {
-              history.push(route);
-              return;
-            }
-          }
+          // FIXED: Never reuse old state. Always determine role from CURRENT user data.
           
-          // Priority 2: If user has only ONE role, auto-select it
+          // Priority 1: If user has only ONE role, auto-select it
           if (userRoles.length === 1) {
             const singleRole = userRoles[0];
             localStorage.setItem('active_role', singleRole);
@@ -97,8 +89,9 @@ const Login: React.FC = () => {
             return;
           }
           
-          // Priority 3: Multiple roles and no valid stored role -> go to SwitchAccount
+          // Priority 2: Multiple roles -> go to SwitchAccount
           if (userRoles.length > 1) {
+            // DO NOT set active_role - let user choose
             history.push('/auth/switch-account');
             return;
           }

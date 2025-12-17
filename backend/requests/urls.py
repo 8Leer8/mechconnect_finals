@@ -14,6 +14,7 @@ urlpatterns = [
     path('<int:request_id>/status/', views.update_request_status, name='update_request_status'),
     path('<int:request_id>/delete/', views.delete_request, name='delete_request'),
     path('<int:request_id>/assign/', views.assign_provider_to_request, name='assign_provider_to_request'),
+    path('<int:request_id>/accept/', views.accept_request, name='accept_request'),
     
     # Health check
     path('health/', views.health_check, name='requests_health_check'),

@@ -469,6 +469,91 @@ def get_mechanic_pending_requests(request):
     }, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def accept_request(request, request_id):
+    """
+    Accept a request as a mechanic.
+    - Validates user is authenticated
+    - Validates user has mechanic role
+    - Validates request is in pending/quoted state
+    - Assigns request to the mechanic
+    - Updates request status to accepted
+    - Creates a booking for the accepted request
+    """
+    try:
+        # Get the authenticated user
+        user = request.user
+        
+        # Check if user has a mechanic profile
+        try:
+            mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+        except Mechanic.DoesNotExist:
+            return Response({
+                'error': 'Access denied. User is not a mechanic.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get the request
+        try:
+            req = Request.objects.select_related(
+                'client', 'provider'
+            ).prefetch_related(
+                'custom_request', 'direct_request', 'emergency_request'
+            ).get(request_id=request_id)
+        except Request.DoesNotExist:
+            return Response({
+                'error': 'Request not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Validate request state - only pending or quoted requests can be accepted
+        if req.request_status not in ['pending', 'qouted']:
+            return Response({
+                'error': f'Cannot accept request. Current status is "{req.request_status}". Only pending or quoted requests can be accepted.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if request is already assigned to another mechanic
+        if req.provider and req.provider.acc_id != user.acc_id:
+            return Response({
+                'error': 'This request is already assigned to another mechanic.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if booking already exists for this request
+        existing_booking = Booking.objects.filter(request=req).first()
+        if existing_booking:
+            return Response({
+                'error': 'A booking already exists for this request.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Use transaction to ensure atomicity
+        with transaction.atomic():
+            # Assign mechanic to request and update status
+            req.provider = user
+            req.request_status = 'accepted'
+            req.save()
+            
+            # Create a booking for this accepted request
+            booking = Booking.objects.create(
+                request=req,
+                status='active',
+                amount_fee=0  # Will be updated later with actual fee
+            )
+            
+            # Serialize and return the updated request
+            serializer = RequestSerializer(req)
+            
+            return Response({
+                'message': 'Request accepted successfully',
+                'request': serializer.data,
+                'booking_id': booking.booking_id
+            }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to accept request',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health_check(request):
