@@ -54,6 +54,10 @@ const Profile: React.FC = () => {
   };
 
   const switchToClient = () => {
+    // Mark this as an intentional switch so SwitchAccount doesn't auto-redirect
+    sessionStorage.setItem('intentional_switch', 'true');
+    // Clear active role to allow user to select a new one
+    localStorage.removeItem('active_role');
     // Navigate to switch account page to change roles
     history.push('/auth/switch-account');
     setShowSettingsModal(false);
@@ -318,7 +322,7 @@ const Profile: React.FC = () => {
             </IonItem>
             <IonItem button onClick={switchToClient}>
               <span className="material-icons-round" slot="start">switch_account</span>
-              <IonLabel>Switch to Client</IonLabel>
+              <IonLabel>Switch Roles</IonLabel>
             </IonItem>
             <IonItem button onClick={switchAccount}>
               <span className="material-icons-round" slot="start">person</span>

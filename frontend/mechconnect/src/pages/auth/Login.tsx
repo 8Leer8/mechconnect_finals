@@ -53,22 +53,51 @@ const Login: React.FC = () => {
         const roles = data.user.roles || [];
         const userRoles = roles.map((r: any) => r.account_role);
         
-        // Redirect based on role priority: head_admin > admin > shop_owner > mechanic > client
+        // Check if user has a previously stored active_role
+        const storedActiveRole = localStorage.getItem('active_role');
+        
         setTimeout(() => {
-          if (userRoles.includes('head_admin')) {
-            history.push('/headadmin/dashboard');
-          } else if (userRoles.includes('admin')) {
-            history.push('/admin/dashboard');
-          } else if (userRoles.includes('shop_owner')) {
-            history.push('/shopowner/home');
-          } else if (userRoles.includes('mechanic')) {
-            history.push('/mechanic/home');
-          } else if (userRoles.includes('client')) {
-            history.push('/client/home');
-          } else {
-            // Default fallback
-            history.push('/client/home');
+          // Priority 1: Restore last active role if it's still valid
+          if (storedActiveRole && userRoles.includes(storedActiveRole)) {
+            const roleRoutes: Record<string, string> = {
+              'head_admin': '/headadmin/dashboard',
+              'admin': '/admin/dashboard',
+              'shop_owner': '/shopowner/home',
+              'mechanic': '/mechanic/home',
+              'client': '/client/home'
+            };
+            const route = roleRoutes[storedActiveRole];
+            if (route) {
+              history.push(route);
+              return;
+            }
           }
+          
+          // Priority 2: If user has only ONE role, auto-select it
+          if (userRoles.length === 1) {
+            const singleRole = userRoles[0];
+            localStorage.setItem('active_role', singleRole);
+            const roleRoutes: Record<string, string> = {
+              'head_admin': '/headadmin/dashboard',
+              'admin': '/admin/dashboard',
+              'shop_owner': '/shopowner/home',
+              'mechanic': '/mechanic/home',
+              'client': '/client/home'
+            };
+            const route = roleRoutes[singleRole] || '/client/home';
+            history.push(route);
+            return;
+          }
+          
+          // Priority 3: Multiple roles and no valid stored role -> go to SwitchAccount
+          if (userRoles.length > 1) {
+            history.push('/auth/switch-account');
+            return;
+          }
+          
+          // Fallback: default to client
+          localStorage.setItem('active_role', 'client');
+          history.push('/client/home');
         }, 1000);
       } else {
         setToastMessage(data.error || 'Login failed. Please check your credentials.');

@@ -24,6 +24,8 @@ export const clearAuthData = (): void => {
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
+    // Keep active_role so user's last selected role persists across logout/login
+    // localStorage.removeItem('active_role'); // DO NOT REMOVE
     sessionStorage.clear();
   } catch (error) {
     console.error('Error clearing auth data:', error);
@@ -46,5 +48,30 @@ export const getUserData = (): any | null => {
   } catch (error) {
     console.error('Error getting user data:', error);
     return null;
+  }
+};
+
+export const getActiveRole = (): string | null => {
+  try {
+    return localStorage.getItem('active_role');
+  } catch (error) {
+    console.error('Error getting active role:', error);
+    return null;
+  }
+};
+
+export const setActiveRole = (role: string): void => {
+  try {
+    localStorage.setItem('active_role', role);
+  } catch (error) {
+    console.error('Error setting active role:', error);
+  }
+};
+
+export const clearActiveRole = (): void => {
+  try {
+    localStorage.removeItem('active_role');
+  } catch (error) {
+    console.error('Error clearing active role:', error);
   }
 };
