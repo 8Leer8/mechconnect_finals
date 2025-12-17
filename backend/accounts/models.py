@@ -129,6 +129,11 @@ class Mechanic(models.Model):
         ('available', 'Available'),
         ('working', 'Working'),
     ]
+    APPROVAL_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
 
     mechanic_id = models.OneToOneField('accounts.Account', primary_key=True, on_delete=models.CASCADE, related_name='mechanic_profile')
     profile_photo = models.CharField(max_length=1024, null=True, blank=True)
@@ -140,6 +145,12 @@ class Mechanic(models.Model):
     shop = models.ForeignKey('shop.Shop', on_delete=models.SET_NULL, null=True, blank=True, related_name='mechanics_assigned')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
     token_wallet = models.IntegerField(default=0)
+    
+    # Approval workflow fields
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, blank=True, related_name='mechanics_approved')
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

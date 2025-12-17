@@ -387,3 +387,43 @@
   transform: translateY(1px);
   box-shadow: 0 2px 8px rgba(251, 146, 60, 0.3);
 }
+
+/* PSGC Select Dropdown Styles */
+.psgc-select {
+  width: 100%;
+  height: 48px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --placeholder-color: #cbd5e1;
+  --placeholder-opacity: 1;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: hsl(25, 15%, 25%);
+  background: white;
+}
+
+.psgc-select::part(text) {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.psgc-select::part(placeholder) {
+  color: #cbd5e1;
+  opacity: 1;
+}
+
+.psgc-select::part(icon) {
+  color: #94a3b8;
+}
+
+/* Alert modal for PSGC selects */
+.psgc-select-alert .alert-wrapper {
+  max-height: 80vh;
+}
+
+.psgc-select-alert .alert-radio-group {
+  max-height: 60vh;
+  overflow-y: auto;
+}
