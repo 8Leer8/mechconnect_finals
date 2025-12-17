@@ -478,3 +478,134 @@
   background: hsl(25, 85%, 45%);
   transform: scale(0.98);
 }
+
+.btn-request:disabled {
+  background: hsl(40, 10%, 85%);
+  color: hsl(40, 10%, 60%);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-request:disabled:hover {
+  transform: none;
+}
+
+/* Location Button */
+.btn-location {
+  height: 44px;
+  padding: 0 16px;
+  background: white;
+  color: var(--primary, hsl(25, 85%, 55%));
+  border: 2px solid var(--primary, hsl(25, 85%, 55%));
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-location:hover {
+  background: var(--primary-subtle, hsl(25, 85%, 97%));
+}
+
+.btn-location:active {
+  background: var(--primary-subtle, hsl(25, 85%, 95%));
+  transform: scale(0.98);
+}
+
+.btn-location:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-location .material-icons-round {
+  font-size: 18px;
+}
+
+/* Map Modal */
+.map-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.map-modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid hsl(40, 15%, 90%);
+}
+
+.map-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text, hsl(25, 15%, 25%));
+}
+
+.map-modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: hsl(40, 15%, 95%);
+  color: var(--text, hsl(25, 15%, 25%));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.map-modal-close:hover {
+  background: hsl(40, 15%, 90%);
+}
+
+.map-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.map-modal-footer {
+  padding: 20px;
+  border-top: 1px solid hsl(40, 15%, 90%);
+}
+
+/* Custom Leaflet Marker */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Leaflet Map in Modal */
+.map-modal-body .leaflet-container {
+  border-radius: 8px;
+  border: 1px solid hsl(40, 15%, 90%);
+}

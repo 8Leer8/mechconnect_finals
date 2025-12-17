@@ -367,3 +367,140 @@
 .btn-back-home:active {
   transform: scale(0.98);
 }
+
+/* Location Buttons */
+.location-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.btn-location {
+  flex: 1;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-detect {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(231, 111, 34, 0.25);
+}
+
+.btn-detect:hover {
+  background: hsl(25, 85%, 50%);
+}
+
+.btn-detect:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-map {
+  background: white;
+  color: hsl(25, 85%, 55%);
+  border: 2px solid hsl(25, 85%, 55%);
+}
+
+.btn-map:hover {
+  background: hsl(25, 85%, 55%, 0.1);
+}
+
+/* Map Modal */
+.map-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.map-modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.map-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.map-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: hsl(0, 0%, 95%);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: hsl(0, 0%, 90%);
+}
+
+.map-modal-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.map-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f8f8;
+}
+
+.map-modal-footer p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+}
+
+/* Leaflet Custom Marker */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}

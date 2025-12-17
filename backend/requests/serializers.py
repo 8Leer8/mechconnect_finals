@@ -85,7 +85,7 @@ class RequestSerializer(serializers.ModelSerializer):
 class CreateCustomRequestSerializer(serializers.ModelSerializer):
     """Serializer for creating custom requests"""
     description = serializers.CharField(max_length=2000)
-    concern_picture = serializers.CharField(max_length=1024, required=False, allow_blank=True)
+    concern_picture = serializers.CharField(required=False, allow_blank=True)
     estimated_budget = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
     
     # Location fields

@@ -25,7 +25,7 @@ class Request(models.Model):
 class CustomRequest(models.Model):
     request = models.OneToOneField('requests.Request', primary_key=True, on_delete=models.CASCADE, related_name='custom_request')
     description = models.TextField(null=True, blank=True)
-    concern_picture = models.CharField(max_length=1024, null=True, blank=True)
+    concern_picture = models.TextField(null=True, blank=True)
     providers_note = models.TextField(null=True, blank=True)
 
 
@@ -50,5 +50,5 @@ class DirectRequestAddOn(models.Model):
 class EmergencyRequest(models.Model):
     request = models.OneToOneField('requests.Request', primary_key=True, on_delete=models.CASCADE, related_name='emergency_request')
     description = models.TextField(null=True, blank=True)
-    concern_picture = models.CharField(max_length=1024, null=True, blank=True)
+    concern_picture = models.TextField(null=True, blank=True)
     providers_note = models.TextField(null=True, blank=True)

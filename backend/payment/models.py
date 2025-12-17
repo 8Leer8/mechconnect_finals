@@ -150,3 +150,74 @@ class TokenPackage(models.Model):
     def __str__(self):
         return f"{self.name} - {self.tokens} tokens for ₱{self.price}"
 
+
+class BookingPayment(models.Model):
+    """
+    Payment records for bookings - tracks client payments
+    """
+    PAYMENT_TYPE_CHOICES = [
+        ('full', 'Full Payment'),
+        ('advance', 'Advance Payment'),
+    ]
+    
+    PAYMENT_STATUS_CHOICES = [
+        ('unpaid', 'Unpaid'),
+        ('advance_paid', 'Advance Paid'),
+        ('fully_paid', 'Fully Paid'),
+    ]
+    
+    PAYMENT_METHOD_CHOICES = [
+        ('gcash', 'GCash'),
+        ('paymaya', 'PayMaya'),
+        ('bank_transfer', 'Bank Transfer'),
+        ('cash', 'Cash on Service'),
+        ('other', 'Other'),
+    ]
+
+    payment_id = models.AutoField(primary_key=True)
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.CASCADE, related_name='booking_payments')
+    
+    # Payment details
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES, default='full')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, default='gcash')
+    
+    # Amount tracking
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    remaining_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    
+    # Payment proof
+    payment_proof = models.TextField(null=True, blank=True)  # Base64 image or URL
+    reference_number = models.CharField(max_length=255, null=True, blank=True)
+    
+    # Metadata
+    paid_by = models.ForeignKey('accounts.Account', on_delete=models.SET_NULL, null=True, related_name='payments_made')
+    payment_date = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Payment for Booking #{self.booking.booking_id} - {self.payment_status}"
+
+    def save(self, *args, **kwargs):
+        # Auto-calculate remaining balance
+        self.remaining_balance = self.total_amount - self.amount_paid
+        
+        # Update payment status based on amounts
+        if self.amount_paid == 0:
+            self.payment_status = 'unpaid'
+        elif self.amount_paid >= self.total_amount:
+            self.payment_status = 'fully_paid'
+            self.remaining_balance = 0
+        else:
+            self.payment_status = 'advance_paid'
+            
+        super().save(*args, **kwargs)
+

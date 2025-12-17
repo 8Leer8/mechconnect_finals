@@ -26,7 +26,8 @@ def client_bookings_list(request):
         return Response({'error': 'Client ID is required'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        client = Client.objects.get(client_id=client_id)
+        # client_id is actually the Account's acc_id (OneToOneField relationship)
+        client = Client.objects.get(client_id__acc_id=client_id)
     except Client.DoesNotExist:
         return Response({'error': 'Client not found'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -38,7 +39,9 @@ def client_bookings_list(request):
         'back-jobs': 'back_jobs',
         'rejected': 'rejected',  # This might need custom logic
         'canceled': 'cancelled',
+        'cancelled': 'cancelled',  # Support both spellings
         'disputed': 'dispute',
+        'dispute': 'dispute',  # Support both forms
         'refunded': 'refunded'
     }
     
@@ -101,7 +104,7 @@ def active_booking_detail(request, booking_id):
             'booking__request__client',
             'booking__request__client__client_id',
             'booking__request__provider'
-        ).get(booking_id=booking_id)
+        ).get(booking__booking_id=booking_id)
         
         serializer = ActiveBookingSerializer(active_booking)
         return Response(serializer.data)
@@ -144,7 +147,23 @@ def completed_booking_detail(request, booking_id):
         return Response(serializer.data)
         
     except CompletedBooking.DoesNotExist:
-        return Response({'error': 'Completed booking not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Fall back to general Booking if no CompletedBooking record exists
+        try:
+            booking = Booking.objects.select_related(
+                'request',
+                'request__client',
+                'request__client__client_id',
+                'request__provider'
+            ).prefetch_related(
+                'request__custom_request',
+                'request__direct_request',
+                'request__emergency_request'
+            ).get(booking_id=booking_id, status='completed')
+            
+            serializer = BookingSerializer(booking)
+            return Response(serializer.data)
+        except Booking.DoesNotExist:
+            return Response({'error': 'Completed booking not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -163,7 +182,23 @@ def rescheduled_booking_detail(request, booking_id):
         return Response(serializer.data)
         
     except RescheduledBooking.DoesNotExist:
-        return Response({'error': 'Rescheduled booking not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Fall back to general Booking if no RescheduledBooking record exists
+        try:
+            booking = Booking.objects.select_related(
+                'request',
+                'request__client',
+                'request__client__client_id',
+                'request__provider'
+            ).prefetch_related(
+                'request__custom_request',
+                'request__direct_request',
+                'request__emergency_request'
+            ).get(booking_id=booking_id, status='rescheduled')
+            
+            serializer = BookingSerializer(booking)
+            return Response(serializer.data)
+        except Booking.DoesNotExist:
+            return Response({'error': 'Rescheduled booking not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -182,7 +217,23 @@ def cancelled_booking_detail(request, booking_id):
         return Response(serializer.data)
         
     except CancelledBooking.DoesNotExist:
-        return Response({'error': 'Cancelled booking not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Fall back to general Booking if no CancelledBooking record exists
+        try:
+            booking = Booking.objects.select_related(
+                'request',
+                'request__client',
+                'request__client__client_id',
+                'request__provider'
+            ).prefetch_related(
+                'request__custom_request',
+                'request__direct_request',
+                'request__emergency_request'
+            ).get(booking_id=booking_id, status='cancelled')
+            
+            serializer = BookingSerializer(booking)
+            return Response(serializer.data)
+        except Booking.DoesNotExist:
+            return Response({'error': 'Cancelled booking not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -476,6 +527,146 @@ def mechanic_bookings_list(request):
         'bookings': serializer.data,
         'total': len(serializer.data)
     })
+
+
+@api_view(['POST'])
+def request_reschedule(request):
+    """
+    Create a reschedule request for a booking
+    POST /api/bookings/<booking_id>/reschedule/
+    """
+    booking_id = request.data.get('booking_id')
+    reason = request.data.get('reason', '')
+    requested_by_id = request.data.get('requested_by_id')
+    
+    if not booking_id:
+        return Response({'error': 'booking_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        booking = Booking.objects.get(booking_id=booking_id)
+    except Booking.DoesNotExist:
+        return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Get requested_by account
+    from accounts.models import Account
+    requested_by = None
+    if requested_by_id:
+        try:
+            requested_by = Account.objects.get(acc_id=requested_by_id)
+        except Account.DoesNotExist:
+            pass
+    
+    # Determine role
+    requested_by_role = 'client'  # Default to client
+    
+    # Create reschedule request
+    reschedule = RescheduledBooking.objects.create(
+        booking=booking,
+        reason=reason,
+        requested_by=requested_by,
+        requested_by_role=requested_by_role,
+        status='pending'
+    )
+    
+    # Update booking status to rescheduled
+    booking.status = 'rescheduled'
+    booking.save()
+    
+    return Response({
+        'message': 'Reschedule request submitted successfully',
+        'reschedule_id': reschedule.rescheduled_booking_id,
+        'booking_id': booking.booking_id,
+        'status': booking.status
+    }, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def cancel_booking(request):
+    """
+    Cancel a booking
+    POST /api/bookings/cancel/
+    """
+    booking_id = request.data.get('booking_id')
+    reason = request.data.get('reason', '')
+    cancelled_by_id = request.data.get('cancelled_by_id')
+    
+    if not booking_id:
+        return Response({'error': 'booking_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        booking = Booking.objects.get(booking_id=booking_id)
+    except Booking.DoesNotExist:
+        return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Get cancelled_by account
+    from accounts.models import Account
+    cancelled_by = None
+    if cancelled_by_id:
+        try:
+            cancelled_by = Account.objects.get(acc_id=cancelled_by_id)
+        except Account.DoesNotExist:
+            pass
+    
+    # Determine role
+    cancelled_by_role = 'client'  # Default to client
+    
+    # Create cancellation record
+    cancellation = CancelledBooking.objects.create(
+        booking=booking,
+        reason=reason,
+        cancelled_by=cancelled_by,
+        cancelled_by_role=cancelled_by_role,
+        status='cancelled'
+    )
+    
+    # Update booking status to cancelled
+    booking.status = 'cancelled'
+    booking.save()
+    
+    return Response({
+        'message': 'Booking cancelled successfully',
+        'cancellation_id': cancellation.cancelled_booking_id,
+        'booking_id': booking.booking_id,
+        'status': booking.status
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def mark_booking_complete(request):
+    """
+    Mark a booking as completed (for client to request completion)
+    POST /api/bookings/<booking_id>/complete/
+    """
+    booking_id = request.data.get('booking_id')
+    
+    if not booking_id:
+        return Response({'error': 'booking_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        booking = Booking.objects.get(booking_id=booking_id)
+    except Booking.DoesNotExist:
+        return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Update booking status to completed
+    from django.utils import timezone
+    booking.status = 'completed'
+    booking.completed_at = timezone.now()
+    booking.save()
+    
+    # Create CompletedBooking entry if it doesn't exist
+    completed_booking, created = CompletedBooking.objects.get_or_create(
+        booking=booking,
+        defaults={
+            'completed_at': timezone.now()
+        }
+    )
+    
+    return Response({
+        'message': 'Booking marked as completed successfully',
+        'booking_id': booking.booking_id,
+        'status': booking.status,
+        'completed_at': booking.completed_at
+    }, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

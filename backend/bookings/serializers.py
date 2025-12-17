@@ -17,6 +17,7 @@ class BookingSerializer(serializers.ModelSerializer):
     request_type = serializers.CharField(source='request.request_type', read_only=True)
     service_details = serializers.SerializerMethodField()
     service_time = serializers.SerializerMethodField()
+    payment_info = serializers.SerializerMethodField()
     
     class Meta:
         model = Booking
@@ -24,7 +25,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'booking_id', 'request', 'status', 'amount_fee', 'booked_at',
             'updated_at', 'completed_at', 'client_name', 'provider_name',
             'provider_contact', 'client_address', 'location', 'request_summary', 
-            'request_type', 'service_details', 'service_time'
+            'request_type', 'service_details', 'service_time', 'payment_info'
         ]
         read_only_fields = ['booking_id', 'booked_at', 'updated_at']
     
@@ -40,7 +41,11 @@ class BookingSerializer(serializers.ModelSerializer):
     
     def get_provider_contact(self, obj):
         if obj.request.provider:
-            return obj.request.provider.phone_number or "Contact not available"
+            # Try to get contact number from Mechanic or Shop profile
+            if hasattr(obj.request.provider, 'mechanic_profile'):
+                return obj.request.provider.mechanic_profile.contact_number or "Contact not available"
+            elif hasattr(obj.request.provider, 'shop_profile'):
+                return obj.request.provider.shop_profile.contact_number or "Contact not available"
         return "Contact not available"
     
     def get_location(self, obj):
@@ -133,6 +138,49 @@ class BookingSerializer(serializers.ModelSerializer):
             description = obj.request.emergency_request.description or "Emergency request"
             return description[:100] + "..." if len(description) > 100 else description
         return "Booking details unavailable"
+    
+    def get_payment_info(self, obj):
+        """Get payment information for this booking"""
+        from payment.models import BookingPayment
+        
+        try:
+            # Get the most recent payment for this booking
+            payment = BookingPayment.objects.filter(booking=obj).order_by('-created_at').first()
+            
+            if payment:
+                return {
+                    'payment_status': payment.payment_status,
+                    'payment_status_display': payment.get_payment_status_display(),
+                    'payment_method': payment.payment_method,
+                    'payment_method_display': payment.get_payment_method_display(),
+                    'total_amount': str(payment.total_amount),
+                    'amount_paid': str(payment.amount_paid),
+                    'remaining_balance': str(payment.remaining_balance),
+                    'payment_date': payment.payment_date.isoformat() if payment.payment_date else None,
+                    'reference_number': payment.reference_number,
+                }
+            else:
+                # No payment record yet - return unpaid status
+                return {
+                    'payment_status': 'unpaid',
+                    'payment_status_display': 'Unpaid',
+                    'payment_method': None,
+                    'payment_method_display': None,
+                    'total_amount': str(obj.amount_fee),
+                    'amount_paid': '0.00',
+                    'remaining_balance': str(obj.amount_fee),
+                    'payment_date': None,
+                    'reference_number': None,
+                }
+        except Exception as e:
+            # Return default unpaid status on error
+            return {
+                'payment_status': 'unpaid',
+                'payment_status_display': 'Unpaid',
+                'total_amount': str(obj.amount_fee),
+                'amount_paid': '0.00',
+                'remaining_balance': str(obj.amount_fee),
+            }
 
 
 class ActiveBookingSerializer(serializers.ModelSerializer):

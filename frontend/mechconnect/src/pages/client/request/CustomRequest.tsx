@@ -2,20 +2,27 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { requestsAPI, geolocationAPI } from '../../../utils/api';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import {
+  REGION_IX_DATA,
+  getAllMunicipalities,
+  getBarangaysForMunicipality,
+  getMunicipalityCoordinates,
+  REGION_IX_BOUNDS,
+  REGION_IX_CENTER
+} from '../../../data/region9-addresses';
 import './CustomRequest.css';
 
 interface LocationData {
-  houseBuildingNumber: string;
-  streetName: string;
-  subdivisionVillage: string;
+  houseNumber: string;
+  street: string;
   barangay: string;
   cityMunicipality: string;
   province: string;
   region: string;
-  postalCode: string;
-  latitude?: number;
-  longitude?: number;
-  formattedAddress?: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 const CustomRequest: React.FC = () => {
@@ -36,19 +43,26 @@ const CustomRequest: React.FC = () => {
   
   // Location state
   const [locationData, setLocationData] = useState<LocationData>({
-    houseBuildingNumber: '',
-    streetName: '',
-    subdivisionVillage: '',
+    houseNumber: '',
+    street: '',
     barangay: '',
     cityMunicipality: '',
     province: '',
-    region: '',
-    postalCode: ''
+    region: 'Region IX - Zamboanga Peninsula',
+    latitude: null,
+    longitude: null
   });
   
   const [isLocationLoading, setIsLocationLoading] = useState(false);
-  const [locationMode, setLocationMode] = useState<'simple' | 'detailed'>('simple');
   const [savedLocations, setSavedLocations] = useState<LocationData[]>([]);
+  const [availableBarangays, setAvailableBarangays] = useState<Array<{ name: string; lat: number; lng: number }>>([]);
+  const [allMunicipalities] = useState(getAllMunicipalities());
+  const [showMapModal, setShowMapModal] = useState(false);
+  
+  // Map refs
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
 
   // Loading and error states
   const [isLoading, setIsLoading] = useState(false);
@@ -91,54 +105,110 @@ const CustomRequest: React.FC = () => {
     };
   }, [isCalendarOpen]);
 
+  // Add marker to map
+  const addMarker = (lat: number, lng: number) => {
+    if (!mapInstanceRef.current) return;
+
+    if (markerRef.current) {
+      markerRef.current.remove();
+    }
+
+    const customIcon = L.divIcon({
+      className: 'custom-marker',
+      html: '<div style="background: red; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    markerRef.current = L.marker([lat, lng], { icon: customIcon }).addTo(mapInstanceRef.current);
+    mapInstanceRef.current.setView([lat, lng], 13);
+  };
+
+  // Handle municipality selection
+  const handleMunicipalityChange = (municipality: string, province: string) => {
+    setLocationData(prev => ({
+      ...prev,
+      cityMunicipality: municipality,
+      province: province,
+      barangay: ''
+    }));
+
+    const barangays = getBarangaysForMunicipality(municipality);
+    setAvailableBarangays(barangays);
+
+    const coords = getMunicipalityCoordinates(municipality);
+    if (coords && mapInstanceRef.current) {
+      addMarker(coords.lat, coords.lng);
+      setLocationData(prev => ({
+        ...prev,
+        latitude: coords.lat,
+        longitude: coords.lng
+      }));
+    }
+  };
+
+  // Handle barangay selection
+  const handleBarangayChange = (barangay: string) => {
+    setLocationData(prev => ({ ...prev, barangay }));
+
+    const selectedBarangay = availableBarangays.find(b => b.name === barangay);
+    if (selectedBarangay) {
+      addMarker(selectedBarangay.lat, selectedBarangay.lng);
+      setLocationData(prev => ({
+        ...prev,
+        latitude: selectedBarangay.lat,
+        longitude: selectedBarangay.lng
+      }));
+    }
+  };
+
   // Geolocation functions
   const getCurrentLocation = async () => {
     setIsLocationLoading(true);
     
     try {
-      // Get current position using the geolocation API utility
       const position = await geolocationAPI.getCurrentPosition();
       const { latitude, longitude } = position.coords;
       
-      // Try to get address from coordinates using reverse geocoding
-      const address = await geolocationAPI.reverseGeocode(latitude, longitude);
-      
+      // Check if location is within Region IX bounds
+      const isWithinRegionIX = 
+        latitude >= REGION_IX_BOUNDS[0][0] && 
+        latitude <= REGION_IX_BOUNDS[1][0] &&
+        longitude >= REGION_IX_BOUNDS[0][1] && 
+        longitude <= REGION_IX_BOUNDS[1][1];
+
+      if (!isWithinRegionIX) {
+        setError('Your current location is outside Region IX (Zamboanga Peninsula). Please select a municipality and barangay from the dropdowns.');
+        setShowToast(true);
+        setIsLocationLoading(false);
+        return;
+      }
+
       setLocationData(prev => ({
         ...prev,
         latitude,
-        longitude,
-        formattedAddress: address,
-        // Try to parse address into components if possible
-        streetName: address.split(',')[0] || '',
-        cityMunicipality: address.split(',')[1]?.trim() || '',
-        province: address.split(',')[2]?.trim() || ''
+        longitude
       }));
+
+      if (mapInstanceRef.current) {
+        addMarker(latitude, longitude);
+      }
       
-      setSuccessMessage('Location set successfully!');
+      setSuccessMessage('GPS location detected in Region IX!');
       setShowToast(true);
     } catch (error: any) {
-      console.error('Geolocation error details:', {
-        code: error.code,
-        message: error.message,
-        errorObject: error
-      });
+      console.error('Geolocation error:', error);
       
-      // Provide more specific error messages based on the error code
       let errorMessage = 'Could not get your location. ';
       
       if (error.code === 1) {
-        // PERMISSION_DENIED
         errorMessage += 'Please allow location access in your browser settings.';
       } else if (error.code === 2) {
-        // POSITION_UNAVAILABLE
-        errorMessage += 'Location services unavailable. Try: 1) Enable location services in Windows Settings 2) Use a browser with location support 3) Check your internet connection 4) Disable VPN if active';
+        errorMessage += 'Location services unavailable. Please select from the dropdowns instead.';
       } else if (error.code === 3) {
-        // TIMEOUT
         errorMessage += 'Location request timed out. Please try again.';
-      } else if (error.message) {
-        errorMessage += error.message;
       } else {
-        errorMessage += 'Please check permissions and try again.';
+        errorMessage += 'Please select from the dropdowns instead.';
       }
       
       setError(errorMessage);
@@ -150,10 +220,10 @@ const CustomRequest: React.FC = () => {
 
   // Save current location for future use
   const saveCurrentLocation = () => {
-    if (locationData.formattedAddress || locationData.streetName) {
+    if (locationData.street || locationData.cityMunicipality) {
       const locationToSave = {
         ...locationData,
-        houseBuildingNumber: locationData.houseBuildingNumber || 'Current Location'
+        houseNumber: locationData.houseNumber || 'Current Location'
       };
       
       setSavedLocations(prev => {
@@ -175,6 +245,32 @@ const CustomRequest: React.FC = () => {
     }
   }, []);
 
+  // Initialize map
+  useEffect(() => {
+    if (!showMapModal || !mapRef.current || mapInstanceRef.current) return;
+
+    const map = L.map(mapRef.current).setView(REGION_IX_CENTER, 9);
+    mapInstanceRef.current = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add Region IX boundary
+    L.rectangle(REGION_IX_BOUNDS, {
+      color: '#0066cc',
+      weight: 2,
+      fillOpacity: 0.1
+    }).addTo(map);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [showMapModal]);
+
   const goBack = () => {
     history.goBack();
   };
@@ -182,9 +278,38 @@ const CustomRequest: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Compress image before converting to base64
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Calculate new dimensions (max 1200px width/height)
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 1200;
+          
+          if (width > height && width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          } else if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Draw compressed image
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64 with compression (0.7 quality)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          setSelectedImage(compressedBase64);
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -296,6 +421,15 @@ const CustomRequest: React.FC = () => {
         throw new Error('Date and time are required for scheduled requests');
       }
 
+      // Validate location fields
+      if (!locationData.cityMunicipality) {
+        throw new Error('Municipality is required. Please select from the dropdown.');
+      }
+
+      if (!locationData.barangay) {
+        throw new Error('Barangay is required. Please select from the dropdown.');
+      }
+
       // Prepare the request data
       const requestData = {
         client_id: clientId,
@@ -307,14 +441,14 @@ const CustomRequest: React.FC = () => {
         scheduled_date: requestType === 'freely' && selectedDate ? selectedDate.toISOString().split('T')[0] : null,
         scheduled_time: requestType === 'freely' ? selectedTime : null,
         // Location data
-        house_building_number: locationData.houseBuildingNumber,
-        street_name: locationData.streetName,
-        subdivision_village: locationData.subdivisionVillage,
-        barangay: locationData.barangay,
-        city_municipality: locationData.cityMunicipality,
-        province: locationData.province,
-        region: locationData.region,
-        postal_code: locationData.postalCode
+        house_building_number: locationData.houseNumber || '',
+        street_name: locationData.street || '',
+        subdivision_village: '',
+        barangay: locationData.barangay || '',
+        city_municipality: locationData.cityMunicipality || '',
+        province: locationData.province || '',
+        region: locationData.region || '',
+        postal_code: ''
       };
 
       console.log('Sending request data:', requestData);
@@ -344,14 +478,14 @@ const CustomRequest: React.FC = () => {
         setSelectedTime('');
         setEstimatedBudget('');
         setLocationData({
-          houseBuildingNumber: '',
-          streetName: '',
-          subdivisionVillage: '',
+          houseNumber: '',
+          street: '',
           barangay: '',
           cityMunicipality: '',
           province: '',
-          region: '',
-          postalCode: ''
+          region: 'Region IX - Zamboanga Peninsula',
+          latitude: null,
+          longitude: null
         });
 
         // Navigate back to requests page after a delay
@@ -360,7 +494,18 @@ const CustomRequest: React.FC = () => {
         }, 2000);
         
       } else {
-        throw new Error(data.error || 'Failed to submit request');
+        // Show detailed validation errors from backend
+        let errorMessage = data.error || 'Failed to submit request';
+        
+        // If there are validation details, format them nicely
+        if (data.details) {
+          const detailMessages = Object.entries(data.details)
+            .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
+            .join('\n');
+          errorMessage = `${errorMessage}\n\n${detailMessages}`;
+        }
+        
+        throw new Error(errorMessage);
       }
     } catch (err) {
       console.error('Error creating request:', err);
@@ -434,158 +579,129 @@ const CustomRequest: React.FC = () => {
             </div>
 
             <div className="form-section">
-              <div className="location-header">
-                <label className="form-label">Set Location</label>
-                <div className="location-mode-toggle">
-                  <button 
-                    className={`toggle-btn ${locationMode === 'simple' ? 'active' : ''}`}
-                    onClick={() => setLocationMode('simple')}
-                  >
-                    Simple
-                  </button>
-                  <button 
-                    className={`toggle-btn ${locationMode === 'detailed' ? 'active' : ''}`}
-                    onClick={() => setLocationMode('detailed')}
-                  >
-                    Detailed
-                  </button>
-                </div>
+              <label className="form-label">Location (Region IX - Zamboanga Peninsula)</label>
+              
+              <div className="location-buttons" style={{ marginBottom: '16px' }}>
+                <button 
+                  className="btn-location btn-detect"
+                  onClick={getCurrentLocation}
+                  disabled={isLocationLoading}
+                >
+                  <span className="material-icons-round">
+                    {isLocationLoading ? 'hourglass_empty' : 'my_location'}
+                  </span>
+                  {isLocationLoading ? 'Detecting GPS...' : 'Detect GPS Location'}
+                </button>
+                <button 
+                  className="btn-location btn-map"
+                  onClick={() => setShowMapModal(true)}
+                >
+                  <span className="material-icons-round">map</span>
+                  View Map
+                </button>
               </div>
 
-              {locationMode === 'simple' ? (
-                <div className="simple-location">
-                  <div className="location-buttons">
-                    <button 
-                      className="location-btn primary"
-                      onClick={getCurrentLocation}
-                      disabled={isLocationLoading}
-                    >
-                      <span className="material-icons-round icon-sm">
-                        {isLocationLoading ? 'hourglass_empty' : 'my_location'}
-                      </span>
-                      {isLocationLoading ? 'Getting Location...' : 'Set My Location'}
-                    </button>
-                    
-                    {(locationData.formattedAddress || locationData.streetName) && (
-                      <button 
-                        className="location-btn secondary"
-                        onClick={saveCurrentLocation}
-                      >
-                        <span className="material-icons-round icon-sm">bookmark_add</span>
-                        Save Location
-                      </button>
-                    )}
-                  </div>
-
-                  {locationData.formattedAddress && (
-                    <div className="current-location">
-                      <div className="location-display">
-                        <span className="material-icons-round location-icon">place</span>
-                        <div className="location-text">
-                          <div className="address-main">{locationData.formattedAddress}</div>
-                          {locationData.latitude && locationData.longitude && (
-                            <div className="coordinates">
-                              {locationData.latitude.toFixed(6)}, {locationData.longitude.toFixed(6)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <input 
-                        type="text" 
-                        className="location-input house-number" 
-                        placeholder="House/Building No (Optional)" 
-                        value={locationData.houseBuildingNumber}
-                        onChange={(e) => handleLocationChange('houseBuildingNumber', e.target.value)}
-                      />
-                    </div>
-                  )}
-
-                  {savedLocations.length > 0 && (
-                    <div className="saved-locations">
-                      <h4>Saved Locations</h4>
-                      <div className="saved-location-list">
-                        {savedLocations.map((location, index) => (
-                          <button 
-                            key={index}
-                            className="saved-location-item"
-                            onClick={() => setLocationData(location)}
-                          >
-                            <span className="material-icons-round">place</span>
-                            <div className="saved-location-text">
-                              <div className="saved-location-name">
-                                {location.houseBuildingNumber || 'Saved Location'}
-                              </div>
-                              <div className="saved-location-address">
-                                {location.formattedAddress || `${location.streetName}, ${location.cityMunicipality}`}
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              <div className="location-grid">
+                <div className="form-group">
+                  <label className="form-label-small">House/Building No.</label>
+                  <input 
+                    type="text" 
+                    className="form-input"
+                    placeholder="e.g., 123"
+                    value={locationData.houseNumber}
+                    onChange={(e) => handleLocationChange('houseNumber', e.target.value)}
+                  />
                 </div>
-              ) : (
-                <div className="location-grid">
+
+                <div className="form-group">
+                  <label className="form-label-small">Street</label>
                   <input 
                     type="text" 
-                    className="location-input" 
-                    placeholder="House/Building No" 
-                    value={locationData.houseBuildingNumber}
-                    onChange={(e) => handleLocationChange('houseBuildingNumber', e.target.value)}
+                    className="form-input"
+                    placeholder="e.g., Main St"
+                    value={locationData.street}
+                    onChange={(e) => handleLocationChange('street', e.target.value)}
                   />
-                  <input 
-                    type="text" 
-                    className="location-input" 
-                    placeholder="Street Name" 
-                    value={locationData.streetName}
-                    onChange={(e) => handleLocationChange('streetName', e.target.value)}
-                  />
-                  <input 
-                    type="text" 
-                    className="location-input" 
-                    placeholder="Subdivision/Village" 
-                    value={locationData.subdivisionVillage}
-                    onChange={(e) => handleLocationChange('subdivisionVillage', e.target.value)}
-                  />
-                  <input 
-                    type="text" 
-                    className="location-input" 
-                    placeholder="Barangay" 
-                    value={locationData.barangay}
-                    onChange={(e) => handleLocationChange('barangay', e.target.value)}
-                  />
-                  <input 
-                    type="text" 
-                    className="location-input" 
-                    placeholder="City/Municipality" 
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label-small">Municipality <span style={{color: 'red'}}>*</span></label>
+                  <select
+                    className="form-input"
                     value={locationData.cityMunicipality}
-                    onChange={(e) => handleLocationChange('cityMunicipality', e.target.value)}
-                  />
+                    onChange={(e) => {
+                      const selected = e.target.value;
+                      const municipality = allMunicipalities.find(m => m.municipality === selected);
+                      if (municipality) {
+                        handleMunicipalityChange(municipality.municipality, municipality.province);
+                      }
+                    }}
+                  >
+                    <option value="">Select Municipality</option>
+                    {REGION_IX_DATA.map(province => (
+                      <optgroup key={province.province} label={province.province}>
+                        {province.municipalities.map(municipality => (
+                          <option key={municipality.name} value={municipality.name}>
+                            {municipality.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label-small">Barangay <span style={{color: 'red'}}>*</span></label>
+                  <select
+                    className="form-input"
+                    value={locationData.barangay}
+                    onChange={(e) => handleBarangayChange(e.target.value)}
+                    disabled={!locationData.cityMunicipality}
+                  >
+                    <option value="">Select Barangay</option>
+                    {availableBarangays.map(barangay => (
+                      <option key={barangay.name} value={barangay.name}>
+                        {barangay.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label-small">Province</label>
                   <input 
                     type="text" 
-                    className="location-input" 
-                    placeholder="Province" 
+                    className="form-input"
                     value={locationData.province}
-                    onChange={(e) => handleLocationChange('province', e.target.value)}
-                  />
-                  <input 
-                    type="text" 
-                    className="location-input" 
-                    placeholder="Region" 
-                    value={locationData.region}
-                    onChange={(e) => handleLocationChange('region', e.target.value)}
-                  />
-                  <input 
-                    type="text" 
-                    className="location-input" 
-                    placeholder="Postal Code" 
-                    value={locationData.postalCode}
-                    onChange={(e) => handleLocationChange('postalCode', e.target.value)}
+                    readOnly
+                    style={{ background: '#f0f0f0' }}
                   />
                 </div>
-              )}
+
+                <div className="form-group">
+                  <label className="form-label-small">Region</label>
+                  <input 
+                    type="text" 
+                    className="form-input"
+                    value={locationData.region}
+                    readOnly
+                    style={{ background: '#f0f0f0' }}
+                  />
+                </div>
+
+                {locationData.latitude && locationData.longitude && (
+                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label className="form-label-small">Coordinates</label>
+                    <input 
+                      type="text" 
+                      className="form-input"
+                      value={`${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}`}
+                      readOnly
+                      style={{ background: '#f0f0f0' }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="form-section">
@@ -705,6 +821,26 @@ const CustomRequest: React.FC = () => {
             {isLoading ? 'Submitting...' : 'Submit Request'}
           </button>
         </div>
+
+        {/* Map Modal */}
+        {showMapModal && (
+          <div className="map-modal-overlay" onClick={() => setShowMapModal(false)}>
+            <div className="map-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="map-modal-header">
+                <h3>Region IX - Zamboanga Peninsula</h3>
+                <button className="close-btn" onClick={() => setShowMapModal(false)}>
+                  <span className="material-icons-round">close</span>
+                </button>
+              </div>
+              <div className="map-modal-body">
+                <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+              </div>
+              <div className="map-modal-footer">
+                <p>Select a municipality and barangay from the dropdowns to see the location on the map.</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Toast Notifications */}
         <IonToast

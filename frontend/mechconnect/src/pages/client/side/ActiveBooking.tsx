@@ -6,7 +6,7 @@ import './ActiveBooking.css';
 interface BookingData {
   booking_id: number;
   status: string;
-  amount_fee: number;
+  amount_fee: string | number;  // API returns string, but can be number
   booked_at: string;
   service_time: string;
   client_name: string;
@@ -29,6 +29,17 @@ interface BookingData {
     region?: string;
     postal_code?: string;
   };
+  payment_info?: {
+    payment_status: string;
+    payment_status_display: string;
+    payment_method?: string;
+    payment_method_display?: string;
+    total_amount: string;
+    amount_paid: string;
+    remaining_balance: string;
+    payment_date?: string;
+    reference_number?: string;
+  };
 }
 
 const ActiveBooking: React.FC = () => {
@@ -44,19 +55,49 @@ const ActiveBooking: React.FC = () => {
   };
 
   const handleCancel = () => {
-    history.push('/client/cancel-booking-form');
+    history.push({
+      pathname: '/client/cancel-booking-form',
+      state: { bookingId: id }
+    });
   };
 
   const handleReschedule = () => {
-    history.push('/client/reschedule-booking-form');
+    console.log('Reschedule clicked, booking ID:', id, 'booking data:', bookingData);
+    history.push({
+      pathname: '/client/reschedule-booking-form',
+      state: {
+        bookingId: id,
+        bookingData: bookingData
+      }
+    });
   };
 
   const handleComplete = () => {
-    history.push('/client/client-payment');
+    console.log('Complete clicked, booking ID:', id, 'booking data:', bookingData);
+    history.push({
+      pathname: '/client/client-payment',
+      state: {
+        bookingId: id,
+        totalAmount: bookingData?.amount_fee || '0',
+        bookingDetails: bookingData
+      }
+    });
   };
 
   const handleAdvancePayment = () => {
     history.push('/client/advance-payment');
+  };
+
+  const handlePayment = () => {
+    if (bookingData) {
+      history.push('/client/payment-form', {
+        bookingId: bookingData.booking_id,
+        totalAmount: typeof bookingData.amount_fee === 'string' 
+          ? bookingData.amount_fee 
+          : bookingData.amount_fee.toString(),
+        bookingDetails: bookingData
+      });
+    }
   };
 
   const toggleLocation = () => {
@@ -78,10 +119,42 @@ const ActiveBooking: React.FC = () => {
       const response = await fetch(`http://localhost:8000/api/bookings/active/${id}/`);
       const data = await response.json();
 
+      console.log('ActiveBooking - API Response:', data);
+      console.log('ActiveBooking - Response status:', response.status);
+
       if (response.ok) {
-        setBookingData(data);
+        // The API returns nested structure with booking_details
+        const bookingDetails = data.booking_details || data;
+        setBookingData(bookingDetails);
+        console.log('ActiveBooking - Booking data set:', bookingDetails);
+        
+        // Check if booking status is no longer active
+        // If it changed status, redirect to the appropriate page
+        if (bookingDetails.status && bookingDetails.status !== 'active') {
+          console.log('Booking status changed to:', bookingDetails.status);
+          setTimeout(() => {
+            switch (bookingDetails.status) {
+              case 'rescheduled':
+                history.replace(`/client/rescheduled-booking/${id}`);
+                break;
+              case 'completed':
+                history.replace(`/client/completed-booking/${id}`);
+                break;
+              case 'cancelled':
+                history.replace(`/client/canceled-booking/${id}`);
+                break;
+              case 'dispute':
+                history.replace(`/client/disputed-booking/${id}`);
+                break;
+              default:
+                // Stay on current page
+                break;
+            }
+          }, 100);
+        }
       } else {
         setError(data.error || 'Failed to load booking details');
+        console.error('ActiveBooking - API Error:', data);
       }
     } catch (err) {
       setError('Network error occurred');
@@ -267,16 +340,62 @@ const ActiveBooking: React.FC = () => {
 
             <div className="booking-divider"></div>
 
+            {bookingData.payment_info && (
+              <>
+                <div className="booking-section payment-section">
+                  <h3 className="section-title">Payment Information</h3>
+                  <div className="detail-row">
+                    <span className="detail-label">Payment Status:</span>
+                    <span className={`payment-status-badge ${bookingData.payment_info.payment_status}`}>
+                      {bookingData.payment_info.payment_status_display}
+                    </span>
+                  </div>
+                  {bookingData.payment_info.payment_method && (
+                    <div className="detail-row">
+                      <span className="detail-label">Payment Method:</span>
+                      <span className="detail-value">{bookingData.payment_info.payment_method_display}</span>
+                    </div>
+                  )}
+                  <div className="detail-row">
+                    <span className="detail-label">Amount Paid:</span>
+                    <span className="detail-value">₱{parseFloat(bookingData.payment_info.amount_paid).toFixed(2)}</span>
+                  </div>
+                  {parseFloat(bookingData.payment_info.remaining_balance) > 0 && (
+                    <div className="detail-row">
+                      <span className="detail-label">Remaining Balance:</span>
+                      <span className="detail-value amount-due">₱{parseFloat(bookingData.payment_info.remaining_balance).toFixed(2)}</span>
+                    </div>
+                  )}
+                  {bookingData.payment_info.payment_date && (
+                    <div className="detail-row">
+                      <span className="detail-label">Payment Date:</span>
+                      <span className="detail-value">{formatDate(bookingData.payment_info.payment_date)}</span>
+                    </div>
+                  )}
+                  {bookingData.payment_info.reference_number && (
+                    <div className="detail-row">
+                      <span className="detail-label">Reference Number:</span>
+                      <span className="detail-value">{bookingData.payment_info.reference_number}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="booking-divider"></div>
+              </>
+            )}
+
             <div className="total-section">
               <span className="total-label">Total</span>
-              <span className="total-amount">₱{bookingData.amount_fee.toFixed(2)}</span>
+              <span className="total-amount">₱{typeof bookingData.amount_fee === 'string' ? parseFloat(bookingData.amount_fee).toFixed(2) : bookingData.amount_fee.toFixed(2)}</span>
             </div>
           </div>
 
-          <button className="btn-advance-payment" onClick={handleAdvancePayment}>
-            <span className="material-icons-round icon-sm">payment</span>
-            Advance Payment
-          </button>
+          {(!bookingData.payment_info || bookingData.payment_info.payment_status === 'unpaid' || 
+            (bookingData.payment_info.payment_status === 'advance_paid' && parseFloat(bookingData.payment_info.remaining_balance) > 0)) && (
+            <button className="btn-submit-payment" onClick={handlePayment}>
+              <span className="material-icons-round icon-sm">payment</span>
+              {bookingData.payment_info?.payment_status === 'advance_paid' ? 'Pay Remaining Balance' : 'Submit Payment'}
+            </button>
+          )}
 
           <div className="action-buttons">
             <button className="btn-cancel" onClick={handleCancel}>

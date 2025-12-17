@@ -1,4 +1,4 @@
-import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonPage, IonToast, useIonViewWillEnter } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNav from '../../../components/BottomNav';
@@ -108,6 +108,12 @@ const Booking: React.FC = () => {
     
     return () => window.removeEventListener('resize', checkScrollable);
   }, [activeTab]);
+
+  // Refresh bookings when navigating back to this page
+  useIonViewWillEnter(() => {
+    console.log('Booking page - refreshing bookings for tab:', activeTab);
+    fetchBookings();
+  });
 
   const handleTabActive = () => {
     setActiveTab('active');

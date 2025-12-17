@@ -330,6 +330,9 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .btn-cancel {
@@ -378,4 +381,77 @@
 .btn-complete:active {
   background: hsl(140, 60%, 88%);
   transform: scale(0.98);
+}
+
+/* Payment Section */
+.payment-section {
+  background: hsl(25, 85%, 98%);
+  border: 1px solid hsl(25, 85%, 90%);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.payment-section .section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 12px 0;
+}
+
+.payment-status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.payment-status-badge.unpaid {
+  background: hsl(0, 70%, 95%);
+  color: hsl(0, 70%, 45%);
+}
+
+.payment-status-badge.advance_paid {
+  background: hsl(40, 90%, 95%);
+  color: hsl(40, 90%, 45%);
+}
+
+.payment-status-badge.fully_paid {
+  background: hsl(140, 60%, 95%);
+  color: hsl(140, 60%, 40%);
+}
+
+.amount-due {
+  color: hsl(25, 85%, 55%);
+  font-weight: 600;
+}
+
+.btn-submit-payment {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  background: hsl(25, 85%, 55%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px hsla(25, 85%, 55%, 0.3);
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.btn-submit-payment:hover {
+  background: hsl(25, 85%, 50%);
+  box-shadow: 0 4px 12px hsla(25, 85%, 55%, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-submit-payment:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px hsla(25, 85%, 55%, 0.3);
 }

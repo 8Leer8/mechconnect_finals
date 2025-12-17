@@ -1,20 +1,75 @@
 import { IonContent, IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import { useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './CancelBookingForm.css';
+
+interface LocationState {
+  bookingId: number;
+  bookingData?: any;
+}
 
 const CancelBookingForm: React.FC = () => {
   const history = useHistory();
+  const location = useLocation<LocationState>();
+  const { bookingId, bookingData } = location.state || {};
+  
   const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!bookingId) {
+      setError('Booking information not found');
+    }
+  }, [bookingId]);
 
   const goBack = () => {
     history.goBack();
   };
 
-  const handleSubmit = () => {
-    console.log('Cancel booking with reason:', reason);
-    // Handle cancel booking submission
-    history.goBack();
+  const handleSubmit = async () => {
+    // Validation
+    if (!reason.trim()) {
+      alert('Please provide a reason for cancellation');
+      return;
+    }
+    
+    if (!bookingId) {
+      alert('Booking information not found');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const clientId = localStorage.getItem('userId');
+      
+      const response = await fetch('http://localhost:8000/api/bookings/cancel/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: bookingId,
+          reason: reason,
+          cancelled_by_id: clientId ? parseInt(clientId) : undefined,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Booking cancelled successfully!');
+        history.push(`/client/canceled-booking/${bookingId}`);
+      } else {
+        alert(data.error || 'Failed to cancel booking');
+      }
+    } catch (error) {
+      console.error('Cancellation error:', error);
+      alert('Network error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

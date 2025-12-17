@@ -48,6 +48,12 @@ import ActiveBooking from '../pages/client/side/ActiveBooking';
 import CompletedBooking from '../pages/client/side/CompletedBooking';
 import CanceledBooking from '../pages/client/side/CanceledBooking';
 import BackJobsBooking from '../pages/client/side/BackJobsBooking';
+
+// Client Payment Pages
+import PaymentForm from '../pages/client/payment/PaymentForm';
+import ClientPayment from '../pages/client/payment/ClientPayment';
+import RescheduleBookingForm from '../pages/client/side/RescheduleBookingForm';
+import CancelBookingForm from '../pages/client/side/CancelBookingForm';
 import BackJobsForm from '../pages/client/side/BackJobsForm';
 import DisputedBooking from '../pages/client/side/DisputedBooking';
 import RescheduledBooking from '../pages/client/side/RescheduledBooking';
@@ -161,6 +167,18 @@ const AppRoutes: React.FC = () => {
       </AuthGuard>
       <AuthGuard exact path="/client/refunded-booking/:id">
         <RefundedBooking />
+      </AuthGuard>
+      <AuthGuard exact path="/client/payment-form">
+        <PaymentForm />
+      </AuthGuard>
+      <AuthGuard exact path="/client/client-payment">
+        <ClientPayment />
+      </AuthGuard>
+      <AuthGuard exact path="/client/reschedule-booking-form">
+        <RescheduleBookingForm />
+      </AuthGuard>
+      <AuthGuard exact path="/client/cancel-booking-form">
+        <CancelBookingForm />
       </AuthGuard>
       
       {/* Protected Shop Owner Routes */}

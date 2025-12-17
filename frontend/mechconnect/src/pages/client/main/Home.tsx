@@ -1,4 +1,4 @@
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, useIonViewWillEnter } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BottomNav from '../../../components/BottomNav';
@@ -21,7 +21,7 @@ const Home: React.FC = () => {
   const history = useHistory();
   const [activeBooking, setActiveBooking] = useState<ActiveBooking | null>(null);
   const [loading, setLoading] = useState(true);
-  const [clientId, setClientId] = useState<number>(1);
+  const [clientId, setClientId] = useState<number | null>(null);
 
   const goToNotifications = () => history.push('/client/notifications');
   const goToCustomRequest = () => history.push('/client/custom-request');
@@ -32,16 +32,27 @@ const Home: React.FC = () => {
   // Get client ID from localStorage
   useEffect(() => {
     const userDataString = localStorage.getItem('user');
+    const userIdString = localStorage.getItem('userId');
+    
+    console.log('Home - localStorage user:', userDataString);
+    console.log('Home - localStorage userId:', userIdString);
+    
     if (userDataString) {
       try {
         const userData = JSON.parse(userDataString);
-        const id = userData.acc_id || userData.account_id || 1;
+        const id = userData.acc_id || userData.account_id || parseInt(userIdString || '0');
         setClientId(id);
         console.log('Home - User data:', userData);
         console.log('Home - Using client ID:', id);
       } catch (e) {
         console.error('Error parsing user data:', e);
+        if (userIdString) {
+          setClientId(parseInt(userIdString));
+        }
       }
+    } else if (userIdString) {
+      setClientId(parseInt(userIdString));
+      console.log('Home - Using userId from localStorage:', userIdString);
     }
   }, []);
 
@@ -71,29 +82,61 @@ const Home: React.FC = () => {
     }
   };
 
-  // Fetch active bookings on mount
-  useEffect(() => {
-    const fetchActiveBooking = async () => {
-      try {
-        const result = await bookingsAPI.getClientBookings(clientId, 'active');
-        console.log('Bookings API result:', result);
-        if (result.data && result.data.bookings && result.data.bookings.length > 0) {
-          console.log('First active booking:', result.data.bookings[0]);
-          setActiveBooking(result.data.bookings[0]); // Get the first active booking
-        } else {
-          console.log('No active bookings found');
-        }
-      } catch (error) {
-        console.error('Error fetching active booking:', error);
-      } finally {
-        setLoading(false);
+  // Fetch active bookings
+  const fetchActiveBooking = async () => {
+    if (!clientId) {
+      console.log('Home - No clientId available, skipping fetch');
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      console.log('Home - Fetching bookings for client ID:', clientId);
+      const result = await bookingsAPI.getClientBookings(clientId, 'active');
+      console.log('Home - Bookings API result:', result);
+      if (result.data && result.data.bookings && result.data.bookings.length > 0) {
+        console.log('Home - First active booking:', result.data.bookings[0]);
+        setActiveBooking(result.data.bookings[0]); // Get the first active booking
+      } else {
+        console.log('Home - No active bookings found');
+        setActiveBooking(null); // Clear the active booking if none found
       }
-    };
+    } catch (error) {
+      console.error('Home - Error fetching active booking:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch active bookings on mount and when clientId changes
+  useEffect(() => {
+    console.log('Home - clientId changed:', clientId);
     if (clientId) {
       fetchActiveBooking();
     }
   }, [clientId]);
+
+  // Refresh bookings when page comes into focus
+  useEffect(() => {
+    const handleFocus = () => {
+      if (clientId) {
+        console.log('Home page focused, refreshing bookings...');
+        fetchActiveBooking();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [clientId]);
+
+  // Ionic lifecycle - refresh when entering the page
+  useIonViewWillEnter(() => {
+    if (clientId) {
+      console.log('Home page will enter, refreshing bookings...');
+      fetchActiveBooking();
+    }
+  });
 
   return (
     <IonPage>

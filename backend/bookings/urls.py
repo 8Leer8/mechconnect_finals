@@ -28,4 +28,9 @@ urlpatterns = [
     path('back-jobs/', views.back_jobs_bookings_list, name='back_jobs_bookings_list'),
     path('disputed/', views.disputed_bookings_list, name='disputed_bookings_list'),
     path('refunded/', views.refunded_bookings_list, name='refunded_bookings_list'),
+    
+    # Actions
+    path('reschedule/', views.request_reschedule, name='request_reschedule'),
+    path('complete/', views.mark_booking_complete, name='mark_booking_complete'),
+    path('cancel/', views.cancel_booking, name='cancel_booking'),
 ]

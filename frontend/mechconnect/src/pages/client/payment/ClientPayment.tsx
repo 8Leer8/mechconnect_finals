@@ -1,12 +1,28 @@
 import { IonContent, IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import { useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import './ClientPayment.css';
+
+interface LocationState {
+  bookingId: number;
+  totalAmount: string;
+  bookingDetails?: any;
+}
 
 const ClientPayment: React.FC = () => {
   const history = useHistory();
+  const location = useLocation<LocationState>();
+  const { bookingId, totalAmount, bookingDetails } = location.state || {};
+  
   const [proofImage, setProofImage] = useState<string | null>(null);
-  const [remainingAmount, setRemainingAmount] = useState<string>('');
+  const [remainingAmount, setRemainingAmount] = useState<string>(totalAmount || '');
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (!bookingId) {
+      setError('Booking information not found');
+    }
+  }, [bookingId]);
 
   const goBack = () => history.goBack();
 
@@ -21,9 +37,48 @@ const ClientPayment: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Submit payment');
-    history.goBack();
+  const handleSubmit = async () => {
+    // Validation
+    if (!remainingAmount || parseFloat(remainingAmount) <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+    
+    if (!proofImage) {
+      alert('Please upload proof of payment');
+      return;
+    }
+    
+    try {
+      if (!bookingId) {
+        alert('Booking information not found');
+        return;
+      }
+      
+      // Mark booking as complete
+      const response = await fetch('http://localhost:8000/api/bookings/complete/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: bookingId,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Payment completed and booking marked as complete!');
+        // Redirect to the completed booking detail page
+        history.push(`/client/completed-booking/${bookingId}`);
+      } else {
+        alert(data.error || 'Failed to complete booking');
+      }
+    } catch (error) {
+      console.error('Completion error:', error);
+      alert('Network error occurred. Please try again.');
+    }
   };
 
   return (
@@ -44,7 +99,7 @@ const ClientPayment: React.FC = () => {
             {/* Booking ID */}
             <div className="booking-id-section">
               <span className="booking-id-label">Booking ID:</span>
-              <span className="booking-id-value">#BK-2847</span>
+              <span className="booking-id-value">#{bookingId || 'N/A'}</span>
             </div>
 
             <div className="payment-divider"></div>
