@@ -27,6 +27,7 @@ class CustomRequest(models.Model):
     description = models.TextField(null=True, blank=True)
     concern_picture = models.TextField(null=True, blank=True)
     providers_note = models.TextField(null=True, blank=True)
+    estimated_budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
 
 class QuotedRequestItem(models.Model):

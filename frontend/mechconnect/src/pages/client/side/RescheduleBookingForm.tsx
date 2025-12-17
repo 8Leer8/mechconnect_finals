@@ -174,10 +174,19 @@ const RescheduleBookingForm: React.FC = () => {
     
     try {
       const bookingId = (history.location.state as any)?.bookingId;
-      const clientId = localStorage.getItem('userId');
+      
+      // Get client ID from user object
+      const userDataString = localStorage.getItem('user');
+      const userData = userDataString ? JSON.parse(userDataString) : null;
+      const clientId = userData?.acc_id || userData?.account_id;
       
       if (!bookingId) {
         alert('Booking information not found');
+        return;
+      }
+      
+      if (!clientId) {
+        alert('User session not found. Please log in again.');
         return;
       }
       
@@ -189,7 +198,7 @@ const RescheduleBookingForm: React.FC = () => {
         body: JSON.stringify({
           booking_id: bookingId,
           reason: reason,
-          requested_by_id: clientId ? parseInt(clientId) : undefined,
+          requested_by_id: clientId,
         }),
       });
       

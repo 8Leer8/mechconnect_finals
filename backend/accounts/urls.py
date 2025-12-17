@@ -81,5 +81,9 @@ urlpatterns = [
     # Head Admin Token Pricing
     path('head-admin/token-pricing/', tokens.manage_token_pricing, name='manage_token_pricing'),
     path('head-admin/token-pricing/<int:package_id>/', tokens.manage_token_pricing, name='manage_token_pricing_detail'),
+    
+    # Notification endpoints
+    path('notifications/', users.user_notifications, name='user_notifications'),
+    path('notifications/<int:notification_id>/read/', users.mark_notification_read, name='mark_notification_read'),
 ]
 

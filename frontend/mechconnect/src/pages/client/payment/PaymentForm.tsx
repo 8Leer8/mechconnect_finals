@@ -145,8 +145,16 @@ const PaymentForm: React.FC = () => {
     setLoading(true);
 
     try {
-      // Get client ID from localStorage
-      const clientId = localStorage.getItem('userId');
+      // Get client ID from user object
+      const userDataString = localStorage.getItem('user');
+      const userData = userDataString ? JSON.parse(userDataString) : null;
+      const clientId = userData?.acc_id || userData?.account_id;
+      
+      if (!clientId) {
+        setError('User session not found. Please log in again.');
+        setLoading(false);
+        return;
+      }
       
       // Compress image if provided
       let paymentProof = null;
@@ -156,7 +164,7 @@ const PaymentForm: React.FC = () => {
 
       const payload = {
         booking_id: bookingId,
-        paid_by_id: clientId ? parseInt(clientId) : undefined,
+        paid_by_id: clientId,
         ...paymentData,
         payment_proof: paymentProof,
       };

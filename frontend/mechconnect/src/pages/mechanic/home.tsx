@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BottomNavMechanic from '../../components/BottomNavMechanic';
 import Wallet from '../../components/Wallet';
+import { requestsAPI } from '../../utils/api';
 import './Home.css';
 
 // Interface for job data from API
@@ -57,9 +58,17 @@ const Home: React.FC = () => {
   // Handle accept/decline actions for requests
   const handleAcceptRequest = async (requestId: number) => {
     try {
-      // In a real app, this would make an API call
+      const result = await requestsAPI.updateRequestStatus(requestId, 'accepted');
+      
+      if (result.error) {
+        setToastMessage(result.error);
+        setShowToast(true);
+        return;
+      }
+      
+      // Remove from pending list on success
       setPendingRequests(prev => prev.filter(req => req.request_id !== requestId));
-      setToastMessage('Request accepted successfully!');
+      setToastMessage('Request accepted successfully! Booking created.');
       setShowToast(true);
     } catch (error) {
       console.error('Error accepting request:', error);
@@ -70,7 +79,15 @@ const Home: React.FC = () => {
 
   const handleDeclineRequest = async (requestId: number) => {
     try {
-      // In a real app, this would make an API call
+      const result = await requestsAPI.updateRequestStatus(requestId, 'rejected');
+      
+      if (result.error) {
+        setToastMessage(result.error);
+        setShowToast(true);
+        return;
+      }
+      
+      // Remove from pending list on success
       setPendingRequests(prev => prev.filter(req => req.request_id !== requestId));
       setToastMessage('Request declined');
       setShowToast(true);

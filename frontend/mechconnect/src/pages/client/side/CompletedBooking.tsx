@@ -33,7 +33,9 @@ const CompletedBooking: React.FC = () => {
   };
 
   const handleSeePaymentDetail = () => {
-    history.push('/client/payment-detail');
+    if (bookingData?.booking_id) {
+      history.push(`/client/payment-detail/${bookingData.booking_id}`);
+    }
   };
 
   const handleRequestBackJob = () => {
@@ -52,17 +54,26 @@ const CompletedBooking: React.FC = () => {
     setError(null);
 
     try {
+      console.log('CompletedBooking - Fetching booking ID:', id);
       const response = await fetch(`http://localhost:8000/api/bookings/completed/${id}/`);
+      
+      console.log('CompletedBooking - Response status:', response.status);
       const data = await response.json();
+      console.log('CompletedBooking - Response data:', data);
 
       if (response.ok) {
-        setBookingData(data);
+        // Handle nested structure from API
+        const bookingDetails = data.booking_details || data;
+        console.log('CompletedBooking - Setting booking data:', bookingDetails);
+        setBookingData(bookingDetails);
       } else {
         setError(data.error || 'Failed to load booking details');
+        console.error('CompletedBooking - API error:', data);
       }
     } catch (err) {
-      setError('Network error occurred');
-      console.error('Error fetching booking details:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Network error: ${errorMessage}`);
+      console.error('CompletedBooking - Fetch error:', err);
     } finally {
       setLoading(false);
     }

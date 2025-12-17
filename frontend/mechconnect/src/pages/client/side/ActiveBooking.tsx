@@ -55,9 +55,13 @@ const ActiveBooking: React.FC = () => {
   };
 
   const handleCancel = () => {
+    console.log('Cancel clicked, booking ID:', id, 'type:', typeof id);
     history.push({
       pathname: '/client/cancel-booking-form',
-      state: { bookingId: id }
+      state: { 
+        bookingId: parseInt(id),  // Convert to number
+        bookingData: bookingData
+      }
     });
   };
 
@@ -116,11 +120,16 @@ const ActiveBooking: React.FC = () => {
     setError(null);
 
     try {
+      console.log('ActiveBooking - Fetching booking ID:', id);
+      console.log('ActiveBooking - API URL:', `http://localhost:8000/api/bookings/active/${id}/`);
+      
       const response = await fetch(`http://localhost:8000/api/bookings/active/${id}/`);
-      const data = await response.json();
-
-      console.log('ActiveBooking - API Response:', data);
+      
       console.log('ActiveBooking - Response status:', response.status);
+      console.log('ActiveBooking - Response ok:', response.ok);
+      
+      const data = await response.json();
+      console.log('ActiveBooking - API Response data:', data);
 
       if (response.ok) {
         // The API returns nested structure with booking_details
@@ -141,7 +150,7 @@ const ActiveBooking: React.FC = () => {
                 history.replace(`/client/completed-booking/${id}`);
                 break;
               case 'cancelled':
-                history.replace(`/client/canceled-booking/${id}`);
+                history.replace(`/client/cancelled-booking/${id}`);
                 break;
               case 'dispute':
                 history.replace(`/client/disputed-booking/${id}`);
@@ -157,8 +166,13 @@ const ActiveBooking: React.FC = () => {
         console.error('ActiveBooking - API Error:', data);
       }
     } catch (err) {
-      setError('Network error occurred');
-      console.error('Error fetching booking details:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Network error: ${errorMessage}`);
+      console.error('ActiveBooking - Fetch error:', err);
+      console.error('ActiveBooking - Error details:', {
+        message: errorMessage,
+        bookingId: id
+      });
     } finally {
       setLoading(false);
     }
@@ -405,10 +419,6 @@ const ActiveBooking: React.FC = () => {
             <button className="btn-reschedule" onClick={handleReschedule}>
               <span className="material-icons-round icon-sm">event</span>
               Reschedule
-            </button>
-            <button className="btn-complete" onClick={handleComplete}>
-              <span className="material-icons-round icon-sm">check_circle</span>
-              Complete
             </button>
           </div>
         </div>

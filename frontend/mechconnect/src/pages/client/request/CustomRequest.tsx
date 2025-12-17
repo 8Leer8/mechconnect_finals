@@ -71,7 +71,34 @@ const CustomRequest: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
 
   // Client ID - In a real app, this would come from authentication context
-  const [clientId, setClientId] = useState<number>(1); // Default to 1 for testing
+  const [clientId, setClientId] = useState<number | null>(null);
+
+  // Get client ID from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('user');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        const id = userData.acc_id || userData.account_id;
+        if (id) {
+          setClientId(id);
+          console.log('CustomRequest - Using client ID:', id);
+        } else {
+          console.error('No user ID found in localStorage');
+          setToastMessage('User session not found. Please log in again.');
+          setShowToast(true);
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        setToastMessage('Invalid user session. Please log in again.');
+        setShowToast(true);
+      }
+    } else {
+      console.error('No user data in localStorage');
+      setToastMessage('Not authenticated. Please log in.');
+      setShowToast(true);
+    }
+  }, []);
   
   // Provider ID - Get from URL parameters if coming from mechanic profile
   const [providerId, setProviderId] = useState<number | null>(null);
@@ -436,7 +463,7 @@ const CustomRequest: React.FC = () => {
         provider_id: providerId, // Include provider ID if available
         description: problemDescription.trim(),
         concern_picture: selectedImage || '',
-        estimated_budget: estimatedBudget ? parseFloat(estimatedBudget.replace(/[₱,]/g, '')) : null,
+        estimated_budget: estimatedBudget ? parseFloat(estimatedBudget) : null,
         schedule_type: requestType,
         scheduled_date: requestType === 'freely' && selectedDate ? selectedDate.toISOString().split('T')[0] : null,
         scheduled_time: requestType === 'freely' ? selectedTime : null,
@@ -707,11 +734,13 @@ const CustomRequest: React.FC = () => {
             <div className="form-section">
               <label className="form-label">Estimated Budget</label>
               <input
-                type="text"
+                type="number"
                 className="budget-input"
-                placeholder="Enter your estimated budget (e.g., ₱5,000)"
+                placeholder="Enter your estimated budget (e.g., 5000)"
                 value={estimatedBudget}
                 onChange={(e) => setEstimatedBudget(e.target.value)}
+                min="0"
+                step="0.01"
               />
             </div>
 

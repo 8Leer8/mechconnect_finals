@@ -4,21 +4,41 @@ import { useState, useEffect } from 'react';
 import './BackJobsBooking.css';
 
 interface BookingData {
-  booking_id: number;
+  back_jobs_booking_id: number;
+  booking: number;
+  reason: string;
   status: string;
-  amount_fee: number;
-  booked_at: string;
-  service_time: string;
-  client_name: string;
-  provider_name: string;
-  provider_contact: string;
-  request_summary: string;
-  request_type: string;
-  service_details: {
-    service_name: string;
-    includes?: string;
-    addons?: string;
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+  booking_details: {
+    booking_id: number;
+    status: string;
+    amount_fee: string;
+    booked_at: string;
+    service_time: string;
+    client_name: string;
+    provider_name: string;
+    provider_contact: string;
+    request_summary: string;
+    request_type: string;
+    service_details: {
+      service_name: string;
+      includes?: string;
+      addons?: string;
+    };
+    location: {
+      house_number?: string;
+      street_name?: string;
+      subdivision?: string;
+      barangay?: string;
+      city?: string;
+      province?: string;
+      region?: string;
+      postal_code?: string;
+    };
   };
+  requested_by_name: string;
 }
 
 const BackJobsBooking: React.FC = () => {
@@ -34,11 +54,59 @@ const BackJobsBooking: React.FC = () => {
   };
 
   const handleCancel = () => {
-    history.push('/client/cancel-booking-form');
+    if (bookingData) {
+      // The API returns nested structure with booking_details
+      const actualBookingId = (bookingData as any).booking_details?.booking_id || (bookingData as any).booking || bookingData.booking_id;
+      const actualBookingData = (bookingData as any).booking_details || bookingData;
+      
+      history.push({
+        pathname: '/client/cancel-booking-form',
+        state: {
+          bookingId: actualBookingId,
+          bookingData: actualBookingData
+        }
+      });
+    } else {
+      alert('Booking data not available');
+    }
   };
 
-  const handleComplete = () => {
-    console.log('Complete booking');
+  const handleComplete = async () => {
+    if (!bookingData || !id) {
+      alert('Booking data not available');
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to mark this booking as completed?');
+    if (!confirmed) return;
+
+    try {
+      // The API returns nested structure with booking_details
+      const actualBookingId = (bookingData as any).booking_details?.booking_id || (bookingData as any).booking || bookingData.booking_id;
+      
+      const response = await fetch('http://localhost:8000/api/bookings/complete/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: actualBookingId
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Booking marked as completed successfully!');
+        // Redirect to completed booking detail page
+        history.push(`/client/completed-booking/${actualBookingId}`);
+      } else {
+        alert(data.error || 'Failed to mark booking as completed');
+      }
+    } catch (error) {
+      console.error('Complete booking error:', error);
+      alert('Network error occurred. Please try again.');
+    }
   };
 
   const toggleLocation = () => {
@@ -131,17 +199,17 @@ const BackJobsBooking: React.FC = () => {
         <div className="booking-container">
           <div className="booking-card">
             <div className="booking-id-badge backjobs">
-              <span className="booking-id">#BK-{bookingData.booking_id}</span>
+              <span className="booking-id">#BK-{bookingData.booking_details.booking_id}</span>
             </div>
 
             <div className="booking-section">
               <div className="detail-row">
                 <span className="detail-label">Provider:</span>
-                <span className="detail-value provider-name">{bookingData.provider_name}</span>
+                <span className="detail-value provider-name">{bookingData.booking_details.provider_name}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Contact number:</span>
-                <span className="detail-value">{bookingData.provider_contact || 'Not available'}</span>
+                <span className="detail-value">{bookingData.booking_details.provider_contact || 'Not available'}</span>
               </div>
             </div>
 
@@ -150,7 +218,17 @@ const BackJobsBooking: React.FC = () => {
             <div className="booking-section">
               <h3 className="section-title">Service Details</h3>
               <div className="service-item">
-                <span className="service-name">{bookingData.service_details?.service_name || bookingData.request_summary}</span>
+                <span className="service-name">{bookingData.booking_details.service_details?.service_name || bookingData.booking_details.request_summary}</span>
+              </div>
+              {bookingData.booking_details.service_details?.includes && (
+                <div className="detail-row">
+                  <span className="detail-label">Includes:</span>
+                  <span className="detail-value">{bookingData.booking_details.service_details.includes}</span>
+                </div>
+              )}
+              <div className="detail-row">
+                <span className="detail-label">Add-ons:</span>
+                <span className="detail-value">{bookingData.booking_details.service_details?.addons || 'None'}</span>
               </div>
             </div>
 
@@ -159,7 +237,7 @@ const BackJobsBooking: React.FC = () => {
             <div className="booking-section">
               <div className="detail-row">
                 <span className="detail-label">Booked at:</span>
-                <span className="detail-value">Nov 20, 2025 - 8:00 AM</span>
+                <span className="detail-value">{formatDate(bookingData.booking_details.booked_at)}</span>
               </div>
             </div>
 
@@ -170,7 +248,7 @@ const BackJobsBooking: React.FC = () => {
                 <span className="material-icons-round icon-sm">history</span>
                 <span>Back Job</span>
               </div>
-              <p className="backjob-note">This service requires a follow-up visit</p>
+              <p className="backjob-note">{bookingData.reason}</p>
             </div>
 
             <div className="booking-divider"></div>
@@ -187,35 +265,35 @@ const BackJobsBooking: React.FC = () => {
                   <div className="location-grid">
                     <div className="location-item">
                       <span className="location-label">House/Building No:</span>
-                      <span className="location-value">789</span>
+                      <span className="location-value">{bookingData.booking_details.location.house_number || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">Street Name:</span>
-                      <span className="location-value">Elm Street</span>
+                      <span className="location-value">{bookingData.booking_details.location.street_name || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">Subdivision/Village:</span>
-                      <span className="location-value">Pine Grove</span>
+                      <span className="location-value">{bookingData.booking_details.location.subdivision || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">Barangay:</span>
-                      <span className="location-value">Bagong Pag-asa</span>
+                      <span className="location-value">{bookingData.booking_details.location.barangay || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">City/Municipality:</span>
-                      <span className="location-value">Pasig City</span>
+                      <span className="location-value">{bookingData.booking_details.location.city || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">Province:</span>
-                      <span className="location-value">Metro Manila</span>
+                      <span className="location-value">{bookingData.booking_details.location.province || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">Region:</span>
-                      <span className="location-value">NCR</span>
+                      <span className="location-value">{bookingData.booking_details.location.region || 'N/A'}</span>
                     </div>
                     <div className="location-item">
                       <span className="location-label">Postal Code:</span>
-                      <span className="location-value">1550</span>
+                      <span className="location-value">{bookingData.booking_details.location.postal_code || 'N/A'}</span>
                     </div>
                   </div>
                 </div>
@@ -227,7 +305,7 @@ const BackJobsBooking: React.FC = () => {
             <div className="booking-section">
               <div className="detail-row">
                 <span className="detail-label">Service time:</span>
-                <span className="detail-value">Nov 28, 2025 - 3:00 PM</span>
+                <span className="detail-value">{bookingData.booking_details.service_time}</span>
               </div>
             </div>
           </div>

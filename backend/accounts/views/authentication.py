@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import login as django_login
+from django.contrib.auth.hashers import check_password, make_password
 from django.utils import timezone
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -10,7 +11,7 @@ from django.core.cache import cache
 import uuid
 from datetime import timedelta
 
-from ..models import Account, PasswordReset
+from ..models import Account, PasswordReset, AccountAddress, Client
 from ..serializers import (
     UserRegistrationSerializer, UserLoginSerializer, AccountSerializer,
     PasswordChangeSerializer, PasswordResetRequestSerializer, 
@@ -154,23 +155,19 @@ def login(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def profile(request):
     """
     Get current user profile
     """
     try:
-        # In a real implementation, you'd get the user from JWT token or session
-        # For now, we'll get by ID from query params or use a mock user
         user_id = request.GET.get('user_id')
-        if user_id:
-            user = get_object_or_404(Account, acc_id=user_id)
-        else:
-            # Mock response - replace with actual authenticated user
+        if not user_id:
             return Response({
-                'error': 'User ID required in query params for this demo'
+                'error': 'User ID required in query params'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        user = get_object_or_404(Account, acc_id=user_id)
         serializer = AccountSerializer(user)
         return Response({
             'user': serializer.data
@@ -184,10 +181,10 @@ def profile(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def update_profile(request):
     """
-    Update user profile information
+    Update user profile information including account, address, and client profile
     """
     try:
         user_id = request.data.get('user_id')
@@ -199,18 +196,45 @@ def update_profile(request):
         user = get_object_or_404(Account, acc_id=user_id)
         
         # Update basic account info
-        serializer = AccountSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message': 'Profile updated successfully',
-                'user': serializer.data
-            }, status=status.HTTP_200_OK)
+        account_fields = ['firstname', 'lastname', 'middlename', 'email', 'date_of_birth', 'gender', 'username']
+        for field in account_fields:
+            if field in request.data:
+                setattr(user, field, request.data[field])
+        user.save()
         
+        # Update or create address
+        address_fields = {
+            'house_building_number': request.data.get('house_building_number'),
+            'street_name': request.data.get('street_name'),
+            'subdivision_village': request.data.get('subdivision_village'),
+            'barangay': request.data.get('barangay'),
+            'city_municipality': request.data.get('city_municipality'),
+            'province': request.data.get('province'),
+            'region': request.data.get('region'),
+            'postal_code': request.data.get('postal_code')
+        }
+        
+        # Filter out None values
+        address_fields = {k: v for k, v in address_fields.items() if v is not None}
+        
+        if address_fields:
+            address, created = AccountAddress.objects.update_or_create(
+                acc_add_id=user,
+                defaults=address_fields
+            )
+        
+        # Update client profile if exists and contact_number provided
+        if hasattr(user, 'client_profile') and 'contact_number' in request.data:
+            client = user.client_profile
+            client.contact_number = request.data['contact_number']
+            client.save()
+        
+        # Return updated user data
+        serializer = AccountSerializer(user)
         return Response({
-            'error': 'Validation failed',
-            'details': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'message': 'Profile updated successfully',
+            'user': serializer.data
+        }, status=status.HTTP_200_OK)
         
     except Exception as e:
         return Response({
@@ -220,37 +244,42 @@ def update_profile(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def change_password(request):
     """
     Change user password
     """
     try:
         user_id = request.data.get('user_id')
-        if not user_id:
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        
+        if not user_id or not old_password or not new_password:
             return Response({
-                'error': 'User ID required'
+                'error': 'User ID, old password, and new password are required'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         user = get_object_or_404(Account, acc_id=user_id)
         
-        # Create a mock request object for the serializer context
-        mock_request = type('MockRequest', (), {'user': user})()
-        serializer = PasswordChangeSerializer(
-            data=request.data, 
-            context={'request': mock_request}
-        )
-        
-        if serializer.is_valid():
-            serializer.save()
+        # Verify old password
+        if not check_password(old_password, user.password):
             return Response({
-                'message': 'Password changed successfully'
-            }, status=status.HTTP_200_OK)
+                'error': 'Current password is incorrect'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate new password length
+        if len(new_password) < 8:
+            return Response({
+                'error': 'New password must be at least 8 characters long'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update password
+        user.password = make_password(new_password)
+        user.save()
         
         return Response({
-            'error': 'Validation failed',
-            'details': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'message': 'Password changed successfully'
+        }, status=status.HTTP_200_OK)
         
     except Exception as e:
         return Response({

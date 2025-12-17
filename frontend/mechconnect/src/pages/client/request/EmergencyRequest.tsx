@@ -57,8 +57,38 @@ const EmergencyRequest: React.FC = () => {
   const [toastColor, setToastColor] = useState<'success' | 'danger' | 'warning'>('success');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Client ID - TODO: Get from authentication context
-  const [clientId] = useState<number>(1);
+  // Client ID from authentication
+  const [clientId, setClientId] = useState<number | null>(null);
+
+  // Get client ID from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('user');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        const id = userData.acc_id || userData.account_id;
+        if (id) {
+          setClientId(id);
+          console.log('EmergencyRequest - Using client ID:', id);
+        } else {
+          console.error('No user ID found in localStorage');
+          setToastMessage('User session not found. Please log in again.');
+          setToastColor('danger');
+          setShowToast(true);
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        setToastMessage('Invalid user session. Please log in again.');
+        setToastColor('danger');
+        setShowToast(true);
+      }
+    } else {
+      console.error('No user data in localStorage');
+      setToastMessage('Not authenticated. Please log in.');
+      setToastColor('danger');
+      setShowToast(true);
+    }
+  }, []);
 
   // Fetch saved location on mount
   useEffect(() => {

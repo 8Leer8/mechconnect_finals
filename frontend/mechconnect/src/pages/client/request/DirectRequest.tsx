@@ -85,8 +85,32 @@ const DirectRequest: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Client ID - TODO: Get from authentication context
-  const [clientId] = useState<number>(1);
+  // Client ID from authentication
+  const [clientId, setClientId] = useState<number | null>(null);
+
+  // Get client ID from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('user');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        const id = userData.acc_id || userData.account_id;
+        if (id) {
+          setClientId(id);
+          console.log('DirectRequest - Using client ID:', id);
+        } else {
+          console.error('No user ID found in localStorage');
+          alert('User session not found. Please log in again.');
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        alert('Invalid user session. Please log in again.');
+      }
+    } else {
+      console.error('No user data in localStorage');
+      alert('Not authenticated. Please log in.');
+    }
+  }, []);
 
   // Fetch service addons from database
   const fetchServiceAddons = async () => {

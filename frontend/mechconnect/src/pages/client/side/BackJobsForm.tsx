@@ -285,7 +285,13 @@ const BackJobsForm: React.FC = () => {
       // Get client ID from localStorage
       const userDataString = localStorage.getItem('user');
       const userData = userDataString ? JSON.parse(userDataString) : null;
-      const clientId = userData?.acc_id || userData?.account_id || 1;
+      const clientId = userData?.acc_id || userData?.account_id;
+      
+      if (!clientId) {
+        alert('User session not found. Please log in again.');
+        return;
+      }
+      
       console.log('BackJobsForm - Submitting with client ID:', clientId);
       
       const response = await bookingsAPI.createBackJobRequest(

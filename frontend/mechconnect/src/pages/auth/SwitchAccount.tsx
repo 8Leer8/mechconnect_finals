@@ -39,12 +39,20 @@ const SwitchAccount: React.FC = () => {
       const storedUser = localStorage.getItem('user');
       if (!storedUser) {
         setError('User not found. Please login again.');
+        setLoading(false);
         return;
       }
 
       const user = JSON.parse(storedUser);
-      const userId = user.acc_id || user.id || 10; // fallback to 10 for testing
+      const userId = user.acc_id || user.account_id;
+      
+      if (!userId) {
+        setError('Invalid user data. Please login again.');
+        setLoading(false);
+        return;
+      }
 
+      console.log('SwitchAccount - Using user ID:', userId);
       const response = await fetch(`http://localhost:8000/api/accounts/check-roles/?user_id=${userId}`);
       const data = await response.json();
 

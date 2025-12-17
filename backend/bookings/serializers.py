@@ -118,12 +118,18 @@ class BookingSerializer(serializers.ModelSerializer):
         """Get scheduled service time if available"""
         if obj.request.request_type == 'direct' and hasattr(obj.request, 'direct_request'):
             direct_req = obj.request.direct_request
-            if direct_req.scheduled_date and direct_req.scheduled_time:
-                return f"{direct_req.scheduled_date} at {direct_req.scheduled_time}"
+            # Check if scheduled_date and scheduled_time attributes exist
+            scheduled_date = getattr(direct_req, 'scheduled_date', None)
+            scheduled_time = getattr(direct_req, 'scheduled_time', None)
+            if scheduled_date and scheduled_time:
+                return f"{scheduled_date} at {scheduled_time}"
         elif obj.request.request_type == 'custom' and hasattr(obj.request, 'custom_request'):
             custom_req = obj.request.custom_request
-            if custom_req.scheduled_date and custom_req.scheduled_time:
-                return f"{custom_req.scheduled_date} at {custom_req.scheduled_time}"
+            # Check if scheduled_date and scheduled_time attributes exist
+            scheduled_date = getattr(custom_req, 'scheduled_date', None)
+            scheduled_time = getattr(custom_req, 'scheduled_time', None)
+            if scheduled_date and scheduled_time:
+                return f"{scheduled_date} at {scheduled_time}"
         return "To be scheduled"
     
     def get_request_summary(self, obj):

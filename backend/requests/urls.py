@@ -15,6 +15,12 @@ urlpatterns = [
     path('<int:request_id>/status/', views.update_request_status, name='update_request_status'),
     path('<int:request_id>/delete/', views.delete_request, name='delete_request'),
     path('<int:request_id>/assign/', views.assign_provider_to_request, name='assign_provider_to_request'),
+    path('cancel/', views.cancel_request, name='cancel_request'),
+    
+    # Quotation management
+    path('<int:request_id>/create-quote/', views.create_quoted_items, name='create_quoted_items'),
+    path('<int:request_id>/accept-quotation/', views.accept_quotation, name='accept_quotation'),
+    path('<int:request_id>/reject-quotation/', views.reject_quotation, name='reject_quotation'),
     
     # Health check
     path('health/', views.health_check, name='requests_health_check'),

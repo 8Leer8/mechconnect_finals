@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, IonToast, IonSpinner } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -11,28 +11,43 @@ import {
   REGION_IX_BOUNDS,
   REGION_IX_CENTER
 } from '../../../data/region9-addresses';
-import { geolocationAPI } from '../../../utils/api';
+import { geolocationAPI, accountAPI, getInitials } from '../../../utils/api';
+import { getUserId, getUserData, setUserData } from '../../../utils/auth';
 import './AccountSettings.css';
 
 const AccountSettings: React.FC = () => {
   const history = useHistory();
   
   const [formData, setFormData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    contactNumber: '+63 912 345 6789',
-    houseNumber: '123',
-    street: 'Main Street',
-    barangay: 'Tetuan',
-    cityMunicipality: 'Zamboanga City',
-    province: 'Zamboanga del Sur',
+    firstName: '',
+    lastName: '',
+    middleName: '',
+    username: '',
+    email: '',
+    contactNumber: '',
+    houseNumber: '',
+    street: '',
+    barangay: '',
+    cityMunicipality: '',
+    province: '',
     region: 'Region IX - Zamboanga Peninsula',
     latitude: null as number | null,
     longitude: null as number | null
   });
 
-  const [availableBarangays, setAvailableBarangays] = useState<Array<{ name: string; lat: number; lng: number }>>([]);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger' | 'warning'>('success');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [availableBarangays, setAvailableBarangays] = useState<Array<{ name: string; coordinates?: [number, number] }>>([]);
   const [allMunicipalities] = useState(getAllMunicipalities());
   const [showMapModal, setShowMapModal] = useState(false);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
@@ -44,6 +59,69 @@ const AccountSettings: React.FC = () => {
   const goBack = () => {
     history.goBack();
   };
+
+  // Get user ID from localStorage and fetch profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const id = getUserId();
+      const userData = getUserData();
+      
+      if (!id || !userData) {
+        setToastMessage('User not logged in. Please log in.');
+        setToastColor('danger');
+        setShowToast(true);
+        setIsLoading(false);
+        history.push('/auth/login');
+        return;
+      }
+
+      try {
+        setUserId(id);
+
+        // Fetch profile from backend
+        const result = await accountAPI.getProfile(id);
+        
+        if (result.error) {
+          setToastMessage(result.error);
+          setToastColor('danger');
+          setShowToast(true);
+        } else if (result.data) {
+          const user = result.data.user;
+          setFormData({
+            firstName: user.firstname || '',
+            lastName: user.lastname || '',
+            middleName: user.middlename || '',
+            username: user.username || '',
+            email: user.email || '',
+            contactNumber: user.client_profile?.contact_number || '',
+            houseNumber: user.address?.house_building_number || '',
+            street: user.address?.street_name || '',
+            barangay: user.address?.barangay || '',
+            cityMunicipality: user.address?.city_municipality || '',
+            province: user.address?.province || '',
+            region: user.address?.region || 'Region IX - Zamboanga Peninsula',
+            latitude: null,
+            longitude: null
+          });
+
+          // Load barangays if municipality is set
+          if (user.address?.city_municipality) {
+            const barangays = getBarangaysForMunicipality(user.address.city_municipality);
+            setAvailableBarangays(barangays);
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching user profile:', e);
+        setToastMessage('Failed to load profile data');
+        setToastColor('danger');
+        setShowToast(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleInputChange = (field: string, value: string | number | null) => {
     setFormData(prev => ({
@@ -108,11 +186,11 @@ const AccountSettings: React.FC = () => {
 
     const coords = getMunicipalityCoordinates(municipality);
     if (coords && mapInstanceRef.current) {
-      addMarker(coords.lat, coords.lng);
+      addMarker(coords[0], coords[1]);
       setFormData(prev => ({
         ...prev,
-        latitude: coords.lat,
-        longitude: coords.lng
+        latitude: coords[0],
+        longitude: coords[1]
       }));
     }
   };
@@ -121,12 +199,12 @@ const AccountSettings: React.FC = () => {
     setFormData(prev => ({ ...prev, barangay }));
 
     const selectedBarangay = availableBarangays.find(b => b.name === barangay);
-    if (selectedBarangay) {
-      addMarker(selectedBarangay.lat, selectedBarangay.lng);
+    if (selectedBarangay && selectedBarangay.coordinates) {
+      addMarker(selectedBarangay.coordinates[0], selectedBarangay.coordinates[1]);
       setFormData(prev => ({
         ...prev,
-        latitude: selectedBarangay.lat,
-        longitude: selectedBarangay.lng
+        latitude: selectedBarangay.coordinates![0],
+        longitude: selectedBarangay.coordinates![1]
       }));
     }
   };
@@ -182,19 +260,135 @@ const AccountSettings: React.FC = () => {
   };
 
   const handleEditProfile = () => {
-    console.log('Edit profile picture');
+    setToastMessage('Profile picture upload coming soon');
+    setToastColor('warning');
+    setShowToast(true);
   };
 
-  const handleSaveChanges = () => {
-    console.log('Save changes:', formData);
+  const handleSaveChanges = async () => {
+    if (!userId) {
+      setToastMessage('User ID not found');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      setToastMessage('First name, last name, and email are required');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    if (!formData.cityMunicipality || !formData.barangay) {
+      setToastMessage('Municipality and barangay are required');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const result = await accountAPI.updateProfile({
+        user_id: userId,
+        firstname: formData.firstName,
+        lastname: formData.lastName,
+        middlename: formData.middleName,
+        username: formData.username,
+        email: formData.email,
+        contact_number: formData.contactNumber,
+        house_building_number: formData.houseNumber,
+        street_name: formData.street,
+        barangay: formData.barangay,
+        city_municipality: formData.cityMunicipality,
+        province: formData.province,
+        region: formData.region
+      });
+
+      if (result.error) {
+        setToastMessage(result.error);
+        setToastColor('danger');
+      } else {
+        setToastMessage('Profile updated successfully!');
+        setToastColor('success');
+        
+        // Update localStorage with new data
+        if (result.data) {
+          setUserData(result.data.user);
+        }
+      }
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      setToastMessage('Failed to save profile changes');
+      setToastColor('danger');
+      setShowToast(true);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleChangePassword = () => {
-    console.log('Change password');
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!userId) return;
+
+    if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      setToastMessage('All password fields are required');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setToastMessage('New passwords do not match');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 8) {
+      setToastMessage('New password must be at least 8 characters long');
+      setToastColor('danger');
+      setShowToast(true);
+      return;
+    }
+
+    try {
+      const result = await accountAPI.changePassword({
+        user_id: userId,
+        old_password: passwordForm.oldPassword,
+        new_password: passwordForm.newPassword
+      });
+
+      if (result.error) {
+        setToastMessage(result.error);
+        setToastColor('danger');
+      } else {
+        setToastMessage('Password changed successfully!');
+        setToastColor('success');
+        setShowPasswordModal(false);
+        setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      }
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setToastMessage('Failed to change password');
+      setToastColor('danger');
+      setShowToast(true);
+    }
   };
 
   const handleDeleteAccount = () => {
-    console.log('Delete account');
+    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      setToastMessage('Account deletion coming soon');
+      setToastColor('warning');
+      setShowToast(true);
+    }
   };
 
   return (
@@ -211,17 +405,24 @@ const AccountSettings: React.FC = () => {
           <div className="header-spacer"></div>
         </div>
 
-        <div className="account-settings-container">
-          {/* Profile Picture Section */}
-          <div className="profile-picture-section">
-            <div className="profile-picture-wrapper">
-              <div className="profile-picture">JD</div>
-              <button className="edit-picture-button" onClick={handleEditProfile}>
-                <span className="material-icons-round">edit</span>
-              </button>
-            </div>
-            <div className="profile-username">johndoe</div>
+        {isLoading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+            <IonSpinner name="crescent" />
           </div>
+        ) : (
+          <div className="account-settings-container">
+            {/* Profile Picture Section */}
+            <div className="profile-picture-section">
+              <div className="profile-picture-wrapper">
+                <div className="profile-picture">
+                  {getInitials(`${formData.firstName} ${formData.lastName}`)}
+                </div>
+                <button className="edit-picture-button" onClick={handleEditProfile}>
+                  <span className="material-icons-round">edit</span>
+                </button>
+              </div>
+              <div className="profile-username">{formData.username}</div>
+            </div>
 
           {/* Personal Information */}
           <div className="form-section">
@@ -335,7 +536,7 @@ const AccountSettings: React.FC = () => {
               >
                 <option value="">Select Municipality</option>
                 {REGION_IX_DATA.map(province => (
-                  <optgroup key={province.province} label={province.province}>
+                  <optgroup key={province.name} label={province.name}>
                     {province.municipalities.map(municipality => (
                       <option key={municipality.name} value={municipality.name}>
                         {municipality.name}
@@ -400,9 +601,15 @@ const AccountSettings: React.FC = () => {
               </div>
             )}
 
-            <button className="btn btn-primary" onClick={handleSaveChanges}>
-              <span className="material-icons-round">save</span>
-              Save Changes
+            <button 
+              className="btn btn-primary" 
+              onClick={handleSaveChanges}
+              disabled={isSaving}
+            >
+              <span className="material-icons-round">
+                {isSaving ? 'hourglass_empty' : 'save'}
+              </span>
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
 
@@ -442,6 +649,7 @@ const AccountSettings: React.FC = () => {
             </button>
           </div>
         </div>
+        )}
 
         {/* Map Modal */}
         {showMapModal && (
@@ -462,6 +670,69 @@ const AccountSettings: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Password Change Modal */}
+        {showPasswordModal && (
+          <div className="map-modal-overlay" onClick={() => setShowPasswordModal(false)}>
+            <div className="map-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+              <div className="map-modal-header">
+                <h3>Change Password</h3>
+                <button className="close-btn" onClick={() => setShowPasswordModal(false)}>
+                  <span className="material-icons-round">close</span>
+                </button>
+              </div>
+              <div className="map-modal-body" style={{ padding: '20px' }}>
+                <div className="form-group">
+                  <label className="form-label">Current Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={passwordForm.oldPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
+                    placeholder="Enter current password"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">New Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                    placeholder="Enter new password (min 8 characters)"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Confirm New Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                    placeholder="Re-enter new password"
+                  />
+                </div>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handlePasswordSubmit}
+                  style={{ marginTop: '10px' }}
+                >
+                  <span className="material-icons-round">lock</span>
+                  Change Password
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={3000}
+          position="top"
+          color={toastColor}
+        />
       </IonContent>
     </IonPage>
   );

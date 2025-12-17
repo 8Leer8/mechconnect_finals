@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IonContent, IonPage, IonInput, IonButton, IonText, IonLoading, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import { setUserData } from '../../utils/auth';
 import './Login.css';
 
 // API Configuration
@@ -14,6 +15,12 @@ const Login: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
+
+  // Clear any existing session when landing on login page
+  useEffect(() => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -43,10 +50,10 @@ const Login: React.FC = () => {
         setToastColor('success');
         setShowToast(true);
         
-        // Store user data
+        // Store user data using centralized session management
         if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          localStorage.setItem('userId', data.user.acc_id);
+          setUserData(data.user);
+          console.log('Login - Session established for user:', data.user.username, '(ID:', data.user.acc_id, ')');
         }
         
         // Role-based routing

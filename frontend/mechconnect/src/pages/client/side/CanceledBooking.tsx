@@ -4,21 +4,40 @@ import { useState, useEffect } from 'react';
 import './CanceledBooking.css';
 
 interface BookingData {
-  booking_id: number;
+  cancelled_booking_id: number;
+  booking: number;
+  reason: string;
+  cancelled_by: number;
+  cancelled_by_role: string;
   status: string;
-  amount_fee: number;
-  booked_at: string;
   cancelled_at: string;
-  client_name: string;
-  provider_name: string;
-  provider_contact: string;
-  request_summary: string;
-  request_type: string;
-  cancellation_reason: string;
-  service_details: {
-    service_name: string;
-    includes?: string;
-    addons?: string;
+  updated_at: string;
+  cancelled_by_name: string;
+  booking_details: {
+    booking_id: number;
+    status: string;
+    amount_fee: string;
+    booked_at: string;
+    client_name: string;
+    provider_name: string;
+    provider_contact: string;
+    request_summary: string;
+    request_type: string;
+    service_details: {
+      service_name: string;
+      includes?: string;
+      addons?: string;
+    };
+    location: {
+      house_number?: string;
+      street_name?: string;
+      subdivision?: string;
+      barangay?: string;
+      city?: string;
+      province?: string;
+      region?: string;
+      postal_code?: string;
+    };
   };
 }
 
@@ -117,24 +136,43 @@ const CanceledBooking: React.FC = () => {
           <button className="back-button" onClick={goBack}>
             <span className="material-icons-round">arrow_back</span>
           </button>
-          <h1 className="canceled-booking-title">Canceled Booking</h1>
+          <h1 className="canceled-booking-title">Cancelled Booking</h1>
           <div className="header-spacer"></div>
         </div>
 
         <div className="booking-container">
           <div className="booking-card">
             <div className="booking-id-badge canceled">
-              <span className="booking-id">#BK-2844</span>
+              <span className="booking-id">#BK-{bookingData.booking_details.booking_id}</span>
             </div>
 
             <div className="booking-section">
               <div className="detail-row">
                 <span className="detail-label">Provider name:</span>
-                <span className="detail-value provider-name">David Rodriguez</span>
+                <span className="detail-value provider-name">{bookingData.booking_details.provider_name || 'No Provider Assigned'}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Provider type:</span>
-                <span className="detail-value">Independent Mechanic</span>
+                <span className="detail-label">Contact number:</span>
+                <span className="detail-value">{bookingData.booking_details.provider_contact || 'Not available'}</span>
+              </div>
+            </div>
+
+            <div className="booking-divider"></div>
+
+            <div className="booking-section">
+              <h3 className="section-title">Service Details</h3>
+              <div className="service-item">
+                <span className="service-name">{bookingData.booking_details.service_details?.service_name || bookingData.booking_details.request_summary}</span>
+              </div>
+              {bookingData.booking_details.service_details?.includes && (
+                <div className="detail-row">
+                  <span className="detail-label">Includes:</span>
+                  <span className="detail-value">{bookingData.booking_details.service_details.includes}</span>
+                </div>
+              )}
+              <div className="detail-row">
+                <span className="detail-label">Add-ons:</span>
+                <span className="detail-value">{bookingData.booking_details.service_details?.addons || 'None'}</span>
               </div>
             </div>
 
@@ -142,8 +180,16 @@ const CanceledBooking: React.FC = () => {
 
             <div className="booking-section">
               <div className="detail-row">
-                <span className="detail-label">Canceled at:</span>
-                <span className="detail-value">Nov 24, 2025 - 3:45 PM</span>
+                <span className="detail-label">Booked at:</span>
+                <span className="detail-value">{formatDate(bookingData.booking_details.booked_at)}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Cancelled at:</span>
+                <span className="detail-value">{formatDate(bookingData.cancelled_at)}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Cancelled by:</span>
+                <span className="detail-value">{bookingData.cancelled_by_name} ({bookingData.cancelled_by_role})</span>
               </div>
             </div>
 
@@ -155,11 +201,8 @@ const CanceledBooking: React.FC = () => {
                 <div className="cancellation-info">
                   <span className="cancellation-label">Reason:</span>
                   <p className="cancellation-reason">
-                    Changed my mind about the service. Will reschedule at a later time.
+                    {bookingData.reason || 'No reason provided'}
                   </p>
-                </div>
-                <div className="cancellation-footer">
-                  <span className="cancellation-from">From: Client</span>
                 </div>
               </div>
             </div>

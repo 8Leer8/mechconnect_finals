@@ -21,6 +21,7 @@ export const isAuthenticated = (): boolean => {
 export const clearAuthData = (): void => {
   try {
     localStorage.removeItem('user');
+    localStorage.removeItem('userId');
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
@@ -46,5 +47,52 @@ export const getUserData = (): any | null => {
   } catch (error) {
     console.error('Error getting user data:', error);
     return null;
+  }
+};
+
+export const getUserId = (): number | null => {
+  try {
+    // First try to get from userId key
+    const userIdStr = localStorage.getItem('userId');
+    if (userIdStr) {
+      const id = parseInt(userIdStr);
+      if (!isNaN(id)) return id;
+    }
+    
+    // Fallback to user object
+    const userData = getUserData();
+    if (userData?.acc_id) {
+      return userData.acc_id;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error getting user ID:', error);
+    return null;
+  }
+};
+
+export const setUserData = (userData: any): void => {
+  try {
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData));
+      if (userData.acc_id) {
+        localStorage.setItem('userId', String(userData.acc_id));
+      }
+    }
+  } catch (error) {
+    console.error('Error setting user data:', error);
+  }
+};
+
+export const updateUserData = (updates: any): void => {
+  try {
+    const currentUser = getUserData();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...updates };
+      setUserData(updatedUser);
+    }
+  } catch (error) {
+    console.error('Error updating user data:', error);
   }
 };

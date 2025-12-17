@@ -37,6 +37,7 @@ def client_bookings_list(request):
         'completed': 'completed',
         'rescheduled': 'rescheduled',
         'back-jobs': 'back_jobs',
+        'back_jobs': 'back_jobs',  # Support both hyphen and underscore
         'rejected': 'rejected',  # This might need custom logic
         'canceled': 'cancelled',
         'cancelled': 'cancelled',  # Support both spellings
@@ -170,13 +171,17 @@ def completed_booking_detail(request, booking_id):
 def rescheduled_booking_detail(request, booking_id):
     """Get detailed information about a rescheduled booking"""
     try:
+        # Get the most recent rescheduled booking record (in case there are multiple)
         rescheduled_booking = RescheduledBooking.objects.select_related(
             'booking',
             'booking__request',
             'booking__request__client',
             'booking__request__client__client_id',
             'booking__request__provider'
-        ).get(booking__booking_id=booking_id)
+        ).filter(booking__booking_id=booking_id).order_by('-requested_at').first()
+        
+        if not rescheduled_booking:
+            raise RescheduledBooking.DoesNotExist
         
         serializer = RescheduledBookingSerializer(rescheduled_booking)
         return Response(serializer.data)
@@ -205,13 +210,17 @@ def rescheduled_booking_detail(request, booking_id):
 def cancelled_booking_detail(request, booking_id):
     """Get detailed information about a cancelled booking"""
     try:
+        # Get the most recent cancelled booking record (in case there are multiple)
         cancelled_booking = CancelledBooking.objects.select_related(
             'booking',
             'booking__request',
             'booking__request__client',
             'booking__request__client__client_id',
             'booking__request__provider'
-        ).get(booking__booking_id=booking_id)
+        ).filter(booking__booking_id=booking_id).order_by('-cancelled_at').first()
+        
+        if not cancelled_booking:
+            raise CancelledBooking.DoesNotExist
         
         serializer = CancelledBookingSerializer(cancelled_booking)
         return Response(serializer.data)
@@ -240,19 +249,23 @@ def cancelled_booking_detail(request, booking_id):
 def back_jobs_booking_detail(request, booking_id):
     """Get detailed information about a back jobs booking"""
     try:
+        # Get the most recent back jobs booking for this booking (in case there are multiple)
         back_jobs_booking = BackJobsBooking.objects.select_related(
             'booking',
             'booking__request',
             'booking__request__client',
             'booking__request__client__client_id',
             'booking__request__provider'
-        ).get(booking__booking_id=booking_id)
+        ).filter(booking__booking_id=booking_id).order_by('-created_at').first()
+        
+        if not back_jobs_booking:
+            return Response({'error': 'Back jobs booking not found'}, status=status.HTTP_404_NOT_FOUND)
         
         serializer = BackJobsBookingSerializer(back_jobs_booking)
         return Response(serializer.data)
         
-    except BackJobsBooking.DoesNotExist:
-        return Response({'error': 'Back jobs booking not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -572,6 +585,17 @@ def request_reschedule(request):
     booking.status = 'rescheduled'
     booking.save()
     
+    # Send notification to provider
+    from accounts.models import Notification
+    if booking.request and booking.request.provider:
+        Notification.objects.create(
+            receiver=booking.request.provider,
+            title='Booking Rescheduled',
+            message=f'Booking #{booking.booking_id} has been rescheduled. Reason: {reason[:100]}',
+            type='warning'
+        )
+        print(f"Reschedule notification sent to provider: {booking.request.provider.acc_id}")
+    
     return Response({
         'message': 'Reschedule request submitted successfully',
         'reschedule_id': reschedule.rescheduled_booking_id,
@@ -590,13 +614,23 @@ def cancel_booking(request):
     reason = request.data.get('reason', '')
     cancelled_by_id = request.data.get('cancelled_by_id')
     
+    print(f"Cancel booking request received:")
+    print(f"  booking_id: {booking_id} (type: {type(booking_id)})")
+    print(f"  reason: {reason}")
+    print(f"  cancelled_by_id: {cancelled_by_id}")
+    
     if not booking_id:
         return Response({'error': 'booking_id is required'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
         booking = Booking.objects.get(booking_id=booking_id)
+        print(f"  Found booking: {booking.booking_id} with status: {booking.status}")
     except Booking.DoesNotExist:
-        return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+        print(f"  Booking not found with ID: {booking_id}")
+        # Let's check what bookings exist
+        all_bookings = Booking.objects.all().values_list('booking_id', flat=True)
+        print(f"  Available booking IDs: {list(all_bookings)}")
+        return Response({'error': f'Booking not found with ID: {booking_id}'}, status=status.HTTP_404_NOT_FOUND)
     
     # Get cancelled_by account
     from accounts.models import Account
@@ -622,6 +656,17 @@ def cancel_booking(request):
     # Update booking status to cancelled
     booking.status = 'cancelled'
     booking.save()
+    
+    # Send notification to provider
+    from accounts.models import Notification
+    if booking.request and booking.request.provider:
+        Notification.objects.create(
+            receiver=booking.request.provider,
+            title='Booking Cancelled',
+            message=f'Booking #{booking.booking_id} has been cancelled. Reason: {reason[:100]}',
+            type='alert'
+        )
+        print(f"Cancellation notification sent to provider: {booking.request.provider.acc_id}")
     
     return Response({
         'message': 'Booking cancelled successfully',
@@ -661,12 +706,111 @@ def mark_booking_complete(request):
         }
     )
     
+    # Send notification to provider
+    from accounts.models import Notification
+    if booking.request and booking.request.provider:
+        Notification.objects.create(
+            receiver=booking.request.provider,
+            title='Booking Completed',
+            message=f'Booking #{booking.booking_id} has been marked as completed by the client.',
+            type='info'
+        )
+        print(f"Completion notification sent to provider: {booking.request.provider.acc_id}")
+    
     return Response({
         'message': 'Booking marked as completed successfully',
         'booking_id': booking.booking_id,
         'status': booking.status,
         'completed_at': booking.completed_at
     }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_booking_by_request(request, request_id):
+    """Get booking associated with a specific request ID"""
+    try:
+        booking = Booking.objects.select_related(
+            'request',
+            'request__client',
+            'request__client__client_id',
+            'request__provider'
+        ).prefetch_related(
+            'request__custom_request',
+            'request__direct_request',
+            'request__emergency_request'
+        ).filter(request__request_id=request_id).first()
+        
+        if not booking:
+            return Response({
+                'error': 'No booking found for this request'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = BookingSerializer(booking)
+        return Response({
+            'booking': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to retrieve booking',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def accept_backjob(request, backjob_id):
+    """Accept/approve a backjob and reactivate the booking"""
+    try:
+        # Get the backjob
+        backjob = BackJobsBooking.objects.select_related('booking').get(
+            back_jobs_booking_id=backjob_id
+        )
+        
+        # Update backjob status to approved
+        backjob.status = 'approved'
+        backjob.save()
+        
+        # Reactivate the booking
+        booking = backjob.booking
+        booking.status = 'active'
+        booking.completed_at = None  # Clear the completed date since it's active again
+        booking.save()
+        
+        # Send notification to client
+        from accounts.models import Notification
+        if booking.request and booking.request.client:
+            provider_name = 'Provider'
+            if booking.request.provider:
+                if hasattr(booking.request.provider, 'mechanic_profile'):
+                    provider_name = f"{booking.request.provider.firstname} {booking.request.provider.lastname}"
+                elif hasattr(booking.request.provider, 'shop_profile'):
+                    provider_name = booking.request.provider.shop_profile.shop_name
+            
+            Notification.objects.create(
+                receiver=booking.request.client.client_id,
+                title='Back Job Accepted',
+                message=f'{provider_name} has accepted your back job request. Booking #{booking.booking_id} is now active again.',
+                type='info'
+            )
+            print(f"Back job acceptance notification sent to client: {booking.request.client.client_id.acc_id}")
+        
+        return Response({
+            'success': True,
+            'message': 'Backjob accepted successfully. Booking is now active.',
+            'backjob_id': backjob.back_jobs_booking_id,
+            'booking_id': booking.booking_id,
+            'backjob_status': backjob.status,
+            'booking_status': booking.status
+        }, status=status.HTTP_200_OK)
+        
+    except BackJobsBooking.DoesNotExist:
+        return Response({
+            'error': 'Backjob not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': 'Failed to accept backjob',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])

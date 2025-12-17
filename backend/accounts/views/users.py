@@ -146,13 +146,14 @@ def verify_user(request, user_id):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def user_notifications(request):
     """
     Get notifications for a user
     """
     try:
         user_id = request.GET.get('user_id')
+        print(f"[NOTIFICATIONS] Fetching notifications for user_id: {user_id}")
         if not user_id:
             return Response({
                 'error': 'User ID required in query params'
@@ -160,6 +161,7 @@ def user_notifications(request):
         
         user = get_object_or_404(Account, acc_id=user_id)
         notifications = user.notifications.all().order_by('-created_at')
+        print(f"[NOTIFICATIONS] Found {notifications.count()} notifications for user {user_id}")
         
         # Filter by read status
         is_read = request.GET.get('is_read')
@@ -185,7 +187,7 @@ def user_notifications(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def mark_notification_read(request, notification_id):
     """
     Mark a notification as read

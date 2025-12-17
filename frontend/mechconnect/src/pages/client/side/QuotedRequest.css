@@ -1,6 +1,11 @@
+.quoted-request-page {
+  z-index: 10000 !important;
+}
+
 .quoted-request-content {
   --background: var(--bg, hsl(40, 20%, 98%));
   padding-bottom: 20px;
+  height: 100%;
 }
 
 /* Material Icons */
@@ -309,6 +314,30 @@
 .btn-counter:active {
   background: hsl(40, 70%, 45%);
   transform: scale(0.98);
+}
+
+.btn-accept:disabled,
+.btn-reject:disabled,
+.btn-counter:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Status Message */
+.status-message {
+  background: hsl(40, 30%, 95%);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.status-message p {
+  margin: 0;
+  color: hsl(40, 20%, 40%);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* Location Details */

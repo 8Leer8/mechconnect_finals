@@ -35,11 +35,60 @@ const RescheduledBooking: React.FC = () => {
   };
 
   const handleCancel = () => {
-    history.push('/client/cancel-booking-form');
+    if (bookingData) {
+      // The API returns nested structure with booking_details
+      const actualBookingId = (bookingData as any).booking_details?.booking_id || (bookingData as any).booking || bookingData.booking_id;
+      const actualBookingData = (bookingData as any).booking_details || bookingData;
+      
+      history.push({
+        pathname: '/client/cancel-booking-form',
+        state: {
+          bookingId: actualBookingId,
+          bookingData: actualBookingData
+        }
+      });
+    } else {
+      alert('Booking data not available');
+    }
   };
 
-  const handleComplete = () => {
-    console.log('Complete booking');
+  const handleComplete = async () => {
+    if (!bookingData || !id) {
+      alert('Booking data not available');
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to mark this booking as completed?');
+    if (!confirmed) return;
+
+    try {
+      // The API returns nested structure with booking_details
+      const actualBookingId = (bookingData as any).booking_details?.booking_id || (bookingData as any).booking || bookingData.booking_id;
+      
+      const response = await fetch('http://localhost:8000/api/bookings/complete/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          booking_id: actualBookingId
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Booking marked as completed successfully!');
+        // Redirect to completed booking detail page
+        const actualBookingId = (bookingData as any).booking_details?.booking_id || (bookingData as any).booking || bookingData.booking_id;
+        history.push(`/client/completed-booking/${actualBookingId}`);
+      } else {
+        alert(data.error || 'Failed to mark booking as completed');
+      }
+    } catch (error) {
+      console.error('Complete booking error:', error);
+      alert('Network error occurred. Please try again.');
+    }
   };
 
   const toggleLocation = () => {

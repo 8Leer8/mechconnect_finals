@@ -1,13 +1,18 @@
-import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonPage, IonToast, useIonViewWillEnter } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNav from '../../../components/BottomNav';
-import { requestsAPI, formatTimeAgo, getInitials, RequestListItem } from '../../../utils/api';
+import { requestsAPI, notificationsAPI, formatTimeAgo, getInitials, RequestListItem } from '../../../utils/api';
 import './Request.css';
 
 const Request: React.FC = () => {
   const history = useHistory();
-  const [activeTab, setActiveTab] = useState('pending');
+  
+  // Check URL for tab parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') || 'pending';
+  
+  const [activeTab, setActiveTab] = useState(initialTab);
   const tabsRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
 
@@ -16,12 +21,51 @@ const Request: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // Client ID - TODO: Get from authentication context
-  const [clientId] = useState<number>(1); // Default to 1 for testing
+  // Client ID from authentication
+  const [clientId, setClientId] = useState<number | null>(null);
+
+  // Get client ID from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem('user');
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        const id = userData.acc_id || userData.account_id;
+        if (id) {
+          setClientId(id);
+          console.log('Request - Using client ID:', id);
+        } else {
+          console.error('No user ID found in localStorage');
+          setError('User session not found. Please log in again.');
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+        setError('Invalid user session. Please log in again.');
+      }
+    } else {
+      console.error('No user data in localStorage');
+      setError('Not authenticated. Please log in.');
+    }
+  }, []);
 
   const goToNotifications = () => history.push('/client/notifications');
   const goToCustomRequest = () => history.push('/client/custom-request');
+  
+  // Fetch unread notifications count
+  const fetchUnreadCount = async () => {
+    if (!clientId) return;
+    try {
+      const result = await notificationsAPI.getUserNotifications(clientId, false);
+      if (result.data) {
+        setUnreadCount(result.data.notifications.length);
+      }
+    } catch (err) {
+      console.error('Error fetching unread notifications:', err);
+    }
+  };
+  
   const goToRequestDetail = (requestId: number, status: string) => {
     switch (status) {
       case 'pending':
@@ -41,11 +85,31 @@ const Request: React.FC = () => {
     }
   };
 
+  // Fetch unread count when clientId is available
+  useEffect(() => {
+    if (clientId) {
+      fetchUnreadCount();
+    }
+  }, [clientId]);
+
+  // Refresh notification count when page becomes active
+  useIonViewWillEnter(() => {
+    if (clientId) {
+      fetchUnreadCount();
+    }
+  });
+
   // Fetch requests from API
   const fetchRequests = async (status = activeTab) => {
+    if (!clientId) {
+      console.log('Request - No clientId, skipping fetch');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
+      console.log('Request - Fetching with clientId:', clientId);
       // Map frontend status to backend status (quoted -> qouted in backend)
       const backendStatus = status === 'quoted' ? 'qouted' : status;
       const result = await requestsAPI.getClientRequests(clientId, backendStatus);
@@ -77,11 +141,13 @@ const Request: React.FC = () => {
     checkScrollable();
     window.addEventListener('resize', checkScrollable);
     
-    // Fetch requests when component mounts or tab changes
-    fetchRequests();
+    // Fetch requests when component mounts or tab changes - but only if clientId is valid
+    if (clientId) {
+      fetchRequests();
+    }
     
     return () => window.removeEventListener('resize', checkScrollable);
-  }, [activeTab]);
+  }, [activeTab, clientId]);
 
   const handleTabPending = () => {
     setActiveTab('pending');
@@ -212,8 +278,12 @@ const Request: React.FC = () => {
             <button 
               className="notification-button"
               onClick={goToNotifications}
+              aria-label="View notifications"
             >
               <span className="material-icons-round">notifications</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
             </button>
           </div>
 

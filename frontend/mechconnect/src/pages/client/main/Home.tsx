@@ -2,7 +2,8 @@ import { IonContent, IonPage, useIonViewWillEnter } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BottomNav from '../../../components/BottomNav';
-import { bookingsAPI, formatTimeAgo, getInitials } from '../../../utils/api';
+import { bookingsAPI, notificationsAPI, formatTimeAgo, getInitials } from '../../../utils/api';
+import { getUserId, getUserData } from '../../../utils/auth';
 import './Home.css';
 
 interface ActiveBooking {
@@ -22,6 +23,7 @@ const Home: React.FC = () => {
   const [activeBooking, setActiveBooking] = useState<ActiveBooking | null>(null);
   const [loading, setLoading] = useState(true);
   const [clientId, setClientId] = useState<number | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const goToNotifications = () => history.push('/client/notifications');
   const goToCustomRequest = () => history.push('/client/custom-request');
@@ -31,30 +33,38 @@ const Home: React.FC = () => {
   
   // Get client ID from localStorage
   useEffect(() => {
-    const userDataString = localStorage.getItem('user');
-    const userIdString = localStorage.getItem('userId');
+    const userData = getUserData();
+    const id = getUserId();
     
-    console.log('Home - localStorage user:', userDataString);
-    console.log('Home - localStorage userId:', userIdString);
+    console.log('Home - User data:', userData);
+    console.log('Home - User ID:', id);
     
-    if (userDataString) {
-      try {
-        const userData = JSON.parse(userDataString);
-        const id = userData.acc_id || userData.account_id || parseInt(userIdString || '0');
-        setClientId(id);
-        console.log('Home - User data:', userData);
-        console.log('Home - Using client ID:', id);
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-        if (userIdString) {
-          setClientId(parseInt(userIdString));
-        }
-      }
-    } else if (userIdString) {
-      setClientId(parseInt(userIdString));
-      console.log('Home - Using userId from localStorage:', userIdString);
+    if (!userData || !id) {
+      console.error('Home - No user data found in session');
+      alert('Session expired. Please log in again.');
+      history.push('/auth/login');
+      return;
     }
-  }, []);
+    
+    // Check if user has client role
+    const hasClientRole = userData.roles?.some((role: any) => role.account_role === 'client');
+    if (!hasClientRole) {
+      console.error('Home - User does not have client role:', userData.roles);
+      alert('This account is not registered as a client. Please log in with a client account.');
+      history.push('/auth/login');
+      return;
+    }
+    
+    // Check if client profile exists
+    if (!userData.client_profile) {
+      console.error('Home - Client profile not found');
+      alert('Client profile not found. Please contact support to complete your account setup.');
+      return;
+    }
+    
+    setClientId(id);
+    console.log('Home - Session initialized with client ID:', id);
+  }, [history]);
 
   const goToBookingDetail = (bookingId: number, status: string) => {
     // Route to the appropriate booking detail page based on status
@@ -69,7 +79,7 @@ const Home: React.FC = () => {
         history.push(`/client/rescheduled-booking/${bookingId}`);
         break;
       case 'cancelled':
-        history.push(`/client/canceled-booking/${bookingId}`);
+        history.push(`/client/cancelled-booking/${bookingId}`);
         break;
       case 'back_jobs':
         history.push(`/client/backjobs-booking/${bookingId}`);
@@ -81,6 +91,36 @@ const Home: React.FC = () => {
         history.push(`/client/active-booking/${bookingId}`);
     }
   };
+
+  // Fetch unread notification count
+  const fetchUnreadCount = async () => {
+    if (!clientId) {
+      console.log('Home - fetchUnreadCount: No clientId');
+      return;
+    }
+    
+    try {
+      console.log('Home - Fetching unread notifications for client:', clientId);
+      const result = await notificationsAPI.getUserNotifications(clientId, false);
+      console.log('Home - Notification API result:', result);
+      if (result.data) {
+        console.log('Home - Unread notifications count:', result.data.notifications.length);
+        console.log('Home - Notifications:', result.data.notifications);
+        setUnreadCount(result.data.notifications.length);
+      } else if (result.error) {
+        console.error('Home - Error from API:', result.error);
+      }
+    } catch (err) {
+      console.error('Home - Error fetching unread notifications:', err);
+    }
+  };
+
+  // Refresh notification count when page becomes active
+  useIonViewWillEnter(() => {
+    if (clientId) {
+      fetchUnreadCount();
+    }
+  });
 
   // Fetch active bookings
   const fetchActiveBooking = async () => {
@@ -130,11 +170,19 @@ const Home: React.FC = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, [clientId]);
 
+  // Fetch unread count when clientId is available
+  useEffect(() => {
+    if (clientId) {
+      fetchUnreadCount();
+    }
+  }, [clientId]);
+
   // Ionic lifecycle - refresh when entering the page
   useIonViewWillEnter(() => {
     if (clientId) {
       console.log('Home page will enter, refreshing bookings...');
       fetchActiveBooking();
+      fetchUnreadCount();
     }
   });
 
@@ -147,8 +195,12 @@ const Home: React.FC = () => {
           <button 
             className="notification-button"
             onClick={goToNotifications}
+            aria-label="View notifications"
           >
             <span className="material-icons-round">notifications</span>
+            {unreadCount > 0 && (
+              <span className="notification-badge">{unreadCount}</span>
+            )}
           </button>
         </div>
 

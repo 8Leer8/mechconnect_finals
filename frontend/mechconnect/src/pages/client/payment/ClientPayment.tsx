@@ -107,13 +107,13 @@ const ClientPayment: React.FC = () => {
             {/* Service Name */}
             <div className="detail-row">
               <span className="detail-label">Service:</span>
-              <span className="detail-value">Engine Oil Change</span>
+              <span className="detail-value">{bookingDetails?.request_summary || 'Service'}</span>
             </div>
 
             {/* Total Price */}
             <div className="detail-row">
               <span className="detail-label">Total Price:</span>
-              <span className="detail-value price-value">₱2,500.00</span>
+              <span className="detail-value price-value">₱{totalAmount || '0.00'}</span>
             </div>
 
             {/* Remaining Balance to Pay */}
@@ -138,7 +138,7 @@ const ClientPayment: React.FC = () => {
             {/* Receiver */}
             <div className="detail-row">
               <span className="detail-label">Receiver:</span>
-              <span className="detail-value receiver-name">Mike Johnson</span>
+              <span className="detail-value receiver-name">{bookingDetails?.provider_name || 'Provider'}</span>
             </div>
 
             <div className="payment-divider"></div>

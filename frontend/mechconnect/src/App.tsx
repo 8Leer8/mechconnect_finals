@@ -25,21 +25,9 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  useEffect(() => {
-    // Set mock authentication data for demo purposes
-    if (!localStorage.getItem('authToken')) {
-      localStorage.setItem('authToken', 'demo-token-12345');
-    }
-    if (!localStorage.getItem('user')) {
-      localStorage.setItem('user', JSON.stringify({
-        id: 5,
-        name: 'John Mechanic',
-        email: 'john.mechanic@example.com',
-        role: 'mechanic'
-      }));
-    }
-  }, []);
-
+  // Note: Mock data removed - session is now managed by Login flow only
+  // Real user data comes from backend after successful authentication
+  
   return (
     <IonApp>
       <IonReactRouter>

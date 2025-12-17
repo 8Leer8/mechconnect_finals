@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
 import Wallet from '../../../components/Wallet';
+import { requestsAPI } from '../../../utils/api';
 import './Jobs.css';
 
 // Interface for job data from API
@@ -337,49 +338,46 @@ const Jobs: React.FC = () => {
   // Handle accept/decline actions for requests
   const handleAcceptRequest = async (requestId: number) => {
     try {
-      // In a real app, this would make an API call
-      // await fetch(`http://localhost:8000/api/requests/${requestId}/accept/`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ mechanic_id: mechanicId })
-      // });
-
-      // For demo, update local state
-      setJobs(prevJobs => 
-        prevJobs.map(job => 
-          job.request_id === requestId 
-            ? { ...job, status: 'active', booked_at: new Date().toISOString() }
-            : job
-        )
-      );
+      const result = await requestsAPI.updateRequestStatus(requestId, 'accepted');
+      
+      if (result.error) {
+        setToastMessage(result.error);
+        setShowToast(true);
+        return;
+      }
+      
+      // Remove from available jobs list
+      setJobs(prevJobs => prevJobs.filter(job => job.request_id !== requestId));
+      setToastMessage('Request accepted successfully! Booking created.');
       setShowToast(true);
-      setToastMessage('Request accepted successfully!');
+      
+      // Optionally refresh the jobs list
+      // fetchJobs(activeTab);
     } catch (error) {
       console.error('Error accepting request:', error);
-      setShowToast(true);
       setToastMessage('Failed to accept request');
+      setShowToast(true);
     }
   };
 
   const handleDeclineRequest = async (requestId: number) => {
     try {
-      // In a real app, this would make an API call
-      // await fetch(`http://localhost:8000/api/requests/${requestId}/decline/`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ mechanic_id: mechanicId })
-      // });
-
-      // For demo, update local state
-      setJobs(prevJobs => 
-        prevJobs.filter(job => job.request_id !== requestId)
-      );
-      setShowToast(true);
+      const result = await requestsAPI.updateRequestStatus(requestId, 'rejected');
+      
+      if (result.error) {
+        setToastMessage(result.error);
+        setShowToast(true);
+        return;
+      }
+      
+      // Remove from jobs list
+      setJobs(prevJobs => prevJobs.filter(job => job.request_id !== requestId));
       setToastMessage('Request declined');
+      setShowToast(true);
     } catch (error) {
       console.error('Error declining request:', error);
-      setShowToast(true);
       setToastMessage('Failed to decline request');
+      setShowToast(true);
     }
   };
 

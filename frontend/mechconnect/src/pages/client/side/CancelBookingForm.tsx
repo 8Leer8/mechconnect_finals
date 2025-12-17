@@ -42,7 +42,44 @@ const CancelBookingForm: React.FC = () => {
     setLoading(true);
     
     try {
-      const clientId = localStorage.getItem('userId');
+      // Get client ID from user object
+      const userDataString = localStorage.getItem('user');
+      console.log('Raw localStorage user:', userDataString);
+      
+      const userData = userDataString ? JSON.parse(userDataString) : null;
+      console.log('Parsed user data:', userData);
+      console.log('User roles:', userData?.roles);
+      console.log('User client_profile:', userData?.client_profile);
+      
+      const clientId = userData?.acc_id || userData?.account_id;
+      console.log('Extracted clientId:', clientId);
+      
+      if (!clientId) {
+        console.error('No valid user session found');
+        alert('User session not found. Please log in again.');
+        setLoading(false);
+        return;
+      }
+      
+      // Check if user is actually a client
+      const isClient = userData?.roles?.some((role: any) => role.account_role === 'client');
+      if (!isClient) {
+        console.error('User is not a client:', userData?.roles);
+        alert('Only clients can cancel bookings. Please log in with a client account.');
+        setLoading(false);
+        return;
+      }
+
+      // Convert bookingId to integer if it's a string
+      const bookingIdInt = typeof bookingId === 'string' ? parseInt(bookingId) : bookingId;
+      
+      console.log('Cancelling booking:', {
+        booking_id: bookingIdInt,
+        reason: reason,
+        cancelled_by_id: clientId,
+        original_bookingId: bookingId,
+        bookingId_type: typeof bookingId
+      });
       
       const response = await fetch('http://localhost:8000/api/bookings/cancel/', {
         method: 'POST',
@@ -50,18 +87,21 @@ const CancelBookingForm: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          booking_id: bookingId,
+          booking_id: bookingIdInt,
           reason: reason,
-          cancelled_by_id: clientId ? parseInt(clientId) : undefined,
+          cancelled_by_id: clientId,
         }),
       });
       
       const data = await response.json();
+      console.log('Cancel booking response:', data);
       
       if (response.ok) {
         alert('Booking cancelled successfully!');
-        history.push(`/client/canceled-booking/${bookingId}`);
+        // Redirect to bookings page with cancelled tab active
+        history.push('/client/booking?tab=cancelled');
       } else {
+        console.error('Cancel booking error:', data);
         alert(data.error || 'Failed to cancel booking');
       }
     } catch (error) {
@@ -88,19 +128,19 @@ const CancelBookingForm: React.FC = () => {
             <div className="booking-info-section">
               <div className="info-row">
                 <span className="info-label">Booking ID:</span>
-                <span className="info-value">#BK-2847</span>
+                <span className="info-value">#{bookingData?.booking_details?.booking_id || bookingData?.booking_id || bookingId}</span>
               </div>
               <div className="info-row">
                 <span className="info-label">Service:</span>
-                <span className="info-value">Oil Change</span>
+                <span className="info-value">{bookingData?.booking_details?.service_details?.service_name || bookingData?.service_details?.service_name || 'N/A'}</span>
               </div>
               <div className="info-row">
                 <span className="info-label">Mechanic:</span>
-                <span className="info-value">Juan Dela Cruz</span>
+                <span className="info-value">{bookingData?.booking_details?.provider_name || bookingData?.provider_name || 'N/A'}</span>
               </div>
               <div className="info-row">
                 <span className="info-label">Date & Time:</span>
-                <span className="info-value">Dec 01, 2024 • 10:00 AM</span>
+                <span className="info-value">{bookingData?.booking_details?.service_time || bookingData?.service_time || 'N/A'}</span>
               </div>
             </div>
 

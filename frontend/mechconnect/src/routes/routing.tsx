@@ -46,19 +46,25 @@ import RejectedRequest from '../pages/client/side/RejectedRequest';
 // Client Booking Detail Pages
 import ActiveBooking from '../pages/client/side/ActiveBooking';
 import CompletedBooking from '../pages/client/side/CompletedBooking';
-import CanceledBooking from '../pages/client/side/CanceledBooking';
+import CancelledBooking from '../pages/client/side/CanceledBooking';
 import BackJobsBooking from '../pages/client/side/BackJobsBooking';
 
 // Client Payment Pages
 import PaymentForm from '../pages/client/payment/PaymentForm';
 import ClientPayment from '../pages/client/payment/ClientPayment';
+import PaymentDetail from '../pages/client/payment/PaymentDetail';
 import RescheduleBookingForm from '../pages/client/side/RescheduleBookingForm';
 import CancelBookingForm from '../pages/client/side/CancelBookingForm';
+import CancelRequestForm from '../pages/client/side/CancelRequestForm';
 import BackJobsForm from '../pages/client/side/BackJobsForm';
 import DisputedBooking from '../pages/client/side/DisputedBooking';
 import RescheduledBooking from '../pages/client/side/RescheduledBooking';
 import RejectedBooking from '../pages/client/side/RejectedBooking';
 import RefundedBooking from '../pages/client/side/RefundedBooking';
+import AccountSettings from '../pages/client/side/AccountSettings';
+import Notification from '../pages/client/side/Notification';
+import Favorite from '../pages/client/side/Favorite';
+import PaymentHistory from '../pages/client/side/PaymentHistory';
 
 // Shop Owner Pages
 import Dashboard from '../pages/shopowner/main/dashboard';
@@ -152,8 +158,8 @@ const AppRoutes: React.FC = () => {
       <AuthGuard exact path="/client/completed-booking/:id">
         <CompletedBooking />
       </AuthGuard>
-      <AuthGuard exact path="/client/canceled-booking/:id">
-        <CanceledBooking />
+      <AuthGuard exact path="/client/cancelled-booking/:id">
+        <CancelledBooking />
       </AuthGuard>
       <AuthGuard exact path="/client/backjobs-booking/:id">
         <BackJobsBooking />
@@ -179,11 +185,29 @@ const AppRoutes: React.FC = () => {
       <AuthGuard exact path="/client/client-payment">
         <ClientPayment />
       </AuthGuard>
+      <AuthGuard exact path="/client/payment-detail/:id">
+        <PaymentDetail />
+      </AuthGuard>
       <AuthGuard exact path="/client/reschedule-booking-form">
         <RescheduleBookingForm />
       </AuthGuard>
       <AuthGuard exact path="/client/cancel-booking-form">
         <CancelBookingForm />
+      </AuthGuard>
+      <AuthGuard exact path="/client/cancel-request-form">
+        <CancelRequestForm />
+      </AuthGuard>
+      <AuthGuard exact path="/client/account-settings">
+        <AccountSettings />
+      </AuthGuard>
+      <AuthGuard exact path="/client/notifications">
+        <Notification />
+      </AuthGuard>
+      <AuthGuard exact path="/client/favorite">
+        <Favorite />
+      </AuthGuard>
+      <AuthGuard exact path="/client/payment-history">
+        <PaymentHistory />
       </AuthGuard>
       
       {/* Protected Shop Owner Routes */}

@@ -422,5 +422,5 @@ class MechanicDiscoverySerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = '__all__'
+        fields = ['notification_id', 'receiver', 'title', 'message', 'type', 'is_read', 'created_at', 'updated_at']
         read_only_fields = ('notification_id', 'created_at', 'updated_at')

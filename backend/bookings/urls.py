@@ -5,6 +5,9 @@ urlpatterns = [
     # Health check
     path('health/', views.health_check, name='bookings_health'),
     
+    # Get booking by request ID
+    path('request/<int:request_id>/', views.get_booking_by_request, name='get_booking_by_request'),
+    
     # Client bookings
     path('client/', views.client_bookings_list, name='client_bookings_list'),
     
@@ -33,4 +36,5 @@ urlpatterns = [
     path('reschedule/', views.request_reschedule, name='request_reschedule'),
     path('complete/', views.mark_booking_complete, name='mark_booking_complete'),
     path('cancel/', views.cancel_booking, name='cancel_booking'),
+    path('backjob/<int:backjob_id>/accept/', views.accept_backjob, name='accept_backjob'),
 ]

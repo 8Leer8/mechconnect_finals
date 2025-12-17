@@ -78,7 +78,17 @@ const PendingRequest: React.FC = () => {
   };
 
   const handleCancel = () => {
-    history.push('/client/cancel-booking-form');
+    if (requestData) {
+      history.push({
+        pathname: '/client/cancel-request-form',
+        state: {
+          requestId: requestData.request_id,
+          requestData: requestData
+        }
+      });
+    } else {
+      alert('Request data not available');
+    }
   };
 
   return (

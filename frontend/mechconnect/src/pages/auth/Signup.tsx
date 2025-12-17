@@ -83,6 +83,9 @@ const Signup: React.FC = () => {
   useEffect(() => {
     // Reset form when component mounts or when navigating to /signup
     resetForm();
+    // Clear any existing user session to prevent data leakage
+    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
   }, [location.pathname]);
 
   // Fetch regions on mount

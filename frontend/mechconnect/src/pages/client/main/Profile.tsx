@@ -45,7 +45,7 @@ const Profile: React.FC = () => {
 
   const goToNotifications = () => history.push('/client/notifications');
   const goToAccountSettings = () => history.push('/client/account-settings');
-  const goToSwitchAccount = () => history.push('/client/switch-account');
+  const goToSwitchAccount = () => history.push('/auth/switch-account');
   const goToFavorites = () => history.push('/client/favorite');
   const goToPaymentHistory = () => history.push('/client/payment-history');
 

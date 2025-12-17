@@ -67,7 +67,8 @@ def create_custom_request(request):
             custom_request = CustomRequest.objects.create(
                 request=main_request,
                 description=data['description'],
-                concern_picture=data.get('concern_picture', '')
+                concern_picture=data.get('concern_picture', ''),
+                estimated_budget=data.get('estimated_budget')
             )
             
             # Update or create client address if location data provided
@@ -210,6 +211,7 @@ def get_request_detail(request, request_id):
 def update_request_status(request, request_id):
     """
     Update the status of a request
+    When status is changed to 'accepted', automatically create a booking
     """
     try:
         req = get_object_or_404(Request, request_id=request_id)
@@ -227,15 +229,95 @@ def update_request_status(request, request_id):
                 'error': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Update request status
+        old_status = req.request_status
         req.request_status = new_status
         req.save()
         
+        # If status changed to 'rejected', send notification to client
+        if new_status == 'rejected' and old_status != 'rejected':
+            from accounts.models import Notification
+            provider_name = 'Provider'
+            if req.provider:
+                if hasattr(req.provider, 'mechanic_profile'):
+                    provider_name = f"{req.provider.firstname} {req.provider.lastname}"
+                elif hasattr(req.provider, 'shop_profile'):
+                    provider_name = req.provider.shop_profile.shop_name
+            
+            Notification.objects.create(
+                receiver=req.client.client_id,
+                title='Request Rejected',
+                message=f'{provider_name} has rejected your service request.',
+                type='alert'
+            )
+            print(f"Rejection notification sent to client: {req.client.client_id.acc_id}")
+        
+        # If status changed to 'accepted', create a booking
+        booking_data = None
+        if new_status == 'accepted' and old_status != 'accepted':
+            from bookings.models import Booking
+            from accounts.models import Notification
+            
+            # Check if booking already exists for this request
+            existing_booking = Booking.objects.filter(request=req).first()
+            
+            if not existing_booking:
+                # Determine the amount based on request type
+                amount = 0
+                if req.request_type == 'custom' and hasattr(req, 'custom_request'):
+                    amount = req.custom_request.estimated_budget or 0
+                elif req.request_type == 'direct' and hasattr(req, 'direct_request'):
+                    # For direct requests, get the service price
+                    amount = req.direct_request.service.price if req.direct_request.service else 0
+                elif hasattr(req, 'price'):
+                    amount = req.price
+                
+                print(f"Creating booking for request {req.request_id}, type: {req.request_type}, amount: {amount}")
+                
+                # Create new booking with 'active' status
+                booking = Booking.objects.create(
+                    request=req,
+                    status='active',
+                    amount_fee=amount
+                )
+                
+                # Send notification to client
+                provider_name = 'Provider'
+                if req.provider:
+                    if hasattr(req.provider, 'mechanic_profile'):
+                        provider_name = f"{req.provider.firstname} {req.provider.lastname}"
+                    elif hasattr(req.provider, 'shop_profile'):
+                        provider_name = req.provider.shop_profile.shop_name
+                
+                # Debug logging
+                print(f"Creating notification for client: {req.client.client_id}")
+                print(f"Client ID acc_id: {req.client.client_id.acc_id}")
+                
+                notification = Notification.objects.create(
+                    receiver=req.client.client_id,
+                    title='Booking Request Accepted',
+                    message=f'{provider_name} has accepted your service request. Your booking is now active.',
+                    type='info'
+                )
+                
+                print(f"Notification created: ID={notification.notification_id}, Receiver={notification.receiver.acc_id}")
+                
+                from bookings.serializers import BookingSerializer
+                booking_serializer = BookingSerializer(booking)
+                booking_data = booking_serializer.data
+        
         serializer = RequestSerializer(req)
         
-        return Response({
+        response_data = {
             'message': 'Request status updated successfully',
             'request': serializer.data
-        }, status=status.HTTP_200_OK)
+        }
+        
+        if booking_data:
+            response_data['booking'] = booking_data
+            response_data['message'] = 'Request accepted and booking created successfully'
+        
+        return Response(response_data, status=status.HTTP_200_OK)
         
     except Exception as e:
         return Response({
@@ -604,6 +686,327 @@ def create_emergency_request(request):
         print(f"Error creating emergency request: {str(e)}")
         return Response({
             'error': 'Failed to create emergency request',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def cancel_request(request):
+    """
+    Cancel/withdraw a pending request - creates a cancelled booking
+    POST /api/requests/cancel/
+    """
+    request_id = request.data.get('request_id')
+    reason = request.data.get('reason', '')
+    
+    if not request_id:
+        return Response({'error': 'request_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        service_request = Request.objects.get(request_id=request_id)
+    except Request.DoesNotExist:
+        return Response({'error': 'Request not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Only allow cancellation of pending or quoted requests
+    if service_request.request_status not in ['pending', 'qouted']:
+        return Response(
+            {'error': f'Cannot cancel request with status: {service_request.request_status}'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Create a booking with cancelled status
+    from bookings.models import Booking, CancelledBooking
+    from accounts.models import Account
+    
+    # Create the booking
+    booking = Booking.objects.create(
+        request=service_request,
+        status='cancelled',
+        amount_fee=0
+    )
+    
+    # Get client account
+    client_account = service_request.client.client_id
+    
+    # Create cancelled booking record
+    CancelledBooking.objects.create(
+        booking=booking,
+        reason=reason,
+        cancelled_by=client_account,
+        cancelled_by_role='client',
+        status='cancelled'
+    )
+    
+    # Update request status to accepted (so it shows as converted to booking)
+    service_request.request_status = 'accepted'
+    service_request.save()
+    
+    return Response({
+        'message': 'Request cancelled successfully',
+        'booking_id': booking.booking_id,
+        'status': booking.status
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def accept_quotation(request, request_id):
+    """
+    Accept a quoted request - changes status to 'accepted' and creates booking with quoted items total
+    POST /api/requests/<request_id>/accept-quotation/
+    """
+    try:
+        # Get the request
+        service_request = Request.objects.get(request_id=request_id)
+        
+        # Verify request is in quoted status
+        if service_request.request_status != 'qouted':
+            return Response({
+                'error': f'Request must be in quoted status. Current status: {service_request.request_status}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get custom request and quoted items
+        if not hasattr(service_request, 'custom_request'):
+            return Response({
+                'error': 'Only custom requests can be quoted'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        custom_request = service_request.custom_request
+        quoted_items = custom_request.quoted_items.all()
+        
+        if not quoted_items.exists():
+            return Response({
+                'error': 'No quoted items found for this request'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Calculate total from quoted items
+        total_amount = sum(item.price for item in quoted_items)
+        
+        # Update request status to accepted
+        service_request.request_status = 'accepted'
+        service_request.save()
+        
+        # Create booking
+        from bookings.models import Booking
+        from accounts.models import Notification
+        
+        booking = Booking.objects.create(
+            request=service_request,
+            status='active',
+            amount_fee=total_amount
+        )
+        
+        # Send notification to provider
+        if service_request.provider:
+            provider_name = 'Provider'
+            if hasattr(service_request.provider, 'mechanic_profile'):
+                provider_name = f"{service_request.provider.firstname} {service_request.provider.lastname}"
+            elif hasattr(service_request.provider, 'shop_profile'):
+                provider_name = service_request.provider.shop_profile.shop_name
+            
+            Notification.objects.create(
+                receiver=service_request.provider,
+                title='Quotation Accepted',
+                message=f'Client has accepted your quotation for ₱{total_amount}. Booking #{booking.booking_id} is now active.',
+                type='info'
+            )
+            print(f"Quotation acceptance notification sent to provider: {service_request.provider.acc_id}")
+        
+        # Send notification to client
+        Notification.objects.create(
+            receiver=service_request.client.client_id,
+            title='Quotation Accepted',
+            message=f'You have accepted the quotation for ₱{total_amount}. Your booking is now active.',
+            type='info'
+        )
+        print(f"Quotation acceptance notification sent to client: {service_request.client.client_id.acc_id}")
+        
+        from bookings.serializers import BookingSerializer
+        booking_serializer = BookingSerializer(booking)
+        
+        return Response({
+            'message': 'Quotation accepted successfully',
+            'booking': booking_serializer.data,
+            'total_amount': str(total_amount)
+        }, status=status.HTTP_200_OK)
+        
+    except Request.DoesNotExist:
+        return Response({
+            'error': 'Request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': 'Failed to accept quotation',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reject_quotation(request, request_id):
+    """
+    Reject a quoted request - changes status to 'rejected'
+    POST /api/requests/<request_id>/reject-quotation/
+    Body: { "reason": "optional rejection reason" }
+    """
+    try:
+        # Get the request
+        service_request = Request.objects.get(request_id=request_id)
+        
+        # Verify request is in quoted status
+        if service_request.request_status != 'qouted':
+            return Response({
+                'error': f'Request must be in quoted status. Current status: {service_request.request_status}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get rejection reason if provided
+        reason = request.data.get('reason', '')
+        
+        # Update request status to rejected
+        service_request.request_status = 'rejected'
+        service_request.save()
+        
+        # Send notification to provider
+        from accounts.models import Notification
+        
+        if service_request.provider:
+            provider_name = 'Provider'
+            if hasattr(service_request.provider, 'mechanic_profile'):
+                provider_name = f"{service_request.provider.firstname} {service_request.provider.lastname}"
+            elif hasattr(service_request.provider, 'shop_profile'):
+                provider_name = service_request.provider.shop_profile.shop_name
+            
+            message = f'Client has rejected your quotation for request #{service_request.request_id}.'
+            if reason:
+                message += f' Reason: {reason}'
+            
+            Notification.objects.create(
+                receiver=service_request.provider,
+                title='Quotation Rejected',
+                message=message,
+                type='warning'
+            )
+            print(f"Quotation rejection notification sent to provider: {service_request.provider.acc_id}")
+        
+        return Response({
+            'message': 'Quotation rejected successfully',
+            'request_id': service_request.request_id,
+            'status': service_request.request_status
+        }, status=status.HTTP_200_OK)
+        
+    except Request.DoesNotExist:
+        return Response({
+            'error': 'Request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': 'Failed to reject quotation',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_quoted_items(request, request_id):
+    """
+    Create quoted items for a custom request (for provider/mechanic side)
+    POST /api/requests/<request_id>/create-quote/
+    Body: {
+        "items": [
+            {"item": "Oil Change", "price": 500.00},
+            {"item": "Brake Pad Replacement", "price": 1500.00}
+        ],
+        "providers_note": "Optional note from provider"
+    }
+    """
+    try:
+        # Get the request
+        service_request = Request.objects.get(request_id=request_id)
+        
+        # Verify it's a custom request
+        if service_request.request_type != 'custom':
+            return Response({
+                'error': 'Only custom requests can be quoted'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify request is in pending status
+        if service_request.request_status not in ['pending']:
+            return Response({
+                'error': f'Can only create quotes for pending requests. Current status: {service_request.request_status}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get items from request body
+        items_data = request.data.get('items', [])
+        providers_note = request.data.get('providers_note', '')
+        
+        if not items_data:
+            return Response({
+                'error': 'At least one item is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get custom request
+        custom_request = service_request.custom_request
+        
+        # Update provider's note if provided
+        if providers_note:
+            custom_request.providers_note = providers_note
+            custom_request.save()
+        
+        # Delete existing quoted items (if any)
+        custom_request.quoted_items.all().delete()
+        
+        # Create new quoted items
+        created_items = []
+        for item_data in items_data:
+            quoted_item = QuotedRequestItem.objects.create(
+                custom_request=custom_request,
+                item=item_data.get('item', ''),
+                price=item_data.get('price', 0)
+            )
+            created_items.append(quoted_item)
+        
+        # Update request status to quoted
+        service_request.request_status = 'qouted'
+        service_request.save()
+        
+        # Send notification to client
+        from accounts.models import Notification
+        
+        provider_name = 'Provider'
+        if service_request.provider:
+            if hasattr(service_request.provider, 'mechanic_profile'):
+                provider_name = f"{service_request.provider.firstname} {service_request.provider.lastname}"
+            elif hasattr(service_request.provider, 'shop_profile'):
+                provider_name = service_request.provider.shop_profile.shop_name
+        
+        total = sum(item.price for item in created_items)
+        
+        Notification.objects.create(
+            receiver=service_request.client.client_id,
+            title='Quotation Received',
+            message=f'{provider_name} has sent you a quotation for ₱{total}. Review it in your requests.',
+            type='info'
+        )
+        print(f"Quotation notification sent to client: {service_request.client.client_id.acc_id}")
+        
+        from .serializers import QuotedRequestItemSerializer
+        serializer = QuotedRequestItemSerializer(created_items, many=True)
+        
+        return Response({
+            'message': 'Quote created successfully',
+            'request_id': service_request.request_id,
+            'items': serializer.data,
+            'total': str(total)
+        }, status=status.HTTP_201_CREATED)
+        
+    except Request.DoesNotExist:
+        return Response({
+            'error': 'Request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': 'Failed to create quote',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

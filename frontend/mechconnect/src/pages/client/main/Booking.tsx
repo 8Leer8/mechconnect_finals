@@ -2,12 +2,17 @@ import { IonContent, IonPage, IonToast, useIonViewWillEnter } from '@ionic/react
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNav from '../../../components/BottomNav';
-import { bookingsAPI, formatTimeAgo, getInitials, BookingListItem } from '../../../utils/api';
+import { bookingsAPI, notificationsAPI, formatTimeAgo, getInitials, BookingListItem } from '../../../utils/api';
 import './Booking.css';
 
 const Booking: React.FC = () => {
   const history = useHistory();
-  const [activeTab, setActiveTab] = useState('active');
+  
+  // Check URL for tab parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') || 'active';
+  
+  const [activeTab, setActiveTab] = useState(initialTab);
   const tabsRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
 
@@ -16,9 +21,11 @@ const Booking: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Client ID from authentication
-  const [clientId, setClientId] = useState<number>(1);
+  const [clientId, setClientId] = useState<number | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // Get client ID from localStorage
   useEffect(() => {
@@ -26,17 +33,54 @@ const Booking: React.FC = () => {
     if (userDataString) {
       try {
         const userData = JSON.parse(userDataString);
-        const id = userData.acc_id || userData.account_id || 1;
-        setClientId(id);
-        console.log('Booking - User data:', userData);
-        console.log('Booking - Using client ID:', id);
+        console.log('Booking - Full user data:', userData);
+        
+        // Check if user has client role
+        const hasClientRole = userData.roles?.some((role: any) => role.account_role === 'client');
+        if (!hasClientRole) {
+          setError('This account is not registered as a client. Please log in with a client account.');
+          setShowToast(true);
+          setAuthLoading(false);
+          return;
+        }
+        
+        const id = userData.acc_id || userData.account_id;
+        if (id) {
+          setClientId(id);
+          console.log('Booking - User data:', userData);
+          console.log('Booking - Using client ID:', id);
+        } else {
+          console.error('Booking - No valid user ID found in user data');
+          setError('Invalid user session. Please log in again.');
+          setShowToast(true);
+        }
       } catch (e) {
         console.error('Error parsing user data:', e);
+        setError('Invalid session data. Please log in again.');
+        setShowToast(true);
       }
+    } else {
+      console.error('Booking - No user data in localStorage');
+      setError('No user session found. Please log in.');
+      setShowToast(true);
     }
+    setAuthLoading(false);
   }, []);
 
   const goToNotifications = () => history.push('/client/notifications');
+  
+  // Fetch unread notifications count
+  const fetchUnreadCount = async () => {
+    if (!clientId) return;
+    try {
+      const result = await notificationsAPI.getUserNotifications(clientId, false);
+      if (result.data) {
+        setUnreadCount(result.data.notifications.length);
+      }
+    } catch (err) {
+      console.error('Error fetching unread notifications:', err);
+    }
+  };
   
   // Navigation to specific booking detail pages
   const goToBookingDetail = (bookingId: number, status: string) => {
@@ -55,7 +99,7 @@ const Booking: React.FC = () => {
         history.push(`/client/backjobs-booking/${bookingId}`);
         break;
       case 'cancelled':
-        history.push(`/client/canceled-booking/${bookingId}`);
+        history.push(`/client/cancelled-booking/${bookingId}`);
         break;
       case 'dispute':
         history.push(`/client/disputed-booking/${bookingId}`);
@@ -71,17 +115,31 @@ const Booking: React.FC = () => {
 
   // Fetch bookings from API
   const fetchBookings = async (status = activeTab) => {
+    if (!clientId) {
+      console.log('Booking - No clientId, skipping fetch');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
+      console.log('Booking - Fetching bookings for clientId:', clientId, 'status:', status);
       const result = await bookingsAPI.getClientBookings(clientId, status);
       
+      console.log('Booking - API result:', result);
+      
       if (result.error) {
+        console.error('Booking - API error:', result.error);
         setError(result.error);
         setShowToast(true);
         setBookings([]);
       } else if (result.data) {
+        console.log('Booking - Received bookings:', result.data.bookings);
+        console.log('Booking - Number of bookings:', result.data.bookings?.length || 0);
         setBookings(result.data.bookings || []);
+      } else {
+        console.warn('Booking - No data or error in result');
+        setBookings([]);
       }
     } catch (err) {
       setError('Failed to load bookings');
@@ -93,6 +151,23 @@ const Booking: React.FC = () => {
     }
   };
 
+  // Fetch unread count when clientId is available
+  useEffect(() => {
+    if (clientId) {
+      fetchUnreadCount();
+    }
+  }, [clientId]);
+
+  // Refresh notification count when page becomes active (already has useIonViewWillEnter for bookings)
+  useIonViewWillEnter(() => {
+    if (clientId) {
+      console.log('Booking page - refreshing notification count');
+      fetchUnreadCount();
+      console.log('Booking page - refreshing bookings for client:', clientId, 'tab:', activeTab);
+      fetchBookings(activeTab);
+    }
+  });
+
   useEffect(() => {
     const checkScrollable = () => {
       if (tabsRef.current) {
@@ -103,65 +178,49 @@ const Booking: React.FC = () => {
     checkScrollable();
     window.addEventListener('resize', checkScrollable);
     
-    // Fetch bookings when component mounts or tab changes
-    fetchBookings();
+    // Fetch bookings when component mounts, tab changes, or clientId is loaded
+    if (clientId) {
+      console.log('Booking - Fetching bookings for client:', clientId, 'tab:', activeTab);
+      fetchBookings(activeTab);
+    }
     
     return () => window.removeEventListener('resize', checkScrollable);
-  }, [activeTab]);
+  }, [activeTab, clientId]);
 
   // Refresh bookings when navigating back to this page
   useIonViewWillEnter(() => {
-    console.log('Booking page - refreshing bookings for tab:', activeTab);
-    fetchBookings();
+    if (clientId) {
+      console.log('Booking page - refreshing bookings for client:', clientId, 'tab:', activeTab);
+      fetchBookings(activeTab);
+    }
   });
 
   const handleTabActive = () => {
     setActiveTab('active');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('active');
-    }
   };
   
   const handleTabCompleted = () => {
     setActiveTab('completed');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('completed');
-    }
   };
   
   const handleTabRescheduled = () => {
     setActiveTab('rescheduled');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('rescheduled');
-    }
   };
   
   const handleTabBackJobs = () => {
     setActiveTab('back_jobs');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('back_jobs');
-    }
   };
   
   const handleTabCanceled = () => {
     setActiveTab('cancelled');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('cancelled');
-    }
   };
   
   const handleTabDisputed = () => {
     setActiveTab('dispute');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('dispute');
-    }
   };
   
   const handleTabRefunded = () => {
     setActiveTab('refunded');
-    if (bookings.length === 0 && !loading) {
-      fetchBookings('refunded');
-    }
   };
 
 
@@ -293,8 +352,12 @@ const Booking: React.FC = () => {
             <button 
               className="notification-button"
               onClick={goToNotifications}
+              aria-label="View notifications"
             >
               <span className="material-icons-round">notifications</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
             </button>
           </div>
 
@@ -331,7 +394,7 @@ const Booking: React.FC = () => {
                   className={`tab-button ${activeTab === 'cancelled' ? 'active' : ''}`}
                   onClick={handleTabCanceled}
                 >
-                  Canceled
+                  Cancelled
                 </button>
                 <button 
                   className={`tab-button ${activeTab === 'dispute' ? 'active' : ''}`}

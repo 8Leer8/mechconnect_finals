@@ -30,6 +30,7 @@ const AcceptedRequest: React.FC = () => {
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const [requestData, setRequestData] = useState<RequestData | null>(null);
+  const [bookingId, setBookingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
@@ -47,6 +48,14 @@ const AcceptedRequest: React.FC = () => {
       
       if (response.ok) {
         setRequestData(data.request);
+        
+        // Fetch booking ID for this request
+        const bookingResponse = await fetch(`http://localhost:8000/api/bookings/request/${id}/`);
+        const bookingData = await bookingResponse.json();
+        
+        if (bookingResponse.ok && bookingData.booking) {
+          setBookingId(bookingData.booking.booking_id);
+        }
       } else {
         setError(data.error || 'Failed to load request details');
       }
@@ -78,7 +87,12 @@ const AcceptedRequest: React.FC = () => {
   };
 
   const handleSeeBookingDetail = () => {
-    history.push('/client/booking-detail');
+    if (bookingId) {
+      history.push(`/client/active-booking/${bookingId}`);
+    } else {
+      setError('Booking not found for this request');
+      setShowToast(true);
+    }
   };
 
   return (

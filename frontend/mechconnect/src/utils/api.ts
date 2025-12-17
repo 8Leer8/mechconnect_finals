@@ -348,6 +348,141 @@ export const formatDate = (dateString: string, includeTime = false) => {
   return date.toLocaleDateString('en-US', options);
 };
 
+// ===== NOTIFICATION APIs =====
+
+export interface NotificationItem {
+  notification_id: number;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'alert' | 'promotional';
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NotificationListResponse {
+  notifications: NotificationItem[];
+}
+
+export const notificationsAPI = {
+  /**
+   * Get notifications for a user
+   */
+  getUserNotifications: async (userId: number, isRead?: boolean, type?: string) => {
+    let endpoint = `/accounts/notifications/?user_id=${userId}`;
+    if (isRead !== undefined) {
+      endpoint += `&is_read=${isRead}`;
+    }
+    if (type) {
+      endpoint += `&type=${type}`;
+    }
+    return apiRequest<NotificationListResponse>(endpoint);
+  },
+
+  /**
+   * Mark notification as read
+   */
+  markAsRead: async (notificationId: number) => {
+    return apiRequest<{ message: string }>(
+      `/accounts/notifications/${notificationId}/read/`,
+      {
+        method: 'PUT',
+      }
+    );
+  },
+};
+
+// ===== ACCOUNT APIs =====
+
+export interface UserProfile {
+  acc_id: number;
+  firstname: string;
+  lastname: string;
+  middlename?: string;
+  email: string;
+  username: string;
+  date_of_birth?: string;
+  gender?: string;
+  is_active: boolean;
+  is_verified: boolean;
+  address?: {
+    house_building_number?: string;
+    street_name?: string;
+    subdivision_village?: string;
+    barangay?: string;
+    city_municipality?: string;
+    province?: string;
+    region?: string;
+    postal_code?: string;
+  };
+  client_profile?: {
+    contact_number?: string;
+    profile_photo?: string;
+  };
+  roles?: Array<{
+    account_role: string;
+  }>;
+}
+
+export interface UserProfileResponse {
+  user: UserProfile;
+}
+
+export interface UpdateProfileData {
+  user_id: number;
+  firstname?: string;
+  lastname?: string;
+  middlename?: string;
+  email?: string;
+  username?: string;
+  date_of_birth?: string;
+  gender?: string;
+  contact_number?: string;
+  house_building_number?: string;
+  street_name?: string;
+  subdivision_village?: string;
+  barangay?: string;
+  city_municipality?: string;
+  province?: string;
+  region?: string;
+  postal_code?: string;
+}
+
+export interface ChangePasswordData {
+  user_id: number;
+  old_password: string;
+  new_password: string;
+}
+
+export const accountAPI = {
+  /**
+   * Get user profile
+   */
+  getProfile: async (userId: number) => {
+    return apiRequest<UserProfileResponse>(`/accounts/profile/?user_id=${userId}`);
+  },
+
+  /**
+   * Update user profile
+   */
+  updateProfile: async (data: UpdateProfileData) => {
+    return apiRequest<UserProfileResponse>('/accounts/profile/update/', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Change password
+   */
+  changePassword: async (data: ChangePasswordData) => {
+    return apiRequest<{ message: string }>('/accounts/password/change/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
+
 // Helper function to format time ago
 export const formatTimeAgo = (dateString: string) => {
   const date = new Date(dateString);
@@ -377,6 +512,8 @@ export default {
   requestsAPI,
   geolocationAPI,
   authAPI,
+  notificationsAPI,
+  accountAPI,
   formatDate,
   formatTimeAgo,
   getInitials,
