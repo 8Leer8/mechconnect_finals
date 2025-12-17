@@ -1,10 +1,30 @@
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import BottomNavMechanic from '../../components/BottomNavMechanic';
+import Wallet from '../../components/Wallet';
 import './Home.css';
+
+// Interface for job data from API
+interface JobData {
+  booking_id?: number;
+  request_id: number;
+  status: string;
+  amount_fee?: number;
+  booked_at?: string;
+  client_name: string;
+  provider_name?: string;
+  request_summary: string;
+  request_type: string;
+  created_at: string;
+  service_location?: string;
+}
 
 const Home: React.FC = () => {
   const history = useHistory();
+  const [pendingRequests, setPendingRequests] = useState<JobData[]>([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const goToNotifications = () => history.push('/mechanic/notifications');
   const goToAvailableJobs = () => history.push('/mechanic/jobs?filter=available');
@@ -12,18 +32,76 @@ const Home: React.FC = () => {
   const goToEarnings = () => history.push('/mechanic/earnings');
   const goToProfile = () => history.push('/mechanic/profile');
 
+  // Mock pending requests data
+  const mockPendingRequests: JobData[] = [
+    {
+      request_id: 11,
+      status: 'pending',
+      client_name: 'Roberto Diaz',
+      request_summary: 'Emergency brake repair - car won\'t stop properly',
+      request_type: 'Emergency Brake Service',
+      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+      service_location: 'Makati City, Philippines'
+    },
+    {
+      request_id: 12,
+      status: 'pending',
+      client_name: 'Sofia Reyes',
+      request_summary: 'Car won\'t start - battery might be dead',
+      request_type: 'Emergency Battery Service',
+      created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 minutes ago
+      service_location: 'Taguig City, Philippines'
+    }
+  ];
+
+  // Handle accept/decline actions for requests
+  const handleAcceptRequest = async (requestId: number) => {
+    try {
+      // In a real app, this would make an API call
+      setPendingRequests(prev => prev.filter(req => req.request_id !== requestId));
+      setToastMessage('Request accepted successfully!');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      setToastMessage('Failed to accept request');
+      setShowToast(true);
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: number) => {
+    try {
+      // In a real app, this would make an API call
+      setPendingRequests(prev => prev.filter(req => req.request_id !== requestId));
+      setToastMessage('Request declined');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Error declining request:', error);
+      setToastMessage('Failed to decline request');
+      setShowToast(true);
+    }
+  };
+
+  // Load pending requests on component mount
+  useEffect(() => {
+    // In a real app, this would fetch from API
+    setPendingRequests(mockPendingRequests);
+  }, []);
+
   return (
     <IonPage>
       <IonContent className="mechanic-home-content" scrollY>
         {/* Header */}
         <div className="mechanic-home-header">
           <h1 className="mechanic-home-title">Home</h1>
-          <button
-            className="mechanic-notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="mechanic-notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>        {/* Welcome Section */}
         <div className="mechanic-home-section">
           <div className="welcome-card">
@@ -87,6 +165,64 @@ const Home: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Pending Requests Section */}
+        {pendingRequests.length > 0 && (
+          <div className="mechanic-home-section">
+            <div className="mechanic-section-header">
+              <h2 className="mechanic-section-title">Pending Requests</h2>
+              <button
+                className="mechanic-view-all-btn"
+                onClick={() => history.push('/mechanic/jobs?filter=requests')}
+              >
+                View All
+              </button>
+            </div>
+            <div className="mechanic-requests-list">
+              {pendingRequests.slice(0, 2).map((request) => (
+                <div key={request.request_id} className="mechanic-request-card">
+                  <div className="mechanic-request-header">
+                    <div className="mechanic-request-info">
+                      <div className="mechanic-request-client">{request.client_name}</div>
+                      <div className="mechanic-request-summary">{request.request_summary}</div>
+                      <div className="mechanic-request-meta">
+                        <span className="mechanic-request-type">{request.request_type}</span>
+                        <span className="mechanic-request-time">
+                          {new Date(request.created_at).toLocaleString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mechanic-request-location">
+                    <span className="material-icons-round location-icon">location_on</span>
+                    <span className="location-text">{request.service_location}</span>
+                  </div>
+
+                  <div className="mechanic-request-actions">
+                    <button
+                      className="mechanic-btn-accept"
+                      onClick={() => handleAcceptRequest(request.request_id)}
+                    >
+                      <span className="material-icons-round">check</span>
+                      Accept
+                    </button>
+                    <button
+                      className="mechanic-btn-decline"
+                      onClick={() => handleDeclineRequest(request.request_id)}
+                    >
+                      <span className="material-icons-round">close</span>
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Current Job Section */}
         <div className="mechanic-home-section">
@@ -155,6 +291,15 @@ const Home: React.FC = () => {
           </div>
         </div>
       </IonContent>
+
+      {/* Toast for notifications */}
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={2000}
+        color="success"
+      />
 
       <BottomNavMechanic />
     </IonPage>

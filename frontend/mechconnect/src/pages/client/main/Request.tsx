@@ -83,43 +83,38 @@ const Request: React.FC = () => {
     checkScrollable();
     window.addEventListener('resize', checkScrollable);
     
-    // Fetch requests when component mounts or tab changes
-    fetchRequests();
+    // Clear old requests and fetch new data when tab changes
+    // This prevents stale data from causing render issues
+    setRequests([]);
+    fetchRequests(activeTab);
     
     return () => window.removeEventListener('resize', checkScrollable);
-  }, [activeTab]);
+  }, [activeTab, clientId]); // Added clientId to dependencies
 
   const handleTabPending = () => {
     setActiveTab('pending');
-    if (requests.length === 0 && !loading) {
-      fetchRequests('pending');
-    }
+    // No need to fetch here, useEffect will handle it
   };
   
   const handleTabQuoted = () => {
     setActiveTab('quoted');
-    if (requests.length === 0 && !loading) {
-      fetchRequests('quoted');
-    }
+    // No need to fetch here, useEffect will handle it
   };
   
   const handleTabAccepted = () => {
     setActiveTab('accepted');
-    if (requests.length === 0 && !loading) {
-      fetchRequests('accepted');
-    }
+    // No need to fetch here, useEffect will handle it
   };
   
   const handleTabRejected = () => {
     setActiveTab('rejected');
-    if (requests.length === 0 && !loading) {
-      fetchRequests('rejected');
-    }
+    // No need to fetch here, useEffect will handle it
   };
 
   // Helper functions
   const getInitials = (fullName: string) => {
-    if (!fullName) return 'UN';
+    // Defensive check: handle null/undefined/empty names
+    if (!fullName || typeof fullName !== 'string') return 'UN';
     return fullName
       .split(' ')
       .map(name => name.charAt(0))
@@ -174,7 +169,8 @@ const Request: React.FC = () => {
       );
     }
 
-    if (requests.length === 0) {
+    // Defensive check: ensure requests is an array
+    if (!Array.isArray(requests) || requests.length === 0) {
       return (
         <div className="no-requests-message">
           No {activeTab} requests found
@@ -182,57 +178,74 @@ const Request: React.FC = () => {
       );
     }
 
-    return requests.map((request) => (
-      <div key={request.request_id} className="request-card">
-        <span className={`status-tag ${getStatusClass(request.request_status)}`}>
-          <span className="material-icons-round" style={{fontSize: '12px'}}>
-            {getStatusIcon(request.request_status)}
-          </span>
-          {request.request_status === 'qouted' ? 'Quoted' : request.request_status.charAt(0).toUpperCase() + request.request_status.slice(1)}
-        </span>
-        
-        <div className="request-header">
-          <div className="provider-info">
-            <div className="provider-avatar">
-              {getInitials(request.provider_name || 'No Provider')}
-            </div>
-            <div className="provider-details">
-              <div className="provider-name">
-                {request.provider_name || 'No Provider Assigned'}
-              </div>
-              <div className="provider-type">
-                {request.request_type === 'custom' ? 'Custom Request' : 
-                 request.request_type === 'direct' ? 'Direct Service' : 
-                 'Emergency Request'}
-              </div>
-              <div className="request-id">#REQ-{request.request_id}</div>
-            </div>
-          </div>
-        </div>
+    // Wrap map in try-catch to prevent render crashes
+    try {
+      return requests.map((request) => {
+        // Defensive checks for each request object
+        if (!request || !request.request_id) return null;
 
-        <div className="request-summary">
-          {request.request_summary}
-        </div>
-        
-        <div className="request-footer">
-          <div className="request-time">
-            Requested {formatTimeAgo(request.created_at)}
+        return (
+          <div key={request.request_id} className="request-card">
+            <span className={`status-tag ${getStatusClass(request.request_status || 'pending')}`}>
+              <span className="material-icons-round" style={{fontSize: '12px'}}>
+                {getStatusIcon(request.request_status || 'pending')}
+              </span>
+              {request.request_status === 'qouted' ? 'Quoted' : 
+               (request.request_status || 'pending').charAt(0).toUpperCase() + 
+               (request.request_status || 'pending').slice(1)}
+            </span>
+            
+            <div className="request-header">
+              <div className="provider-info">
+                <div className="provider-avatar">
+                  {getInitials(request.provider_name || 'No Provider')}
+                </div>
+                <div className="provider-details">
+                  <div className="provider-name">
+                    {request.provider_name || 'No Provider Assigned'}
+                  </div>
+                  <div className="provider-type">
+                    {request.request_type === 'custom' ? 'Custom Request' : 
+                     request.request_type === 'direct' ? 'Direct Service' : 
+                     'Emergency Request'}
+                  </div>
+                  <div className="request-id">#REQ-{request.request_id}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="request-summary">
+              {request.request_summary || 'No description provided'}
+            </div>
+            
+            <div className="request-footer">
+              <div className="request-time">
+                Requested {formatTimeAgo(request.created_at || new Date().toISOString())}
+              </div>
+              <button 
+                className="btn-details" 
+                onClick={() => goToRequestDetail(request.request_id, request.request_status || 'pending')}
+              >
+                <span className="material-icons-round icon-sm">visibility</span>
+                See Details
+              </button>
+            </div>
           </div>
-          <button 
-            className="btn-details" 
-            onClick={() => goToRequestDetail(request.request_id, request.request_status)}
-          >
-            <span className="material-icons-round icon-sm">visibility</span>
-            See Details
-          </button>
+        );
+      }).filter(Boolean); // Remove any null entries
+    } catch (renderError) {
+      console.error('Error rendering request cards:', renderError);
+      return (
+        <div className="error-message">
+          Error displaying requests. Please refresh the page.
         </div>
-      </div>
-    ));
+      );
+    }
   };
 
   return (
     <IonPage>
-      <IonContent className="request-content" style={{ paddingBottom: '80px' }}>
+      <IonContent className="request-content">
         {/* Header */}
         <div className="request-header-top">
           <h1 className="request-title">Request</h1>

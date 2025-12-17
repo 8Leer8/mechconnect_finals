@@ -64,10 +64,15 @@ import MechanicHome from '../pages/mechanic/home';
 import MechanicMap from '../pages/mechanic/map';
 import MechanicJobs from '../pages/mechanic/jobs';
 import MechanicJobDetail from '../pages/mechanic/job-detail';
+import CompletedJobDetail from '../pages/mechanic/completed-job-detail';
+import BackjobDetail from '../pages/mechanic/backjob-detail';
 import MechanicEarnings from '../pages/mechanic/earnings';
 import MechanicProfile from '../pages/mechanic/profile';
 import MechanicNotifications from '../pages/mechanic/notifications';
 import MechanicReviews from '../pages/mechanic/reviews';
+import StartingJob from '../pages/mechanic/starting-job';
+import WorkingJob from '../pages/mechanic/working-job';
+import WalletTopUp from '../pages/mechanic/wallet/TopUp';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -234,11 +239,15 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/mechanic/jobs" component={MechanicJobs} />
       <Route exact path="/mechanic/map" component={MechanicMap} />
       <Route exact path="/mechanic/job-detail/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/start-job/:id" component={StartingJob} />
+      <Route exact path="/mechanic/working-job/:id" component={WorkingJob} />
       <Route exact path="/mechanic/active-job/:id" component={MechanicJobDetail} />
-      <Route exact path="/mechanic/completed-job/:id" component={MechanicJobDetail} />
+      <Route exact path="/mechanic/completed-job/:id" component={CompletedJobDetail} />
+      <Route exact path="/mechanic/backjob-detail/:id" component={BackjobDetail} />
       <Route exact path="/mechanic/cancelled-job/:id" component={MechanicJobDetail} />
       <Route exact path="/mechanic/earnings" component={MechanicEarnings} />
       <Route exact path="/mechanic/profile" component={MechanicProfile} />
+      <Route exact path="/mechanic/wallet/topup" component={WalletTopUp} />
       
       {/* Default Route */}
       <Route exact path="/">

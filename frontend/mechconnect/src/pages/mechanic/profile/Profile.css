@@ -90,6 +90,12 @@
   transform: scale(0.95);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Profile Header Section */
 .profile-header-section {
   background: white;

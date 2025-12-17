@@ -62,12 +62,61 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Map Container */
 .mechanic-map-container {
   padding: 20px;
   padding-bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Leaflet Map Container */
+.leaflet-map-container {
+  height: 300px !important;
+  width: 100% !important;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  position: relative;
+}
+
+/* Fix Leaflet default styles for Ionic */
+.leaflet-map-container .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  border-radius: 16px;
+  background: #f0f0f0;
+}
+
+/* Ensure Leaflet controls render properly */
+.leaflet-map-container .leaflet-control-zoom {
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.leaflet-map-container .leaflet-control-zoom a {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: white;
+  color: #333;
+}
+
+.leaflet-map-container .leaflet-control-zoom a:hover {
+  background-color: #f4f4f4;
+}
+
+/* Keep old placeholder styles for reference (can be removed later) */
 .map-placeholder {
   height: 300px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

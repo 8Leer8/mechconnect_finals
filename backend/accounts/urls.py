@@ -25,6 +25,9 @@ urlpatterns = [
     # Role management
     path('check-roles/', authentication.check_user_roles, name='check_user_roles'),
     
+    # Mechanic registration
+    path('mechanic/register/', authentication.mechanic_register, name='mechanic_register'),
+    
     # Health check
     path('health/', dashboard.health_check, name='health_check'),
 
@@ -46,6 +49,11 @@ urlpatterns = [
     path('head-admin/verifications/', verifications.get_verifications, name='get_verifications'),
     path('head-admin/verify-user/', verifications.verify_user_verification, name='verify_user_verification'),
     path('head-admin/reject-verification/', verifications.reject_verification, name='reject_verification'),
+    
+    # Head Admin Mechanic Approval Management
+    path('head-admin/mechanics/pending/', verifications.get_pending_mechanics, name='get_pending_mechanics'),
+    path('head-admin/mechanics/approve/', verifications.approve_mechanic, name='approve_mechanic'),
+    path('head-admin/mechanics/reject/', verifications.reject_mechanic, name='reject_mechanic'),
     
     # Head Admin Shop Management
     path('head-admin/shops/', shops.get_shops, name='get_shops'),

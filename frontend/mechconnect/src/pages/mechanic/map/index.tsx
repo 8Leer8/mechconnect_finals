@@ -1,14 +1,63 @@
 import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Map.css';
 
 const Map: React.FC = () => {
   const history = useHistory();
   const [showToast, setShowToast] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
 
   const goToNotifications = () => history.push('/mechanic/notifications');
+
+  // Leaflet map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+
+    const timer = setTimeout(() => {
+      if (!mapRef.current) return;
+
+      const map = L.map(mapRef.current, {
+        center: [6.9214, 122.0790], 
+        zoom: 13,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        dragging: true,
+        touchZoom: true,
+        doubleClickZoom: true,
+        boxZoom: true,
+        keyboard: true,
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+        minZoom: 3,
+      }).addTo(map);
+
+      mapInstanceRef.current = map;
+
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 100);
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
 
   // Mock data for nearby jobs
   const [nearbyJobs] = useState([
@@ -77,27 +126,23 @@ const Map: React.FC = () => {
         {/* Header */}
         <div className="mechanic-map-header">
           <h1 className="mechanic-map-title">Map</h1>
-          <button
-            className="mechanic-notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="mechanic-notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>
 
         {/* Map Container */}
         <div className="mechanic-map-container">
-          <div className="map-placeholder">
-            <div className="map-content">
-              <span className="material-icons-round map-icon">map</span>
-              <h3>Interactive Map</h3>
-              <p>Map integration would go here</p>
-              <div className="current-location">
-                <span className="material-icons-round location-icon">my_location</span>
-                <span className="location-text">Current Location: Manila, Philippines</span>
-              </div>
-            </div>
-          </div>
+          <div 
+            ref={mapRef} 
+            className="leaflet-map-container"
+          />
         </div>
 
         {/* Quick Actions */}

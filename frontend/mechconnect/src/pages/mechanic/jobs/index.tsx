@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Jobs.css';
 
 // Interface for job data from API
@@ -11,12 +12,14 @@ interface JobData {
   status: string;
   amount_fee?: number;
   booked_at?: string;
+  completed_at?: string;
   client_name: string;
   provider_name?: string;
   request_summary: string;
   request_type: string;
   created_at: string;
   service_location?: string;
+  original_job_id?: number;
 }
 
 const Jobs: React.FC = () => {
@@ -31,129 +34,13 @@ const Jobs: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
-
-  // Mechanic ID - In a real app, this would come from authentication context
-  const [mechanicId, setMechanicId] = useState<number>(5); // Default to 5 for testing
-
-  // Mock placeholder jobs data
-  const mockJobs: JobData[] = [
-    {
-      request_id: 1,
-      status: 'available',
-      client_name: 'Maria Santos',
-      request_summary: 'Car battery replacement',
-      request_type: 'Battery Service',
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      service_location: 'Makati City, Philippines'
-    },
-    {
-      request_id: 2,
-      status: 'quoted',
-      amount_fee: 2500,
-      client_name: 'Juan Dela Cruz',
-      request_summary: 'Engine oil change and filter replacement',
-      request_type: 'Oil Change',
-      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Quezon City, Philippines'
-    },
-    {
-      booking_id: 101,
-      request_id: 3,
-      status: 'active',
-      amount_fee: 1800,
-      booked_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      client_name: 'Ana Reyes',
-      request_summary: 'Brake pad replacement and inspection',
-      request_type: 'Brake Service',
-      created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Pasig City, Philippines'
-    },
-    {
-      booking_id: 102,
-      request_id: 4,
-      status: 'active',
-      amount_fee: 3200,
-      booked_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      client_name: 'Pedro Garcia',
-      request_summary: 'Full diagnostic scan and error code reading',
-      request_type: 'Diagnostics',
-      created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Taguig City, Philippines'
-    },
-    {
-      booking_id: 103,
-      request_id: 5,
-      status: 'completed',
-      amount_fee: 1500,
-      booked_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      client_name: 'Rosa Mendoza',
-      request_summary: 'Tire rotation and pressure check',
-      request_type: 'Tire Service',
-      created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Manila, Philippines'
-    },
-    {
-      booking_id: 104,
-      request_id: 6,
-      status: 'completed',
-      amount_fee: 4500,
-      booked_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      client_name: 'Carlos Lopez',
-      request_summary: 'Air conditioning system recharge and repair',
-      request_type: 'AC Service',
-      created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Parañaque City, Philippines'
-    },
-    {
-      booking_id: 105,
-      request_id: 7,
-      status: 'cancelled',
-      amount_fee: 2800,
-      booked_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      client_name: 'Elena Torres',
-      request_summary: 'Transmission fluid change',
-      request_type: 'Transmission Service',
-      created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Las Piñas City, Philippines'
-    },
-    {
-      request_id: 8,
-      status: 'available',
-      client_name: 'Miguel Fernandez',
-      request_summary: 'Spark plug replacement and ignition check',
-      request_type: 'Ignition Service',
-      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Muntinlupa City, Philippines'
-    },
-    {
-      booking_id: 106,
-      request_id: 9,
-      status: 'completed',
-      amount_fee: 2100,
-      booked_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      client_name: 'Isabel Ramos',
-      request_summary: 'Suspension inspection and alignment',
-      request_type: 'Suspension Service',
-      created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Valenzuela City, Philippines'
-    },
-    {
-      request_id: 10,
-      status: 'quoted',
-      amount_fee: 3900,
-      client_name: 'Francisco Morales',
-      request_summary: 'Complete engine tune-up and maintenance',
-      request_type: 'Engine Service',
-      created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-      service_location: 'Caloocan City, Philippines'
-    }
-  ];
+  const [toastMessage, setToastMessage] = useState('Job status updated');
 
   // Read query parameters and set initial tab
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const filter = searchParams.get('filter');
-    if (filter && ['all', 'available', 'active', 'completed', 'cancelled'].includes(filter)) {
+    if (filter && ['all', 'requests', 'available', 'active', 'completed', 'cancelled'].includes(filter)) {
       setActiveTab(filter);
     }
   }, [location.search]);
@@ -163,73 +50,143 @@ const Jobs: React.FC = () => {
   // Navigation to job detail pages
   const goToJobDetail = (jobId: number, status: string) => {
     console.log('Navigating to job detail:', jobId, status);
-    history.push(`/mechanic/job-detail/${jobId}?type=${status}`);
+    
+    // Use specific routes for different job types
+    let route = '/mechanic/job-detail';
+    if (status === 'active') {
+      route = '/mechanic/active-job/102'; // Always go to active job 102 (Pedro Garcia's diagnostic service) for demo
+    } else if (status === 'completed') {
+      route = `/mechanic/completed-job/${jobId}`;
+    } else if (status === 'backjob') {
+      route = `/mechanic/backjob-detail/${jobId}`;
+    } else if (status === 'cancelled') {
+      route = `/mechanic/cancelled-job/${jobId}`;
+    } else {
+      route = `${route}/${jobId}`;
+    }
+    
+    history.push(route);
   };
 
   // Fetch jobs from API based on tab
   const fetchJobs = async (status = activeTab) => {
     setLoading(true);
     setError(null);
+    
     try {
+      // Get JWT token from localStorage
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setError('Authentication required. Please login.');
+        setJobs([]);
+        setLoading(false);
+        return;
+      }
+
       let url = '';
-      if (status === 'available') {
-        // Available jobs are requests that are quoted/accepted but not booked yet
-        url = `http://localhost:8000/api/requests/mechanic/available/?mechanic_id=${mechanicId}`;
+      let endpoint = '';
+      
+      // Determine endpoint based on status/tab
+      if (status === 'requests') {
+        // Pending requests assigned to this mechanic
+        endpoint = 'http://localhost:8000/api/requests/mechanic/pending/';
+      } else if (status === 'available') {
+        // Available jobs (quoted/accepted but not booked)
+        endpoint = 'http://localhost:8000/api/requests/mechanic/available/';
       } else if (status === 'all') {
-        // For 'all', we'll combine data from multiple endpoints or use mock data
-        url = `http://localhost:8000/api/bookings/mechanic/?mechanic_id=${mechanicId}`;
+        // All bookings (no status filter)
+        endpoint = 'http://localhost:8000/api/bookings/mechanic/';
       } else {
-        // Active and past jobs are bookings
-        url = `http://localhost:8000/api/bookings/mechanic/?mechanic_id=${mechanicId}&status=${status}`;
+        // Specific status: active, completed, cancelled, backjob
+        endpoint = `http://localhost:8000/api/bookings/mechanic/?status=${status}`;
       }
 
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (response.ok) {
-        let fetchedJobs = data.jobs || data.requests || [];
-        
-        // For 'all', try to get all statuses
-        if (status === 'all') {
-          // In a real app, this might require multiple API calls
-          // For now, use mock data to show all types
-          setJobs(mockJobs);
-        } else {
-          // Filter mock jobs by status if no real data
-          const filteredMockJobs = mockJobs.filter(job => {
-            if (status === 'available') {
-              return job.status === 'available' || job.status === 'quoted';
-            }
-            return job.status === status;
-          });
-          
-          // Use real data if available, otherwise use mock data
-          setJobs(fetchedJobs.length > 0 ? fetchedJobs : filteredMockJobs);
-        }
-      } else {
-        // On API error, use mock data
-        const filteredMockJobs = status === 'all' ? mockJobs : mockJobs.filter(job => {
-          if (status === 'available') {
-            return job.status === 'available' || job.status === 'quoted';
-          }
-          return job.status === status;
-        });
-        setJobs(filteredMockJobs);
-        setError(null); // Don't show error if we have mock data
-      }
-    } catch (err) {
-      // On network error, use mock data
-      const filteredMockJobs = status === 'all' ? mockJobs : mockJobs.filter(job => {
-        if (status === 'available') {
-          return job.status === 'available' || job.status === 'quoted';
-        }
-        return job.status === status;
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      setJobs(filteredMockJobs);
-      setError(null); // Don't show error if we have mock data
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Session expired. Please login again.');
+          setJobs([]);
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Backend returns { jobs: [], total: number } or { message: string }
+      const fetchedJobs = data.jobs || [];
+      
+      if (fetchedJobs.length === 0 && data.message) {
+        console.log(data.message);
+      }
+      
+      setJobs(fetchedJobs);
+      setError(null);
+      
+    } catch (err) {
       console.error('Error fetching jobs:', err);
+      setError('Failed to load jobs. Please try again.');
+      setJobs([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle accept/decline actions for requests
+  const handleAcceptRequest = async (requestId: number) => {
+    try {
+      // In a real app, this would make an API call
+      // await fetch(`http://localhost:8000/api/requests/${requestId}/accept/`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ mechanic_id: mechanicId })
+      // });
+
+      // For demo, update local state
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.request_id === requestId 
+            ? { ...job, status: 'active', booked_at: new Date().toISOString() }
+            : job
+        )
+      );
+      setShowToast(true);
+      setToastMessage('Request accepted successfully!');
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      setShowToast(true);
+      setToastMessage('Failed to accept request');
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: number) => {
+    try {
+      // In a real app, this would make an API call
+      // await fetch(`http://localhost:8000/api/requests/${requestId}/decline/`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ mechanic_id: mechanicId })
+      // });
+
+      // For demo, update local state
+      setJobs(prevJobs => 
+        prevJobs.filter(job => job.request_id !== requestId)
+      );
+      setShowToast(true);
+      setToastMessage('Request declined');
+    } catch (error) {
+      console.error('Error declining request:', error);
+      setShowToast(true);
+      setToastMessage('Failed to decline request');
     }
   };
 
@@ -250,15 +207,19 @@ const Jobs: React.FC = () => {
   }, [activeTab]);
 
   const tabs = [
-    { id: 'all', label: 'All', count: mockJobs.length },
-    { id: 'available', label: 'Available', count: mockJobs.filter(job => job.status === 'available' || job.status === 'quoted').length },
-    { id: 'active', label: 'Active', count: mockJobs.filter(job => job.status === 'active').length },
-    { id: 'completed', label: 'Completed', count: mockJobs.filter(job => job.status === 'completed').length },
-    { id: 'cancelled', label: 'Cancelled', count: mockJobs.filter(job => job.status === 'cancelled').length },
+    { id: 'all', label: 'All', count: activeTab === 'all' ? jobs.length : undefined },
+    { id: 'requests', label: 'Requests', count: activeTab === 'requests' ? jobs.length : undefined },
+    { id: 'available', label: 'Available', count: activeTab === 'available' ? jobs.length : undefined },
+    { id: 'active', label: 'Active', count: activeTab === 'active' ? jobs.length : undefined },
+    { id: 'completed', label: 'Completed', count: activeTab === 'completed' ? jobs.length : undefined },
+    { id: 'backjob', label: 'Backjobs', count: activeTab === 'backjob' ? jobs.length : undefined },
+    { id: 'cancelled', label: 'Cancelled', count: activeTab === 'cancelled' ? jobs.length : undefined },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending':
+        return 'status-pending';
       case 'available':
       case 'quoted':
         return 'status-available';
@@ -266,6 +227,8 @@ const Jobs: React.FC = () => {
         return 'status-active';
       case 'completed':
         return 'status-completed';
+      case 'backjob':
+        return 'status-backjob';
       case 'cancelled':
         return 'status-cancelled';
       default:
@@ -275,6 +238,8 @@ const Jobs: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
+      case 'pending':
+        return 'Pending Response';
       case 'available':
         return 'Available';
       case 'quoted':
@@ -283,6 +248,8 @@ const Jobs: React.FC = () => {
         return 'In Progress';
       case 'completed':
         return 'Completed';
+      case 'backjob':
+        return 'Follow-up Job';
       case 'cancelled':
         return 'Cancelled';
       default:
@@ -296,12 +263,15 @@ const Jobs: React.FC = () => {
         {/* Header */}
         <div className="mechanic-jobs-header">
           <h1 className="mechanic-jobs-title">Jobs</h1>
-          <button
-            className="mechanic-notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="mechanic-notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -354,6 +324,8 @@ const Jobs: React.FC = () => {
               <p>
                 {activeTab === 'available'
                   ? 'No available jobs at the moment. Check back later!'
+                  : activeTab === 'requests'
+                  ? 'No pending requests at the moment.'
                   : activeTab === 'all'
                   ? 'No jobs found.'
                   : `No ${activeTab} jobs found.`
@@ -404,6 +376,31 @@ const Jobs: React.FC = () => {
                       <span className="location-text">{job.service_location}</span>
                     </div>
                   )}
+
+                  {job.status === 'pending' && (
+                    <div className="mechanic-job-actions">
+                      <button
+                        className="action-button accept-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAcceptRequest(job.request_id);
+                        }}
+                      >
+                        <span className="material-icons-round">check</span>
+                        Accept
+                      </button>
+                      <button
+                        className="action-button decline-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeclineRequest(job.request_id);
+                        }}
+                      >
+                        <span className="material-icons-round">close</span>
+                        Decline
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -414,7 +411,7 @@ const Jobs: React.FC = () => {
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
-          message="Job status updated"
+          message={toastMessage}
           duration={2000}
           color="success"
         />

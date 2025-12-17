@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Earnings.css';
 
 interface EarningsData {
@@ -126,12 +127,15 @@ const Earnings: React.FC = () => {
             <span className="material-icons-round">arrow_back</span>
           </button>
           <h1 className="mechanic-earnings-title">Earnings</h1>
-          <button
-            className="notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>
 
         {/* Earnings Overview */}
