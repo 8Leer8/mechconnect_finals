@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Map.css';
 
 const Map: React.FC = () => {
@@ -125,12 +126,15 @@ const Map: React.FC = () => {
         {/* Header */}
         <div className="mechanic-map-header">
           <h1 className="mechanic-map-title">Map</h1>
-          <button
-            className="mechanic-notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="mechanic-notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>
 
         {/* Map Container */}

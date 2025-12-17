@@ -1,0 +1,92 @@
+.mechanic-wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+}
+
+.mechanic-wallet:hover {
+  background: #f9fafb;
+  border-color: hsl(25, 85%, 55%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.wallet-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: hsl(25, 85%, 95%);
+  border-radius: 6px;
+  color: hsl(25, 85%, 55%);
+  flex-shrink: 0;
+}
+
+.wallet-icon .material-icons-round {
+  font-size: 18px;
+}
+
+.wallet-info {
+  flex: 1;
+  text-align: left;
+}
+
+.wallet-label {
+  font-size: 10px;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.wallet-balance {
+  font-size: 14px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+}
+
+.wallet-arrow {
+  display: flex;
+  align-items: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.wallet-arrow .material-icons-round {
+  font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+  .mechanic-wallet {
+    padding: 6px 10px;
+    min-width: 100px;
+  }
+
+  .wallet-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .wallet-icon .material-icons-round {
+    font-size: 16px;
+  }
+
+  .wallet-label {
+    font-size: 9px;
+  }
+
+  .wallet-balance {
+    font-size: 13px;
+  }
+}

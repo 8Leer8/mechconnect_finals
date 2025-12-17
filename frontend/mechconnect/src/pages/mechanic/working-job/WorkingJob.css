@@ -1,0 +1,730 @@
+/* Working Job Page Styles */
+.working-job-content {
+  --background: hsl(40, 20%, 98%);
+  --padding-bottom: 64px;
+}
+
+/* Header */
+.mechanic-job-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: transparent;
+}
+
+.mechanic-job-detail-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(25, 15%, 25%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.notification-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Status Section */
+.status-section {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.status-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 16px 0;
+}
+
+.status-indicator {
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.status-indicator.arrived {
+  background: hsl(25, 85%, 95%);
+  color: hsl(25, 85%, 45%);
+}
+
+.status-indicator.working {
+  background: hsl(142, 76%, 95%);
+  color: hsl(142, 76%, 35%);
+}
+
+/* Pictures Section */
+.pictures-section {
+  padding: 0 16px 16px 16px;
+}
+
+.pictures-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.pictures-subtitle {
+  font-size: 14px;
+  color: hsl(25, 15%, 45%);
+  margin-bottom: 16px;
+}
+
+.required {
+  color: hsl(0, 85%, 55%);
+  font-weight: 600;
+}
+
+.pictures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.picture-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: hsl(0, 0%, 95%);
+}
+
+.picture-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-picture {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: hsl(0, 85%, 55%);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-picture {
+  aspect-ratio: 1;
+  border: 2px dashed hsl(0, 0%, 70%);
+  border-radius: 12px;
+  background: hsl(0, 0%, 98%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px;
+}
+
+.add-picture:hover {
+  border-color: hsl(120, 60%, 45%);
+  background: hsl(120, 60%, 98%);
+}
+
+.add-icon {
+  font-size: 32px;
+  color: hsl(120, 60%, 45%);
+  margin-bottom: 4px;
+}
+
+.add-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  text-align: center;
+}
+
+.pictures-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: hsl(45, 85%, 95%);
+  border-radius: 8px;
+  border: 1px solid hsl(45, 85%, 80%);
+}
+
+.warning-icon {
+  color: hsl(45, 85%, 50%);
+  font-size: 20px;
+}
+
+.warning-text {
+  font-size: 14px;
+  color: hsl(45, 85%, 30%);
+  font-weight: 500;
+}
+
+/* Report Button */
+.report-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: white;
+  color: hsl(0, 85%, 55%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.report-button:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background: hsl(0, 85%, 98%);
+}
+
+.status-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Inspection Section */
+.inspection-section {
+  padding: 0 16px 16px 16px;
+}
+
+.inspection-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.inspection-placeholder {
+  text-align: center;
+  padding: 40px 20px;
+  background: hsl(0, 0%, 95%);
+  border-radius: 12px;
+  border: 2px dashed hsl(0, 0%, 80%);
+}
+
+.inspection-icon {
+  font-size: 48px;
+  color: hsl(210, 100%, 50%);
+  margin-bottom: 12px;
+}
+
+.inspection-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(0, 0%, 30%);
+  margin-bottom: 8px;
+}
+
+.inspection-subtext {
+  font-size: 14px;
+  color: hsl(0, 0%, 50%);
+}
+
+/* Quotes Section */
+.quotes-section {
+  padding: 0 16px 16px 16px;
+}
+
+.quotes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(0, 0%, 20%);
+  margin: 0;
+}
+
+.btn-send-quote {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-send-quote:hover {
+  background: hsl(25, 85%, 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.quotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quote-item {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.quote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.quote-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(0, 0%, 20%);
+}
+
+.quote-amount {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 85%, 55%);
+}
+
+.quote-description {
+  font-size: 14px;
+  color: hsl(0, 0%, 45%);
+  margin-bottom: 12px;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit {
+  background: hsl(45, 85%, 55%);
+  color: white;
+}
+
+.btn-edit:hover {
+  background: hsl(45, 85%, 50%);
+}
+
+.btn-delete {
+  background: hsl(0, 85%, 55%);
+  color: white;
+}
+
+.btn-delete:hover {
+  background: hsl(0, 85%, 50%);
+}
+
+/* Action Buttons */
+.action-buttons {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.btn-contact {
+  background: hsl(25, 15%, 85%);
+  color: hsl(25, 15%, 25%);
+  border: 1px solid hsl(25, 15%, 75%);
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-contact:hover {
+  background: hsl(25, 15%, 80%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-finish {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-finish:hover {
+  background: hsl(25, 85%, 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-pause {
+  background: hsl(45, 85%, 55%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-pause:hover {
+  background: hsl(45, 85%, 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-complete {
+  background: hsl(142, 76%, 36%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-complete:hover {
+  background: hsl(142, 76%, 32%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-finish {
+  background: hsl(25, 100%, 50%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-finish:hover {
+  background: hsl(25, 100%, 45%);
+}
+
+.timer-display {
+  background: hsl(25, 85%, 95%);
+  border: 1px solid hsl(25, 85%, 85%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.timer-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(25, 15%, 40%);
+}
+
+.timer-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+  font-family: 'Courier New', monospace;
+}
+
+.icon-sm {
+  font-size: 20px;
+}
+
+/* Quote Modal */
+.quote-modal {
+  background: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+}
+
+.quote-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+
+.quote-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(0, 0%, 20%);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: hsl(0, 0%, 50%);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background: hsl(0, 0%, 95%);
+}
+
+.quote-modal-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(0, 0%, 30%);
+  margin-bottom: 8px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid hsl(0, 0%, 80%);
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: hsl(210, 100%, 50%);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.quote-modal-footer {
+  padding: 20px;
+  border-top: 1px solid hsl(0, 0%, 90%);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel, .btn-save {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: hsl(0, 0%, 90%);
+  color: hsl(0, 0%, 30%);
+}
+
+.btn-cancel:hover {
+  background: hsl(0, 0%, 80%);
+}
+
+.btn-save {
+  background: hsl(120, 60%, 45%);
+  color: white;
+}
+
+.btn-save:hover {
+  background: hsl(120, 60%, 40%);
+}
+
+/* Finish Job Modal */
+.finish-job-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 90%;
+  margin: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.finish-job-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.finish-job-modal-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0;
+}
+
+.finish-job-modal-content {
+  padding: 24px;
+  text-align: center;
+}
+
+.finish-job-icon {
+  margin-bottom: 16px;
+}
+
+.finish-job-icon .material-icons-round {
+  font-size: 48px;
+  color: hsl(25, 85%, 55%);
+}
+
+.finish-job-modal-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 8px 0;
+}
+
+.finish-job-modal-content p {
+  font-size: 16px;
+  color: hsl(0, 0%, 50%);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.finish-job-modal-footer {
+  padding: 20px;
+  border-top: 1px solid hsl(0, 0%, 90%);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-confirm {
+  background: hsl(25, 85%, 55%);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm:hover {
+  background: hsl(25, 85%, 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}

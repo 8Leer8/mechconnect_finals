@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Jobs.css';
 
 // Interface for job data from API
@@ -11,12 +12,14 @@ interface JobData {
   status: string;
   amount_fee?: number;
   booked_at?: string;
+  completed_at?: string;
   client_name: string;
   provider_name?: string;
   request_summary: string;
   request_type: string;
   created_at: string;
   service_location?: string;
+  original_job_id?: number;
 }
 
 const Jobs: React.FC = () => {
@@ -31,12 +34,40 @@ const Jobs: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('Job status updated');
 
   // Mechanic ID - In a real app, this would come from authentication context
   const [mechanicId, setMechanicId] = useState<number>(5); // Default to 5 for testing
 
   // Mock placeholder jobs data
   const mockJobs: JobData[] = [
+    {
+      request_id: 11,
+      status: 'pending',
+      client_name: 'Roberto Diaz',
+      request_summary: 'Emergency brake repair - car won\'t stop properly',
+      request_type: 'Emergency Brake Service',
+      created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+      service_location: 'Makati City, Philippines'
+    },
+    {
+      request_id: 12,
+      status: 'pending',
+      client_name: 'Sofia Reyes',
+      request_summary: 'Car won\'t start - battery might be dead',
+      request_type: 'Emergency Battery Service',
+      created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(), // 45 minutes ago
+      service_location: 'Taguig City, Philippines'
+    },
+    {
+      request_id: 13,
+      status: 'pending',
+      client_name: 'Antonio Cruz',
+      request_summary: 'Strange noise from engine when accelerating',
+      request_type: 'Engine Diagnostic',
+      created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+      service_location: 'Quezon City, Philippines'
+    },
     {
       request_id: 1,
       status: 'available',
@@ -146,6 +177,48 @@ const Jobs: React.FC = () => {
       request_type: 'Engine Service',
       created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
       service_location: 'Caloocan City, Philippines'
+    },
+    {
+      booking_id: 107,
+      request_id: 14,
+      status: 'backjob',
+      amount_fee: 1800,
+      booked_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      completed_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      client_name: 'Roberto Diaz',
+      request_summary: 'Follow-up brake inspection - customer reported squeaking',
+      request_type: 'Brake Service Follow-up',
+      created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      service_location: 'Makati City, Philippines',
+      original_job_id: 11
+    },
+    {
+      booking_id: 108,
+      request_id: 15,
+      status: 'backjob',
+      amount_fee: 2500,
+      booked_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      completed_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      client_name: 'Carlos Lopez',
+      request_summary: 'AC system recheck - customer says cooling is weak',
+      request_type: 'AC Service Follow-up',
+      created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+      service_location: 'Parañaque City, Philippines',
+      original_job_id: 104
+    },
+    {
+      booking_id: 109,
+      request_id: 16,
+      status: 'backjob',
+      amount_fee: 1200,
+      booked_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      completed_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      client_name: 'Rosa Mendoza',
+      request_summary: 'Tire pressure monitoring - customer wants regular checks',
+      request_type: 'Tire Service Follow-up',
+      created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+      service_location: 'Manila, Philippines',
+      original_job_id: 103
     }
   ];
 
@@ -153,7 +226,7 @@ const Jobs: React.FC = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const filter = searchParams.get('filter');
-    if (filter && ['all', 'available', 'active', 'completed', 'cancelled'].includes(filter)) {
+    if (filter && ['all', 'requests', 'available', 'active', 'completed', 'cancelled'].includes(filter)) {
       setActiveTab(filter);
     }
   }, [location.search]);
@@ -163,7 +236,22 @@ const Jobs: React.FC = () => {
   // Navigation to job detail pages
   const goToJobDetail = (jobId: number, status: string) => {
     console.log('Navigating to job detail:', jobId, status);
-    history.push(`/mechanic/job-detail/${jobId}?type=${status}`);
+    
+    // Use specific routes for different job types
+    let route = '/mechanic/job-detail';
+    if (status === 'active') {
+      route = '/mechanic/active-job/102'; // Always go to active job 102 (Pedro Garcia's diagnostic service) for demo
+    } else if (status === 'completed') {
+      route = `/mechanic/completed-job/${jobId}`;
+    } else if (status === 'backjob') {
+      route = `/mechanic/backjob-detail/${jobId}`;
+    } else if (status === 'cancelled') {
+      route = `/mechanic/cancelled-job/${jobId}`;
+    } else {
+      route = `${route}/${jobId}`;
+    }
+    
+    history.push(route);
   };
 
   // Fetch jobs from API based on tab
@@ -175,6 +263,9 @@ const Jobs: React.FC = () => {
       if (status === 'available') {
         // Available jobs are requests that are quoted/accepted but not booked yet
         url = `http://localhost:8000/api/requests/mechanic/available/?mechanic_id=${mechanicId}`;
+      } else if (status === 'requests') {
+        // Requests are jobs specifically assigned to this mechanic
+        url = `http://localhost:8000/api/requests/mechanic/assigned/?mechanic_id=${mechanicId}`;
       } else if (status === 'all') {
         // For 'all', we'll combine data from multiple endpoints or use mock data
         url = `http://localhost:8000/api/bookings/mechanic/?mechanic_id=${mechanicId}`;
@@ -199,6 +290,8 @@ const Jobs: React.FC = () => {
           const filteredMockJobs = mockJobs.filter(job => {
             if (status === 'available') {
               return job.status === 'available' || job.status === 'quoted';
+            } else if (status === 'requests') {
+              return job.status === 'pending';
             }
             return job.status === status;
           });
@@ -211,6 +304,10 @@ const Jobs: React.FC = () => {
         const filteredMockJobs = status === 'all' ? mockJobs : mockJobs.filter(job => {
           if (status === 'available') {
             return job.status === 'available' || job.status === 'quoted';
+          } else if (status === 'requests') {
+            return job.status === 'pending';
+          } else if (status === 'backjob') {
+            return job.status === 'backjob';
           }
           return job.status === status;
         });
@@ -222,6 +319,10 @@ const Jobs: React.FC = () => {
       const filteredMockJobs = status === 'all' ? mockJobs : mockJobs.filter(job => {
         if (status === 'available') {
           return job.status === 'available' || job.status === 'quoted';
+        } else if (status === 'requests') {
+          return job.status === 'pending';
+        } else if (status === 'backjob') {
+          return job.status === 'backjob';
         }
         return job.status === status;
       });
@@ -230,6 +331,55 @@ const Jobs: React.FC = () => {
       console.error('Error fetching jobs:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle accept/decline actions for requests
+  const handleAcceptRequest = async (requestId: number) => {
+    try {
+      // In a real app, this would make an API call
+      // await fetch(`http://localhost:8000/api/requests/${requestId}/accept/`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ mechanic_id: mechanicId })
+      // });
+
+      // For demo, update local state
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.request_id === requestId 
+            ? { ...job, status: 'active', booked_at: new Date().toISOString() }
+            : job
+        )
+      );
+      setShowToast(true);
+      setToastMessage('Request accepted successfully!');
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      setShowToast(true);
+      setToastMessage('Failed to accept request');
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: number) => {
+    try {
+      // In a real app, this would make an API call
+      // await fetch(`http://localhost:8000/api/requests/${requestId}/decline/`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ mechanic_id: mechanicId })
+      // });
+
+      // For demo, update local state
+      setJobs(prevJobs => 
+        prevJobs.filter(job => job.request_id !== requestId)
+      );
+      setShowToast(true);
+      setToastMessage('Request declined');
+    } catch (error) {
+      console.error('Error declining request:', error);
+      setShowToast(true);
+      setToastMessage('Failed to decline request');
     }
   };
 
@@ -251,14 +401,18 @@ const Jobs: React.FC = () => {
 
   const tabs = [
     { id: 'all', label: 'All', count: mockJobs.length },
+    { id: 'requests', label: 'Requests', count: mockJobs.filter(job => job.status === 'pending').length },
     { id: 'available', label: 'Available', count: mockJobs.filter(job => job.status === 'available' || job.status === 'quoted').length },
     { id: 'active', label: 'Active', count: mockJobs.filter(job => job.status === 'active').length },
     { id: 'completed', label: 'Completed', count: mockJobs.filter(job => job.status === 'completed').length },
+    { id: 'backjob', label: 'Backjobs', count: mockJobs.filter(job => job.status === 'backjob').length },
     { id: 'cancelled', label: 'Cancelled', count: mockJobs.filter(job => job.status === 'cancelled').length },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending':
+        return 'status-pending';
       case 'available':
       case 'quoted':
         return 'status-available';
@@ -266,6 +420,8 @@ const Jobs: React.FC = () => {
         return 'status-active';
       case 'completed':
         return 'status-completed';
+      case 'backjob':
+        return 'status-backjob';
       case 'cancelled':
         return 'status-cancelled';
       default:
@@ -275,6 +431,8 @@ const Jobs: React.FC = () => {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
+      case 'pending':
+        return 'Pending Response';
       case 'available':
         return 'Available';
       case 'quoted':
@@ -283,6 +441,8 @@ const Jobs: React.FC = () => {
         return 'In Progress';
       case 'completed':
         return 'Completed';
+      case 'backjob':
+        return 'Follow-up Job';
       case 'cancelled':
         return 'Cancelled';
       default:
@@ -296,12 +456,15 @@ const Jobs: React.FC = () => {
         {/* Header */}
         <div className="mechanic-jobs-header">
           <h1 className="mechanic-jobs-title">Jobs</h1>
-          <button
-            className="mechanic-notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="mechanic-notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -354,6 +517,8 @@ const Jobs: React.FC = () => {
               <p>
                 {activeTab === 'available'
                   ? 'No available jobs at the moment. Check back later!'
+                  : activeTab === 'requests'
+                  ? 'No pending requests at the moment.'
                   : activeTab === 'all'
                   ? 'No jobs found.'
                   : `No ${activeTab} jobs found.`
@@ -404,6 +569,31 @@ const Jobs: React.FC = () => {
                       <span className="location-text">{job.service_location}</span>
                     </div>
                   )}
+
+                  {job.status === 'pending' && (
+                    <div className="mechanic-job-actions">
+                      <button
+                        className="action-button accept-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAcceptRequest(job.request_id);
+                        }}
+                      >
+                        <span className="material-icons-round">check</span>
+                        Accept
+                      </button>
+                      <button
+                        className="action-button decline-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeclineRequest(job.request_id);
+                        }}
+                      >
+                        <span className="material-icons-round">close</span>
+                        Decline
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -414,7 +604,7 @@ const Jobs: React.FC = () => {
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
-          message="Job status updated"
+          message={toastMessage}
           duration={2000}
           color="success"
         />

@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Reviews.css';
 
 interface Review {
@@ -129,12 +130,15 @@ const Reviews: React.FC = () => {
             <span className="material-icons-round">arrow_back</span>
           </button>
           <h1 className="mechanic-reviews-title">Reviews & Ratings</h1>
-          <button
-            className="notification-button"
-            onClick={goToNotifications}
-          >
-            <span className="material-icons-round">notifications</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="notification-button"
+              onClick={goToNotifications}
+            >
+              <span className="material-icons-round">notifications</span>
+            </button>
+          </div>
         </div>
 
         {/* Rating Summary */}

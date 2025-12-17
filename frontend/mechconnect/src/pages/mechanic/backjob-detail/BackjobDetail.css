@@ -1,0 +1,505 @@
+/* Backjob Detail Page Styles */
+.backjob-detail-content {
+  --background: #f8f9fa;
+  --padding-bottom: 120px; /* Space for bottom nav and wallet */
+}
+
+.backjob-detail-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Header */
+.backjob-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 8px 0;
+}
+
+.backjob-detail-back-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.backjob-detail-back-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.backjob-detail-back-btn .material-icons-round {
+  font-size: 24px;
+  color: #333;
+}
+
+.backjob-detail-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Status Section */
+.backjob-status-section {
+  margin-bottom: 24px;
+}
+
+.backjob-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.backjob-status-badge.status-backjob {
+  background: linear-gradient(135deg, hsl(25, 85%, 55%), hsl(25, 85%, 45%));
+  color: white;
+}
+
+.backjob-status-badge ion-icon {
+  font-size: 16px;
+}
+
+/* Client Section */
+.backjob-client-section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.backjob-client-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.backjob-client-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: hsl(25, 85%, 55%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backjob-client-avatar .material-icons-round {
+  font-size: 24px;
+  color: white;
+}
+
+.backjob-client-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.backjob-job-id {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.contact-customer-btn {
+  --border-radius: 8px;
+  --border-color: hsl(25, 85%, 55%);
+  --color: hsl(25, 85%, 55%);
+  font-weight: 500;
+  width: 100%;
+}
+
+/* Service Section */
+.backjob-service-section {
+  margin-bottom: 24px;
+}
+
+.backjob-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 16px 0;
+}
+
+.backjob-service-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.backjob-service-type {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.service-icon {
+  font-size: 24px;
+  color: hsl(25, 85%, 55%);
+  margin-top: 2px;
+}
+
+.backjob-service-type h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.backjob-service-type p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.backjob-service-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.amount-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.amount-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 85%, 55%);
+}
+
+/* Original Job Section */
+.backjob-original-section {
+  margin-bottom: 24px;
+}
+
+.backjob-original-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.backjob-original-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.backjob-original-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.backjob-original-header .material-icons-round {
+  font-size: 20px;
+  color: hsl(25, 85%, 55%);
+}
+
+.backjob-original-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.backjob-original-id,
+.backjob-original-date,
+.backjob-original-amount {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* Schedule Section */
+.backjob-schedule-section {
+  margin-bottom: 24px;
+}
+
+.backjob-schedule-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.backjob-schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.backjob-schedule-item:last-child {
+  margin-bottom: 0;
+}
+
+.backjob-schedule-item ion-icon {
+  font-size: 20px;
+  color: hsl(25, 85%, 55%);
+  min-width: 20px;
+}
+
+.schedule-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.schedule-value {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Feedback Section */
+.backjob-feedback-section {
+  margin-bottom: 24px;
+}
+
+.backjob-feedback-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.backjob-feedback-rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 4px;
+}
+
+.rating-stars ion-icon {
+  font-size: 16px;
+}
+
+.star-filled {
+  color: #ffd700;
+}
+
+.star-empty {
+  color: #ddd;
+}
+
+.rating-value {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.backjob-feedback-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Photos Section */
+.backjob-photos-section {
+  margin-bottom: 24px;
+}
+
+.backjob-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.backjob-photo-item {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.backjob-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Actions Section */
+.backjob-actions-section {
+  margin-bottom: 24px;
+}
+
+.backjob-reschedule-btn {
+  --background: linear-gradient(135deg, hsl(25, 85%, 55%), hsl(25, 85%, 45%));
+  --border-radius: 12px;
+  --color: white;
+  font-weight: 600;
+  height: 50px;
+}
+
+.backjob-reschedule-btn ion-icon {
+  margin-right: 8px;
+}
+
+/* Modal Styles */
+.backjob-reschedule-modal .modal-wrapper {
+  --border-radius: 12px;
+}
+
+.backjob-modal-content {
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  margin: 20px;
+}
+
+.backjob-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.backjob-modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.backjob-modal-close {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backjob-modal-close ion-icon {
+  font-size: 24px;
+  color: #666;
+}
+
+.backjob-modal-body {
+  margin-bottom: 24px;
+}
+
+.backjob-modal-body p {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.backjob-modal-note {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+.backjob-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.backjob-modal-actions ion-button {
+  flex: 1;
+  --border-radius: 8px;
+  font-weight: 500;
+}
+
+.backjob-confirm-reschedule {
+  --background: hsl(25, 85%, 55%);
+}
+
+/* Contact Modal Styles */
+.backjob-contact-modal .modal-wrapper {
+  --border-radius: 12px;
+}
+
+.backjob-contact-modal .backjob-modal-actions.contact-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.backjob-contact-modal .backjob-modal-actions.contact-options ion-button {
+  --border-radius: 8px;
+  --color: hsl(25, 85%, 55%);
+  --border-color: hsl(25, 85%, 55%);
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .backjob-detail-container {
+    padding: 12px;
+  }
+
+  .backjob-detail-title {
+    font-size: 20px;
+  }
+
+  .backjob-client-header {
+    gap: 12px;
+  }
+
+  .backjob-client-avatar {
+    width: 45px;
+    height: 45px;
+  }
+
+  .backjob-client-avatar .material-icons-round {
+    font-size: 20px;
+  }
+
+  .backjob-service-type {
+    gap: 12px;
+  }
+
+  .service-icon {
+    font-size: 20px;
+  }
+
+  .backjob-schedule-item {
+    gap: 12px;
+  }
+
+  .backjob-photos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+  }
+}
