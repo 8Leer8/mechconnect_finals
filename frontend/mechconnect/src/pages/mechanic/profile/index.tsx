@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast, IonModal, IonHeader, IonToolbar, IonTitl
 import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
 import BottomNavMechanic from '../../../components/BottomNavMechanic';
+import Wallet from '../../../components/Wallet';
 import './Profile.css';
 
 interface MechanicProfile {
@@ -24,10 +25,6 @@ const Profile: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('Feature coming soon');
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-
-  const goToNotifications = () => {
-    history.push('/mechanic/notifications');
-  };
 
   // Mock profile data - in a real app, this would come from an API
   const profileData: MechanicProfile = {
@@ -53,6 +50,12 @@ const Profile: React.FC = () => {
     // Frontend-only: clear local storage and redirect to login
     localStorage.clear();
     history.push('/login');
+    setShowSettingsModal(false);
+  };
+
+  const switchToClient = () => {
+    // Navigate to switch account page to change roles
+    history.push('/auth/switch-account');
     setShowSettingsModal(false);
   };
 
@@ -113,12 +116,15 @@ const Profile: React.FC = () => {
             <span className="material-icons-round">arrow_back</span>
           </button>
           <h1 className="mechanic-profile-title">Profile</h1>
-          <button
-            className="settings-button"
-            onClick={goToSettings}
-          >
-            <span className="material-icons-round">settings</span>
-          </button>
+          <div className="header-actions">
+            <Wallet />
+            <button
+              className="settings-button"
+              onClick={goToSettings}
+            >
+              <span className="material-icons-round">settings</span>
+            </button>
+          </div>
         </div>
 
         {/* Profile Header */}
@@ -309,6 +315,10 @@ const Profile: React.FC = () => {
             <IonItem button onClick={editProfile}>
               <span className="material-icons-round" slot="start">edit</span>
               <IonLabel>Edit Profile</IonLabel>
+            </IonItem>
+            <IonItem button onClick={switchToClient}>
+              <span className="material-icons-round" slot="start">switch_account</span>
+              <IonLabel>Switch to Client</IonLabel>
             </IonItem>
             <IonItem button onClick={switchAccount}>
               <span className="material-icons-round" slot="start">person</span>

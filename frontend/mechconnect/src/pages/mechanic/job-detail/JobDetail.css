@@ -123,6 +123,12 @@
   transform: scale(0.95);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .header-spacer {
   width: 44px;
 }
@@ -376,6 +382,16 @@
   transform: translateY(-1px);
 }
 
+.btn-quote {
+  background: hsl(45, 85%, 55%);
+  color: white;
+}
+
+.btn-quote:hover {
+  background: hsl(45, 85%, 50%);
+  transform: translateY(-1px);
+}
+
 .btn-accept {
   background: hsl(120, 60%, 45%);
   color: white;
@@ -383,6 +399,16 @@
 
 .btn-accept:hover {
   background: hsl(120, 60%, 40%);
+  transform: translateY(-1px);
+}
+
+.btn-start {
+  background: hsl(25, 85%, 55%);
+  color: white;
+}
+
+.btn-start:hover {
+  background: hsl(25, 85%, 50%);
   transform: translateY(-1px);
 }
 
@@ -438,4 +464,144 @@
   .action-buttons button {
     width: 100%;
   }
+}
+
+/* Quote Modal */
+.quote-modal {
+  background: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.quote-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid hsl(0, 0%, 90%);
+}
+
+.quote-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: hsl(0, 0%, 50%);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background: hsl(0, 0%, 95%);
+}
+
+.quote-modal-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.quote-item {
+  background: hsl(0, 0%, 98%);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid hsl(0, 0%, 90%);
+}
+
+.quote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.quote-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.quote-amount {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(120, 60%, 45%);
+}
+
+.quote-description {
+  font-size: 14px;
+  color: hsl(25, 15%, 45%);
+  margin-bottom: 12px;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit {
+  background: hsl(45, 85%, 55%);
+  color: white;
+}
+
+.btn-edit:hover {
+  background: hsl(45, 85%, 50%);
+}
+
+.btn-delete {
+  background: hsl(0, 85%, 55%);
+  color: white;
+}
+
+.btn-delete:hover {
+  background: hsl(0, 85%, 50%);
+}
+
+.quote-modal-footer {
+  padding: 20px;
+  border-top: 1px solid hsl(0, 0%, 90%);
+}
+
+.btn-add-new {
+  width: 100%;
+  padding: 14px 16px;
+  background: hsl(120, 60%, 45%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-add-new:hover {
+  background: hsl(120, 60%, 40%);
+  transform: translateY(-1px);
 }

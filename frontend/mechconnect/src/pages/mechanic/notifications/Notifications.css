@@ -85,6 +85,12 @@
   transform: translateY(-1px);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Notifications List */
 .mechanic-notifications-list {
   padding: 0;

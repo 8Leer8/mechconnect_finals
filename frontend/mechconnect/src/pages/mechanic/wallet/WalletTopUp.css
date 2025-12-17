@@ -1,0 +1,228 @@
+.wallet-topup-content {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 100px; /* Space for bottom nav */
+}
+
+/* Current Balance Card */
+.wallet-balance-card {
+  background: linear-gradient(135deg, hsl(25, 85%, 55%) 0%, hsl(25, 85%, 50%) 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+  text-align: center;
+}
+
+.balance-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.balance-icon {
+  font-size: 24px;
+  opacity: 0.9;
+}
+
+.balance-label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.balance-amount {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.balance-subtitle {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Commission Info Card */
+.commission-info-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.commission-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.commission-icon {
+  color: hsl(25, 85%, 55%);
+  font-size: 20px;
+}
+
+.commission-info-card h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.commission-details {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.commission-details p {
+  margin: 4px 0;
+}
+
+/* Top-up Section */
+.topup-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin-bottom: 16px;
+}
+
+.topup-option {
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.option-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.option-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.option-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+}
+
+.option-tokens {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.option-bonus {
+  text-align: right;
+}
+
+.bonus-badge {
+  background: hsl(142, 76%, 36%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Summary Card */
+.summary-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.bonus-row {
+  color: hsl(142, 76%, 36%);
+  font-weight: 600;
+}
+
+.total-row {
+  font-size: 16px;
+  font-weight: 700;
+  color: hsl(25, 15%, 25%);
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+  padding-top: 12px;
+}
+
+.summary-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 8px 0;
+}
+
+/* Top-up Actions */
+.topup-actions {
+  padding: 16px 0;
+}
+
+.topup-button {
+  --border-radius: 12px;
+  --background: hsl(25, 85%, 55%);
+  --background-hover: hsl(25, 85%, 50%);
+  --background-activated: hsl(25, 85%, 45%);
+  font-weight: 600;
+  height: 50px;
+}
+
+.topup-button .material-icons-round {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+  .wallet-topup-content {
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+
+  .wallet-balance-card {
+    padding: 16px;
+  }
+
+  .balance-amount {
+    font-size: 28px;
+  }
+
+  .option-amount {
+    font-size: 16px;
+  }
+
+  .option-tokens {
+    font-size: 13px;
+  }
+}
