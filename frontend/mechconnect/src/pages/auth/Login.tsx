@@ -43,10 +43,18 @@ const Login: React.FC = () => {
         setToastColor('success');
         setShowToast(true);
         
-        // Store user data
+        // Store user data and JWT tokens
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('userId', data.user.acc_id);
+        }
+        
+        // Store JWT tokens
+        if (data.access) {
+          localStorage.setItem('token', data.access);
+        }
+        if (data.refresh) {
+          localStorage.setItem('refreshToken', data.refresh);
         }
         
         // Role-based routing

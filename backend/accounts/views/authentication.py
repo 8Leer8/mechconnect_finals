@@ -14,7 +14,7 @@ from ..models import Account, PasswordReset
 from ..serializers import (
     UserRegistrationSerializer, UserLoginSerializer, AccountSerializer,
     PasswordChangeSerializer, PasswordResetRequestSerializer, 
-    PasswordResetConfirmSerializer
+    PasswordResetConfirmSerializer, MyTokenObtainPairSerializer
 )
 from ..utils import send_verification_email, send_email_verification_otp, verify_email_otp, is_email_verified, send_password_reset_otp, verify_password_reset_otp, is_password_reset_verified
 
@@ -128,7 +128,7 @@ def register(request):
 @permission_classes([AllowAny])
 def login(request):
     """
-    Authenticate user and return user data
+    Authenticate user and return user data with JWT tokens
     """
     serializer = UserLoginSerializer(data=request.data)
     if serializer.is_valid():
@@ -141,10 +141,16 @@ def login(request):
                 'reason': user.ban.reason_ban
             }, status=status.HTTP_403_FORBIDDEN)
         
+        # Generate JWT tokens
+        token_serializer = MyTokenObtainPairSerializer()
+        refresh = token_serializer.get_token(user)
+        
         user_data = AccountSerializer(user).data
         return Response({
             'message': 'Login successful',
-            'user': user_data
+            'user': user_data,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
         }, status=status.HTTP_200_OK)
     
     return Response({

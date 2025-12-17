@@ -379,33 +379,94 @@ def assign_provider_to_request(request, request_id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_mechanic_available_requests(request):
-    """Get available requests for a mechanic (quoted/accepted but not booked)"""
-    mechanic_id = request.GET.get('mechanic_id')
-
-    if not mechanic_id:
-        return Response({'error': 'Mechanic ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+    """
+    Get available requests for the authenticated mechanic.
+    Available = requests that are quoted/accepted but not yet booked.
+    Uses JWT authentication - no mechanic_id parameter needed.
+    Returns empty list if user has no mechanic profile.
+    """
+    # Get the authenticated user
+    user = request.user
+    
+    # Check if user has a mechanic profile
     try:
-        mechanic = Mechanic.objects.get(mechanic_id=mechanic_id)
+        mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
     except Mechanic.DoesNotExist:
-        return Response({'error': 'Mechanic not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        # User has no mechanic profile, return empty list
+        return Response({
+            'jobs': [],
+            'total': 0,
+            'message': 'User has no mechanic profile'
+        }, status=status.HTTP_200_OK)
+    
     # Get requests that are assigned to this mechanic and are quoted/accepted but not booked
-    requests = Request.objects.filter(
-        provider=mechanic.mechanic_id.acc_id,
+    requests_queryset = Request.objects.filter(
+        provider=user.acc_id,
         request_status__in=['quoted', 'accepted']
     ).exclude(
         # Exclude requests that already have bookings
         request_id__in=Booking.objects.values_list('request_id', flat=True)
-    ).select_related('client').order_by('-created_at')
-
+    ).select_related(
+        'client',
+        'client__client_id'
+    ).prefetch_related(
+        'custom_request',
+        'direct_request',
+        'emergency_request'
+    ).order_by('-created_at')
+    
     # Serialize the requests
-    serializer = RequestListSerializer(requests, many=True)
+    serializer = RequestListSerializer(requests_queryset, many=True)
     return Response({
-        'requests': serializer.data,
+        'jobs': serializer.data,
         'total': len(serializer.data)
-    })
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_mechanic_pending_requests(request):
+    """
+    Get pending requests for the authenticated mechanic.
+    Pending = requests specifically assigned to this mechanic that are awaiting response.
+    Uses JWT authentication - no mechanic_id parameter needed.
+    Returns empty list if user has no mechanic profile.
+    """
+    # Get the authenticated user
+    user = request.user
+    
+    # Check if user has a mechanic profile
+    try:
+        mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+    except Mechanic.DoesNotExist:
+        # User has no mechanic profile, return empty list
+        return Response({
+            'jobs': [],
+            'total': 0,
+            'message': 'User has no mechanic profile'
+        }, status=status.HTTP_200_OK)
+    
+    # Get pending requests assigned to this mechanic
+    requests_queryset = Request.objects.filter(
+        provider=user.acc_id,
+        request_status='pending'
+    ).select_related(
+        'client',
+        'client__client_id'
+    ).prefetch_related(
+        'custom_request',
+        'direct_request',
+        'emergency_request'
+    ).order_by('-created_at')
+    
+    # Serialize the requests
+    serializer = RequestListSerializer(requests_queryset, many=True)
+    return Response({
+        'jobs': serializer.data,
+        'total': len(serializer.data)
+    }, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

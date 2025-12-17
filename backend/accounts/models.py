@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.hashers import check_password as django_check_password
 
 class Account(models.Model):
     acc_id = models.AutoField(primary_key=True)
@@ -18,6 +19,37 @@ class Account(models.Model):
 
     def __str__(self):
         return f"{self.firstname} {self.lastname} ({self.username})"
+    
+    @property
+    def is_authenticated(self):
+        """
+        Always return True. This is a way to tell if the user has been authenticated.
+        Required by Django REST Framework's IsAuthenticated permission class.
+        """
+        return True
+    
+    @property
+    def is_anonymous(self):
+        """
+        Always return False. This is a way to tell if the user is anonymous.
+        Required by Django's authentication system.
+        """
+        return False
+    
+    def check_password(self, raw_password):
+        """
+        Check if the provided raw password matches the stored hashed password.
+        Required for Django authentication and JWT token generation.
+        """
+        return django_check_password(raw_password, self.password)
+    
+    def get_primary_role(self):
+        """
+        Get the primary role of the user.
+        Returns the first role if multiple roles exist, or None if no roles.
+        """
+        first_role = self.roles.first()
+        return first_role.account_role if first_role else None
 
 
 class AccountAddress(models.Model):

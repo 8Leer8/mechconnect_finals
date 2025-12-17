@@ -350,47 +350,76 @@ def refunded_bookings_list(request):
 
 
 from accounts.models import Client, Mechanic
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def mechanic_bookings_list(request):
-    """Get bookings for a specific mechanic filtered by status"""
-    mechanic_id = request.GET.get('mechanic_id')
-    booking_status = request.GET.get('status', 'active')
-
-    if not mechanic_id:
-        return Response({'error': 'Mechanic ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+    """
+    Get bookings/jobs for the authenticated mechanic, filtered by status.
+    Uses JWT authentication - no mechanic_id parameter needed.
+    Returns empty list if user has no mechanic profile or no jobs.
+    """
+    booking_status = request.GET.get('status', '')
+    
+    # Get the authenticated user
+    user = request.user
+    
+    # Check if user has a mechanic profile
     try:
-        mechanic = Mechanic.objects.get(mechanic_id=mechanic_id)
+        mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
     except Mechanic.DoesNotExist:
-        return Response({'error': 'Mechanic not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        # User has no mechanic profile, return empty list
+        return Response({
+            'jobs': [],
+            'total': 0,
+            'message': 'User has no mechanic profile'
+        }, status=status.HTTP_200_OK)
+    
+    # Build query based on status
+    query_filter = {
+        'request__provider': user.acc_id
+    }
+    
     # Map frontend status to backend status
     status_mapping = {
         'active': 'active',
         'completed': 'completed',
         'cancelled': 'cancelled',
         'rescheduled': 'rescheduled',
+        'backjob': 'back_jobs',
         'back-jobs': 'back_jobs',
         'disputed': 'dispute',
         'refunded': 'refunded'
     }
-
-    backend_status = status_mapping.get(booking_status, 'active')
-
-    # Get bookings for this mechanic with the specified status
+    
+    # Handle different status filters
+    if booking_status and booking_status != 'all':
+        backend_status = status_mapping.get(booking_status, booking_status)
+        query_filter['status'] = backend_status
+    
+    # Get bookings for this mechanic
     bookings = Booking.objects.filter(
-        request__provider=mechanic.mechanic_id.acc_id,
-        status=backend_status
-    ).select_related('request__client', 'request').order_by('-booked_at')
-
+        **query_filter
+    ).select_related(
+        'request',
+        'request__client',
+        'request__client__client_id'
+    ).prefetch_related(
+        'request__custom_request',
+        'request__direct_request',
+        'request__emergency_request'
+    ).order_by('-booked_at')
+    
     # Serialize the bookings
     serializer = BookingListSerializer(bookings, many=True)
+    
     return Response({
-        'bookings': serializer.data,
+        'jobs': serializer.data,
         'total': len(serializer.data)
-    })
+    }, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

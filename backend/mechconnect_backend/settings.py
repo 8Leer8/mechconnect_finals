@@ -212,7 +212,7 @@ REST_FRAMEWORK = {
         'user': '2000/hour'  # Authenticated users: 2000 requests per hour
     },
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'accounts.authentication.AccountJWTAuthentication',  # Custom JWT auth for Account model
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
@@ -235,6 +235,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'USER_ID_FIELD': 'acc_id',  # Account model uses acc_id as primary key, not id
+    'USER_ID_CLAIM': 'acc_id',  # Include acc_id in JWT payload
 }
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
