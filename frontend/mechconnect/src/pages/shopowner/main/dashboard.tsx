@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
             <div className="performance-revenue">
               <div>
                 <p className="revenue-label">Today's revenue</p>
-                <p className="revenue-amount">₱1,250</p>
+                <p className="revenue-amount">₱0</p>
               </div>
               <div className="revenue-icon">
                 <span className="material-icons-round">bar_chart</span>
@@ -68,7 +68,7 @@ const Dashboard: React.FC = () => {
                 <span className="material-icons-round">people</span>
               </div>
               <div className="summary-content">
-                <p className="summary-number">75</p>
+                <p className="summary-number">0</p>
                 <p className="summary-label">Total Mechanic</p>
                 <p className="summary-subtext">This month</p>
               </div>
@@ -79,9 +79,9 @@ const Dashboard: React.FC = () => {
                 <span className="material-icons-round">event</span>
               </div>
               <div className="summary-content">
-                <p className="summary-number">175</p>
+                <p className="summary-number">0</p>
                 <p className="summary-label">Total Booking</p>
-                <p className="summary-subtext summary-positive">+12% from last month</p>
+                <p className="summary-subtext summary-positive">+0% from last month</p>
               </div>
             </div>
 
@@ -90,9 +90,9 @@ const Dashboard: React.FC = () => {
                 <span className="material-icons-round">attach_money</span>
               </div>
               <div className="summary-content">
-                <p className="summary-number">₱25,756</p>
+                <p className="summary-number">₱0</p>
                 <p className="summary-label">Total Revenue</p>
-                <p className="summary-subtext summary-positive">+10% from last month</p>
+                <p className="summary-subtext summary-positive">+0% from last month</p>
               </div>
             </div>
 
@@ -101,9 +101,9 @@ const Dashboard: React.FC = () => {
                 <span className="material-icons-round">schedule</span>
               </div>
               <div className="summary-content">
-                <p className="summary-number">13</p>
+                <p className="summary-number">0</p>
                 <p className="summary-label">Today's Booking</p>
-                <p className="summary-subtext">5 Pending Approved</p>
+                <p className="summary-subtext">0 Pending Approved</p>
               </div>
             </div>
           </div>
@@ -118,12 +118,12 @@ const Dashboard: React.FC = () => {
                 <span className="material-icons-round">person</span>
               </div>
               <div className="mechanic-details">
-                <p className="mechanic-name">Rimard Bengil</p>
-                <p className="mechanic-specialty">Engine Repair</p>
-                <p className="mechanic-performance">50 bookings ★ 4.3★</p>
+                <p className="mechanic-name">No Data</p>
+                <p className="mechanic-specialty">-</p>
+                <p className="mechanic-performance">0 bookings ★ 0</p>
               </div>
               <div className="mechanic-revenue">
-                <p className="mechanic-revenue-amount">₱5,000</p>
+                <p className="mechanic-revenue-amount">₱0</p>
                 <p className="mechanic-revenue-label">This Month</p>
               </div>
             </div>

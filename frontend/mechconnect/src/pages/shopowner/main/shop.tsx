@@ -34,9 +34,7 @@ const Shop: React.FC = () => {
       'Professional automotive repair services with certified mechanics and quality parts. We specialize in engine diagnostics, brake repair, and routine maintenance.'
   };
 
-  const shopItems: ShopItem[] = [
-    { id: '1', name: 'Premium Motor Oil (5W-30)', category: 'Engine', price: 35.99, stock: 24, sold: 89, status: 'active' }
-  ];
+  const shopItems: ShopItem[] = [];
 
   const filteredItems = shopItems.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(itemSearch.toLowerCase());
@@ -46,9 +44,9 @@ const Shop: React.FC = () => {
 
   const summaryStats = {
     totalItems: shopItems.length,
-    totalSales: 12745.37,
-    mostSold: shopItems[0],
-    leastSold: shopItems[0]
+    totalSales: 0,
+    mostSold: shopItems[0] || { name: 'No items', sold: 0 },
+    leastSold: shopItems[0] || { name: 'No items', sold: 0 }
   };
 
   return (

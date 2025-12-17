@@ -47,21 +47,7 @@ const ManageBooking: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  const bookings: BookingRequest[] = [
-    {
-      id: 'BK-20231001',
-      customerName: 'Lisa Anderson',
-      phone: '+1 (555) 876-5432',
-      service: 'Electrical Diagnosis',
-      vehicle: '2019 Volkswagen Jetta',
-      duration: '2-3 hours',
-      schedule: 'Oct 20, 11:00 AM',
-      priceRange: '₱120-₱200',
-      notes: 'Dashboard lights not working, possible electrical issue',
-      status: 'Pending',
-      priority: 'High'
-    }
-  ];
+  const bookings: BookingRequest[] = [];
 
   const summaryCards: SummaryCard[] = useMemo(() => {
     const statusCounts = bookings.reduce(
