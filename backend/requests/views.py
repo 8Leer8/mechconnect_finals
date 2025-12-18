@@ -10,7 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Request, CustomRequest, QuotedRequestItem, DirectRequest, EmergencyRequest
 from .serializers import (
     RequestSerializer, CreateCustomRequestSerializer, RequestListSerializer,
-    CustomRequestSerializer, DirectRequestSerializer, EmergencyRequestSerializer
+    CustomRequestSerializer, DirectRequestSerializer, EmergencyRequestSerializer,
+    CreateDirectRequestQuotationSerializer
 )
 from accounts.models import Account, Client, AccountAddress, Mechanic
 from bookings.models import Booking
@@ -564,4 +565,178 @@ def health_check(request):
         'status': 'healthy',
         'timestamp': timezone.now(),
         'service': 'MechConnect Requests API'
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_direct_request_quotation(request, request_id):
+    """
+    Create a quotation for a request (both custom and direct requests).
+    Only the assigned mechanic can create a quotation.
+    Only requests in 'pending' status can be quoted.
+    """
+    try:
+        # Get the authenticated user
+        user = request.user
+        
+        # Check if user has a mechanic profile
+        try:
+            mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+        except Mechanic.DoesNotExist:
+            return Response({
+                'error': 'Access denied. User is not a mechanic.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get the request
+        try:
+            req = Request.objects.select_related(
+                'provider', 'client'
+            ).prefetch_related(
+                'direct_request', 'custom_request'
+            ).get(request_id=request_id)
+        except Request.DoesNotExist:
+            return Response({
+                'error': 'Request not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Validate request type (both custom and direct are supported)
+        if req.request_type not in ['direct', 'custom']:
+            return Response({
+                'error': 'Only direct and custom requests can be quoted.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate request is assigned to this mechanic
+        if req.provider is None or req.provider.acc_id != user.acc_id:
+            return Response({
+                'error': 'You can only quote requests assigned to you.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Validate request status
+        if req.request_status != 'pending':
+            return Response({
+                'error': f'Cannot quote request. Current status is \"{req.request_status}\". Only pending requests can be quoted.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate input data
+        serializer = CreateDirectRequestQuotationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'error': 'Validation failed',
+                'details': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Use transaction to ensure atomicity
+        with transaction.atomic():
+            data = serializer.validated_data
+            
+            # Handle different request types
+            if req.request_type == 'direct':
+                # Get the direct request
+                direct_request = DirectRequest.objects.get(request=req)
+                
+                # Delete existing quotation items if any (allow re-quoting)
+                QuotedRequestItem.objects.filter(direct_request=direct_request).delete()
+                
+                # Create quotation items
+                quoted_items = []
+                for item_data in data['quoted_items']:
+                    quoted_item = QuotedRequestItem.objects.create(
+                        direct_request=direct_request,
+                        item=item_data['item'],
+                        price=float(item_data['price'])
+                    )
+                    quoted_items.append(quoted_item)
+                
+                # Update provider's note if provided
+                if data.get('providers_note'):
+                    direct_request.providers_note = data['providers_note']
+                    direct_request.save()
+                    
+            else:  # custom request
+                # Get the custom request
+                custom_request = CustomRequest.objects.get(request=req)
+                
+                # Delete existing quotation items if any (allow re-quoting)
+                QuotedRequestItem.objects.filter(custom_request=custom_request).delete()
+                
+                # Create quotation items
+                quoted_items = []
+                for item_data in data['quoted_items']:
+                    quoted_item = QuotedRequestItem.objects.create(
+                        custom_request=custom_request,
+                        item=item_data['item'],
+                        price=float(item_data['price'])
+                    )
+                    quoted_items.append(quoted_item)
+                
+                # Update provider's note if provided
+                if data.get('providers_note'):
+                    custom_request.providers_note = data['providers_note']
+                    custom_request.save()
+            
+            # Update request status to 'qouted'
+            req.request_status = 'qouted'
+            req.save()
+            
+            # Serialize and return the updated request
+            request_serializer = RequestSerializer(req)
+            
+            return Response({
+                'message': 'Quotation created successfully',
+                'request': request_serializer.data,
+                'quotation_items': [
+                    {'item': item.item, 'price': str(item.price)} 
+                    for item in quoted_items
+                ]
+            }, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to create quotation',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_mechanic_quoted_requests(request):
+    """
+    Get quoted requests for the authenticated mechanic.
+    Quoted = requests that have been quoted by this mechanic and awaiting client response.
+    Uses JWT authentication - no mechanic_id parameter needed.
+    Returns empty list if user has no mechanic profile.
+    """
+    # Get the authenticated user
+    user = request.user
+    
+    # Check if user has a mechanic profile
+    try:
+        mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+    except Mechanic.DoesNotExist:
+        # User has no mechanic profile, return empty list
+        return Response({
+            'jobs': [],
+            'total': 0,
+            'message': 'User has no mechanic profile'
+        }, status=status.HTTP_200_OK)
+    
+    # Get quoted requests assigned to this mechanic
+    requests_queryset = Request.objects.filter(
+        provider=user.acc_id,
+        request_status='qouted'
+    ).select_related(
+        'client',
+        'client__client_id'
+    ).prefetch_related(
+        'custom_request',
+        'direct_request',
+        'emergency_request'
+    ).order_by('-updated_at')
+    
+    # Serialize the requests
+    serializer = RequestListSerializer(requests_queryset, many=True)
+    return Response({
+        'jobs': serializer.data,
+        'total': len(serializer.data)
     }, status=status.HTTP_200_OK)

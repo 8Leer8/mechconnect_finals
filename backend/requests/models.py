@@ -31,7 +31,8 @@ class CustomRequest(models.Model):
 
 class QuotedRequestItem(models.Model):
     custom_request_item_id = models.AutoField(primary_key=True)
-    custom_request = models.ForeignKey('requests.CustomRequest', on_delete=models.CASCADE, related_name='quoted_items')
+    custom_request = models.ForeignKey('requests.CustomRequest', on_delete=models.CASCADE, related_name='quoted_items', null=True, blank=True)
+    direct_request = models.ForeignKey('requests.DirectRequest', on_delete=models.CASCADE, related_name='quoted_items', null=True, blank=True)
     item = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
@@ -39,6 +40,7 @@ class QuotedRequestItem(models.Model):
 class DirectRequest(models.Model):
     request = models.OneToOneField('requests.Request', primary_key=True, on_delete=models.CASCADE, related_name='direct_request')
     service = models.ForeignKey('services.Service', on_delete=models.CASCADE, related_name='direct_requests')
+    providers_note = models.TextField(null=True, blank=True)
 
 
 class DirectRequestAddOn(models.Model):

@@ -1,7 +1,13 @@
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, IonToast, IonLoading, IonSelect, IonSelectOption, IonSpinner } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './ShopOwnerSignup.css';
+
+/**
+ * ShopOwnerSignup - Role Extension Flow
+ * Allows an existing CLIENT to register as a SHOP OWNER.
+ * Uses client's existing account data from localStorage.
+ */
 
 interface Document {
   id: number;
@@ -12,22 +18,47 @@ interface Document {
   dateExpiry: string;
 }
 
+interface ClientData {
+  acc_id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+  is_verified: boolean;
+  address: {
+    house_building_number: string;
+    street_name: string;
+    subdivision_village: string;
+    barangay: string;
+    city_municipality: string;
+    province: string;
+    region: string;
+    postal_code: string;
+  } | null;
+}
+
+interface PSGCItem {
+  code: string;
+  name: string;
+}
+
+const API_BASE_URL = 'http://localhost:8000/api';
+const PSGC_API_BASE = 'https://psgc.gitlab.io/api';
+
 const ShopOwnerSignup: React.FC = () => {
   const history = useHistory();
 
-  // Personal Information
-  const [lastname, setLastname] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [middlename, setMiddlename] = useState('');
-  const [email, setEmail] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [gender, setGender] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // Loading and error states
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
 
-  // Contact Information
-  const [contactNumber, setContactNumber] = useState('');
+  // Client data from existing account
+  const [clientData, setClientData] = useState<ClientData | null>(null);
+
+  // Address Mode: 'existing' or 'new'
+  const [addressMode, setAddressMode] = useState<'existing' | 'new'>('existing');
 
   // Address Information
   const [houseNumber, setHouseNumber] = useState('');
@@ -39,9 +70,20 @@ const ShopOwnerSignup: React.FC = () => {
   const [region, setRegion] = useState('');
   const [postalCode, setPostalCode] = useState('');
 
-  // Profile Information
-  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
-  const [bio, setBio] = useState('');
+  // PSGC Location Data
+  const [regionsList, setRegionsList] = useState<PSGCItem[]>([]);
+  const [provincesList, setProvincesList] = useState<PSGCItem[]>([]);
+  const [citiesList, setCitiesList] = useState<PSGCItem[]>([]);
+  const [barangaysList, setBarangaysList] = useState<PSGCItem[]>([]);
+  
+  const [selectedRegionCode, setSelectedRegionCode] = useState('');
+  const [selectedProvinceCode, setSelectedProvinceCode] = useState('');
+  const [selectedCityCode, setSelectedCityCode] = useState('');
+  
+  const [loadingRegions, setLoadingRegions] = useState(false);
+  const [loadingProvinces, setLoadingProvinces] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingBarangays, setLoadingBarangays] = useState(false);
 
   // Shop Information
   const [shopName, setShopName] = useState('');
@@ -50,6 +92,10 @@ const ShopOwnerSignup: React.FC = () => {
   const [shopWebsite, setShopWebsite] = useState('');
   const [shopDescription, setShopDescription] = useState('');
   const [serviceBanner, setServiceBanner] = useState<string | null>(null);
+
+  // Profile Information
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [bio, setBio] = useState('');
 
   // Shop Owner Documents
   const [ownerDocuments, setOwnerDocuments] = useState<Document[]>([
@@ -60,6 +106,218 @@ const ShopOwnerSignup: React.FC = () => {
   const [shopDocuments, setShopDocuments] = useState<Document[]>([
     { id: 1, name: '', type: 'business_permit', file: null, dateIssued: '', dateExpiry: '' }
   ]);
+
+  // Fetch regions on mount
+  useEffect(() => {
+    const fetchRegions = async () => {
+      setLoadingRegions(true);
+      try {
+        const response = await fetch(`${PSGC_API_BASE}/regions/`);
+        if (response.ok) {
+          const data = await response.json();
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setRegionsList(sorted);
+        }
+      } catch (error) {
+        console.error('Error fetching regions:', error);
+        setRegionsList([]);
+      } finally {
+        setLoadingRegions(false);
+      }
+    };
+    fetchRegions();
+  }, []);
+
+  // Fetch provinces when region changes
+  useEffect(() => {
+    if (!selectedRegionCode) {
+      setProvincesList([]);
+      return;
+    }
+    const fetchProvinces = async () => {
+      setLoadingProvinces(true);
+      try {
+        const response = await fetch(`${PSGC_API_BASE}/regions/${selectedRegionCode}/provinces/`);
+        if (response.ok) {
+          const data = await response.json();
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setProvincesList(sorted);
+        }
+      } catch (error) {
+        console.error('Error fetching provinces:', error);
+        setProvincesList([]);
+      } finally {
+        setLoadingProvinces(false);
+      }
+    };
+    fetchProvinces();
+  }, [selectedRegionCode]);
+
+  // Fetch cities when province changes
+  useEffect(() => {
+    if (!selectedProvinceCode) {
+      setCitiesList([]);
+      return;
+    }
+    const fetchCities = async () => {
+      setLoadingCities(true);
+      try {
+        const response = await fetch(`${PSGC_API_BASE}/provinces/${selectedProvinceCode}/cities-municipalities/`);
+        if (response.ok) {
+          const data = await response.json();
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setCitiesList(sorted);
+        }
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        setCitiesList([]);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+    fetchCities();
+  }, [selectedProvinceCode]);
+
+  // Fetch barangays when city changes
+  useEffect(() => {
+    if (!selectedCityCode) {
+      setBarangaysList([]);
+      return;
+    }
+    const fetchBarangays = async () => {
+      setLoadingBarangays(true);
+      try {
+        const response = await fetch(`${PSGC_API_BASE}/cities-municipalities/${selectedCityCode}/barangays/`);
+        if (response.ok) {
+          const data = await response.json();
+          const sorted = data.sort((a: PSGCItem, b: PSGCItem) => a.name.localeCompare(b.name));
+          setBarangaysList(sorted);
+        }
+      } catch (error) {
+        console.error('Error fetching barangays:', error);
+        setBarangaysList([]);
+      } finally {
+        setLoadingBarangays(false);
+      }
+    };
+    fetchBarangays();
+  }, [selectedCityCode]);
+
+  // Load client data on mount
+  useEffect(() => {
+    const loadClientData = async () => {
+      setLoading(true);
+      try {
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+          showToastMessage('Please login first', 'danger');
+          history.push('/login');
+          return;
+        }
+
+        const user = JSON.parse(userData);
+        setClientData({
+          acc_id: user.acc_id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          is_verified: user.is_verified,
+          address: user.address || null
+        });
+
+        // Pre-fill address if exists
+        if (user.address) {
+          setHouseNumber(user.address.house_building_number || '');
+          setStreet(user.address.street_name || '');
+          setSubdivision(user.address.subdivision_village || '');
+          setBarangay(user.address.barangay || '');
+          setCity(user.address.city_municipality || '');
+          setProvince(user.address.province || '');
+          setRegion(user.address.region || '');
+          setPostalCode(user.address.postal_code || '');
+          setAddressMode('existing');
+        } else {
+          setAddressMode('new');
+        }
+      } catch (error) {
+        console.error('Error loading client data:', error);
+        showToastMessage('Failed to load account data', 'danger');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadClientData();
+  }, [history]);
+
+  const showToastMessage = (message: string, color: 'success' | 'danger') => {
+    setToastMessage(message);
+    setToastColor(color);
+    setShowToast(true);
+  };
+
+  const handleRegionChange = (regionCode: string) => {
+    const selectedRegion = regionsList.find(r => r.code === regionCode);
+    setSelectedRegionCode(regionCode);
+    setRegion(selectedRegion?.name || '');
+    setSelectedProvinceCode('');
+    setProvince('');
+    setSelectedCityCode('');
+    setCity('');
+    setBarangay('');
+    setProvincesList([]);
+    setCitiesList([]);
+    setBarangaysList([]);
+  };
+
+  const handleProvinceChange = (provinceCode: string) => {
+    const selectedProv = provincesList.find(p => p.code === provinceCode);
+    setSelectedProvinceCode(provinceCode);
+    setProvince(selectedProv?.name || '');
+    setSelectedCityCode('');
+    setCity('');
+    setBarangay('');
+    setCitiesList([]);
+    setBarangaysList([]);
+  };
+
+  const handleCityChange = (cityCode: string) => {
+    const selectedCity = citiesList.find(c => c.code === cityCode);
+    setSelectedCityCode(cityCode);
+    setCity(selectedCity?.name || '');
+    setBarangay('');
+    setBarangaysList([]);
+  };
+
+  const handleBarangayChange = (barangayCode: string) => {
+    const selectedBrgy = barangaysList.find(b => b.code === barangayCode);
+    setBarangay(selectedBrgy?.name || '');
+  };
+
+  const handleAddressModeChange = (mode: 'existing' | 'new') => {
+    setAddressMode(mode);
+    if (mode === 'existing' && clientData?.address) {
+      setHouseNumber(clientData.address.house_building_number || '');
+      setStreet(clientData.address.street_name || '');
+      setSubdivision(clientData.address.subdivision_village || '');
+      setBarangay(clientData.address.barangay || '');
+      setCity(clientData.address.city_municipality || '');
+      setProvince(clientData.address.province || '');
+      setRegion(clientData.address.region || '');
+      setPostalCode(clientData.address.postal_code || '');
+    } else if (mode === 'new') {
+      setHouseNumber('');
+      setStreet('');
+      setSubdivision('');
+      setBarangay('');
+      setCity('');
+      setProvince('');
+      setRegion('');
+      setPostalCode('');
+      setSelectedRegionCode('');
+      setSelectedProvinceCode('');
+      setSelectedCityCode('');
+    }
+  };
 
   const goBack = () => history.goBack();
 
@@ -167,8 +425,12 @@ const ShopOwnerSignup: React.FC = () => {
 
   const handleSubmit = () => {
     console.log('Shop owner application submitted');
-    // Handle form submission
-    history.push('/login');
+    // Show success message
+    showToastMessage('Application submitted successfully! Pending verification.', 'success');
+    // Redirect to switch account page after a brief delay
+    setTimeout(() => {
+      history.push('/auth/switch-account');
+    }, 2000);
   };
 
   return (
@@ -183,94 +445,90 @@ const ShopOwnerSignup: React.FC = () => {
         </div>
 
         <div className="signup-container">
-          {/* Personal Information */}
+          {/* Account Information */}
+          {!loading && clientData && (
+            <div className="form-card">
+              <h2 className="section-title">Account Information</h2>
+              <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '16px' }}>
+                Your shop owner profile will be linked to your existing account.
+              </p>
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px' }}>
+                <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#1f2937' }}>
+                  {clientData.firstname} {clientData.lastname}
+                </p>
+                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+                  {clientData.email}
+                  {clientData.is_verified && (
+                    <span style={{ color: '#10b981', marginLeft: '8px' }}>
+                      <span className="material-icons-round" style={{ fontSize: '14px', verticalAlign: 'middle' }}>verified</span>
+                      Verified
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Address Information with PSGC Selection */}
           <div className="form-card">
-            <h2 className="section-title">Personal Information</h2>
-            
-            <div className="input-group">
-              <label className="input-label">Last Name *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Enter last name"
-                value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
-              />
-            </div>
+            <h2 className="section-title">Shop Location</h2>
+            <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '16px' }}>
+              Where is your shop located?
+            </p>
 
-            <div className="input-group">
-              <label className="input-label">First Name *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Enter first name"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Middle Name</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Enter middle name (optional)"
-                value={middlename}
-                onChange={(e) => setMiddlename(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Email *</label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="Enter email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Date of Birth *</label>
-              <input
-                type="date"
-                className="form-input"
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Gender *</label>
-              <select
-                className="form-input"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
+            {/* Address Mode Toggle */}
+            <div className="address-mode-toggle" style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+              <button
+                type="button"
+                className={`mode-button ${addressMode === 'existing' ? 'active' : ''}`}
+                onClick={() => {
+                  if (clientData?.address) {
+                    handleAddressModeChange('existing');
+                  } else {
+                    showToastMessage('No existing address found. Please enter a new address.', 'danger');
+                  }
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  border: addressMode === 'existing' ? '2px solid #f97316' : '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  background: addressMode === 'existing' ? '#fff7ed' : 'white',
+                  color: addressMode === 'existing' ? '#ea580c' : clientData?.address ? '#64748b' : '#cbd5e1',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  opacity: clientData?.address ? 1 : 0.5,
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+                <span className="material-icons-round" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px' }}>home</span>
+                Use Current Address
+                {!clientData?.address && <span style={{ display: 'block', fontSize: '10px', marginTop: '4px', fontWeight: '400' }}>(No address saved)</span>}
+              </button>
+              <button
+                type="button"
+                className={`mode-button ${addressMode === 'new' ? 'active' : ''}`}
+                onClick={() => handleAddressModeChange('new')}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  border: addressMode === 'new' ? '2px solid #f97316' : '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  background: addressMode === 'new' ? '#fff7ed' : 'white',
+                  color: addressMode === 'new' ? '#ea580c' : '#64748b',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span className="material-icons-round" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '8px' }}>add_location</span>
+                New Address
+              </button>
             </div>
 
-            <div className="input-group">
-              <label className="input-label">Contact Number *</label>
-              <input
-                type="tel"
-                className="form-input"
-                placeholder="Enter contact number"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Address Information */}
-          <div className="form-card">
-            <h2 className="section-title">Address Information</h2>
-            
+            {/* Address Fields */}
             <div className="location-grid">
               <div className="input-group">
                 <label className="input-label">House/Building No.</label>
@@ -280,6 +538,8 @@ const ShopOwnerSignup: React.FC = () => {
                   placeholder="Enter house/building no."
                   value={houseNumber}
                   onChange={(e) => setHouseNumber(e.target.value)}
+                  readOnly={addressMode === 'existing'}
+                  style={{ background: addressMode === 'existing' ? '#f3f4f6' : 'white' }}
                 />
               </div>
 
@@ -291,6 +551,8 @@ const ShopOwnerSignup: React.FC = () => {
                   placeholder="Enter street name"
                   value={street}
                   onChange={(e) => setStreet(e.target.value)}
+                  readOnly={addressMode === 'existing'}
+                  style={{ background: addressMode === 'existing' ? '#f3f4f6' : 'white' }}
                 />
               </div>
 
@@ -302,51 +564,129 @@ const ShopOwnerSignup: React.FC = () => {
                   placeholder="Enter subdivision/village"
                   value={subdivision}
                   onChange={(e) => setSubdivision(e.target.value)}
+                  readOnly={addressMode === 'existing'}
+                  style={{ background: addressMode === 'existing' ? '#f3f4f6' : 'white' }}
                 />
               </div>
 
-              <div className="input-group">
-                <label className="input-label">Barangay *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter barangay"
-                  value={barangay}
-                  onChange={(e) => setBarangay(e.target.value)}
-                />
-              </div>
-
-              <div className="input-group">
-                <label className="input-label">City/Municipality *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter city/municipality"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                />
-              </div>
-
-              <div className="input-group">
-                <label className="input-label">Province *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter province"
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                />
-              </div>
-
+              {/* Region - Dropdown for new address */}
               <div className="input-group">
                 <label className="input-label">Region *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter region"
-                  value={region}
-                  onChange={(e) => setRegion(e.target.value)}
-                />
+                {addressMode === 'existing' ? (
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={region}
+                    readOnly
+                    style={{ background: '#f3f4f6' }}
+                  />
+                ) : (
+                  <div style={{ position: 'relative' }}>
+                    <IonSelect
+                      value={selectedRegionCode}
+                      onIonChange={(e) => handleRegionChange(e.detail.value)}
+                      placeholder={loadingRegions ? 'Loading regions...' : 'Select Region'}
+                      className="form-input psgc-select"
+                      interface="alert"
+                      disabled={loadingRegions}
+                    >
+                      {regionsList.map((r) => (
+                        <IonSelectOption key={r.code} value={r.code}>{r.name}</IonSelectOption>
+                      ))}
+                    </IonSelect>
+                    {loadingRegions && <IonSpinner name="dots" style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)' }} />}
+                  </div>
+                )}
+              </div>
+
+              {/* Province - Dropdown for new address */}
+              <div className="input-group">
+                <label className="input-label">Province *</label>
+                {addressMode === 'existing' ? (
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={province}
+                    readOnly
+                    style={{ background: '#f3f4f6' }}
+                  />
+                ) : (
+                  <div style={{ position: 'relative' }}>
+                    <IonSelect
+                      value={selectedProvinceCode}
+                      onIonChange={(e) => handleProvinceChange(e.detail.value)}
+                      placeholder={loadingProvinces ? 'Loading provinces...' : 'Select Province'}
+                      className="form-input psgc-select"
+                      interface="alert"
+                      disabled={loadingProvinces || !selectedRegionCode}
+                    >
+                      {provincesList.map((p) => (
+                        <IonSelectOption key={p.code} value={p.code}>{p.name}</IonSelectOption>
+                      ))}
+                    </IonSelect>
+                    {loadingProvinces && <IonSpinner name="dots" style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)' }} />}
+                  </div>
+                )}
+              </div>
+
+              {/* City - Dropdown for new address */}
+              <div className="input-group">
+                <label className="input-label">City/Municipality *</label>
+                {addressMode === 'existing' ? (
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={city}
+                    readOnly
+                    style={{ background: '#f3f4f6' }}
+                  />
+                ) : (
+                  <div style={{ position: 'relative' }}>
+                    <IonSelect
+                      value={selectedCityCode}
+                      onIonChange={(e) => handleCityChange(e.detail.value)}
+                      placeholder={loadingCities ? 'Loading cities...' : 'Select City/Municipality'}
+                      className="form-input psgc-select"
+                      interface="alert"
+                      disabled={loadingCities || !selectedProvinceCode}
+                    >
+                      {citiesList.map((c) => (
+                        <IonSelectOption key={c.code} value={c.code}>{c.name}</IonSelectOption>
+                      ))}
+                    </IonSelect>
+                    {loadingCities && <IonSpinner name="dots" style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)' }} />}
+                  </div>
+                )}
+              </div>
+
+              {/* Barangay - Dropdown for new address */}
+              <div className="input-group">
+                <label className="input-label">Barangay *</label>
+                {addressMode === 'existing' ? (
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={barangay}
+                    readOnly
+                    style={{ background: '#f3f4f6' }}
+                  />
+                ) : (
+                  <div style={{ position: 'relative' }}>
+                    <IonSelect
+                      value={barangay}
+                      onIonChange={(e) => handleBarangayChange(e.detail.value)}
+                      placeholder={loadingBarangays ? 'Loading barangays...' : 'Select Barangay'}
+                      className="form-input psgc-select"
+                      interface="alert"
+                      disabled={loadingBarangays || !selectedCityCode}
+                    >
+                      {barangaysList.map((b) => (
+                        <IonSelectOption key={b.code} value={b.code}>{b.name}</IonSelectOption>
+                      ))}
+                    </IonSelect>
+                    {loadingBarangays && <IonSpinner name="dots" style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)' }} />}
+                  </div>
+                )}
               </div>
 
               <div className="input-group">
@@ -357,87 +697,10 @@ const ShopOwnerSignup: React.FC = () => {
                   placeholder="Enter postal code"
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
+                  readOnly={addressMode === 'existing'}
+                  style={{ background: addressMode === 'existing' ? '#f3f4f6' : 'white' }}
                 />
               </div>
-            </div>
-          </div>
-
-          {/* Account Credentials */}
-          <div className="form-card">
-            <h2 className="section-title">Account Credentials</h2>
-            
-            <div className="input-group">
-              <label className="input-label">Username *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Enter username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Password *</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Confirm Password *</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Confirm password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Profile Information */}
-          <div className="form-card">
-            <h2 className="section-title">Profile Information</h2>
-            
-            <div className="input-group">
-              <label className="input-label">Profile Photo</label>
-              {profilePhoto ? (
-                <div className="image-preview-container">
-                  <img src={profilePhoto} alt="Profile" className="image-preview" />
-                  <button className="btn-remove-image" onClick={handleRemoveProfilePhoto}>
-                    <span className="material-icons-round">close</span>
-                  </button>
-                </div>
-              ) : (
-                <label className="file-upload-label">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePhotoChange}
-                    style={{ display: 'none' }}
-                  />
-                  <div className="upload-placeholder">
-                    <span className="material-icons-round">add_photo_alternate</span>
-                    <span>Upload Profile Photo</span>
-                  </div>
-                </label>
-              )}
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Bio</label>
-              <textarea
-                className="form-textarea"
-                placeholder="Tell us about yourself..."
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={4}
-              />
             </div>
           </div>
 
@@ -748,6 +1011,18 @@ const ShopOwnerSignup: React.FC = () => {
           </button>
         </div>
       </IonContent>
+
+      <IonLoading isOpen={loading} message="Loading account data..." />
+      <IonLoading isOpen={submitting} message="Submitting application..." />
+      
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={3000}
+        color={toastColor}
+        position="top"
+      />
     </IonPage>
   );
 };

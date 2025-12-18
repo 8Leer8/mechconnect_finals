@@ -2,7 +2,7 @@
   --background: #f5f5f5;
 }
 
-.request-detail-header {
+.mechanic-job-detail-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px 16px 24px;
   display: flex;
@@ -34,7 +34,7 @@
   font-size: 24px;
 }
 
-.request-detail-title {
+.mechanic-job-detail-title {
   flex: 1;
   margin: 0;
   color: white;
@@ -130,6 +130,122 @@
 .request-detail-container {
   padding: 16px;
   padding-bottom: 80px;
+}
+
+/* Job Detail Container (matching job-detail.css) */
+.job-detail-container {
+  padding: 16px;
+  padding-bottom: 80px;
+}
+
+.job-detail-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Job Header */
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.job-id-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+}
+
+.job-id {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.status-qouted,
+.status-quoted {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.status-accepted {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.status-rejected {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* Job Sections */
+.job-section {
+  padding: 20px;
+}
+
+.section-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.job-divider {
+  height: 1px;
+  background: #f1f5f9;
+}
+
+/* Detail Rows */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: #333;
+  text-align: right;
+  font-weight: 400;
+  flex: 1;
+}
+
+.detail-value.amount {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .detail-card {
@@ -259,4 +375,177 @@
 .accept-btn {
   --background: #51cf66;
   --background-activated: #40c057;
+}
+
+.quote-btn {
+  --background: #ffa94d;
+  --background-activated: #ff8c1a;
+}
+
+/* Quotation Form */
+.quotation-form-card {
+  background: white;
+  border-radius: 16px;
+  margin: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.quotation-form-card .card-header {
+  margin-bottom: 16px;
+}
+
+.quotation-form-card .card-header .subtitle {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #666;
+  font-weight: 400;
+}
+
+.service-info {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.quotation-items {
+  margin: 20px 0;
+}
+
+.quotation-items h3 {
+  font-size: 16px;
+  margin: 0 0 12px;
+  color: #333;
+  font-weight: 600;
+}
+
+.quotation-item-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.quotation-item-row .item-input {
+  flex: 2;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.quotation-item-row .price-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.quotation-item-row .remove-item-btn {
+  background: #ff6b6b;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quotation-item-row .remove-item-btn:active {
+  background: #ff5252;
+  transform: scale(0.95);
+}
+
+.quotation-item-row .remove-item-btn .material-icons-round {
+  color: white;
+  font-size: 20px;
+}
+
+.add-item-btn {
+  width: 100%;
+  padding: 12px;
+  background: #f8f9fa;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.add-item-btn:hover {
+  background: #e9ecef;
+  border-color: #667eea;
+}
+
+.add-item-btn .material-icons-round {
+  font-size: 20px;
+}
+
+.quotation-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.quotation-total .total-label {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.quotation-total .total-value {
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.quotation-note {
+  margin: 20px 0;
+}
+
+.quotation-note label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.quotation-note textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.quotation-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.quotation-form-actions ion-button {
+  flex: 1;
+  margin: 0;
+  font-weight: 600;
+  --border-radius: 12px;
+  height: 48px;
 }

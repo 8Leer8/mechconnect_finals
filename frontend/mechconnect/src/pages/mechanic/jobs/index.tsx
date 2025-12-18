@@ -40,7 +40,7 @@ const Jobs: React.FC = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const filter = searchParams.get('filter');
-    if (filter && ['all', 'requests', 'available', 'active', 'completed', 'cancelled'].includes(filter)) {
+    if (filter && ['all', 'requests', 'available', 'quotation', 'active', 'completed', 'cancelled'].includes(filter)) {
       setActiveTab(filter);
     }
   }, [location.search]);
@@ -94,6 +94,9 @@ const Jobs: React.FC = () => {
       } else if (status === 'available') {
         // Available jobs (quoted/accepted but not booked)
         endpoint = 'http://localhost:8000/api/requests/mechanic/available/';
+      } else if (status === 'quotation') {
+        // Quoted requests - requests that have been quoted
+        endpoint = 'http://localhost:8000/api/requests/mechanic/quoted/';
       } else if (status === 'all') {
         // All bookings (no status filter)
         endpoint = 'http://localhost:8000/api/bookings/mechanic/';
@@ -143,50 +146,78 @@ const Jobs: React.FC = () => {
   // Handle accept/decline actions for requests
   const handleAcceptRequest = async (requestId: number) => {
     try {
-      // In a real app, this would make an API call
-      // await fetch(`http://localhost:8000/api/requests/${requestId}/accept/`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ mechanic_id: mechanicId })
-      // });
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setToastMessage('Authentication required. Please login.');
+        setShowToast(true);
+        return;
+      }
 
-      // For demo, update local state
-      setJobs(prevJobs => 
-        prevJobs.map(job => 
-          job.request_id === requestId 
-            ? { ...job, status: 'active', booked_at: new Date().toISOString() }
-            : job
-        )
-      );
+      const response = await fetch(`http://localhost:8000/api/requests/${requestId}/accept/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to accept request');
+      }
+
       setShowToast(true);
       setToastMessage('Request accepted successfully!');
-    } catch (error) {
+      
+      // Refresh the jobs list
+      fetchJobs(activeTab);
+    } catch (error: any) {
       console.error('Error accepting request:', error);
       setShowToast(true);
-      setToastMessage('Failed to accept request');
+      setToastMessage(error.message || 'Failed to accept request');
     }
   };
 
   const handleDeclineRequest = async (requestId: number) => {
     try {
-      // In a real app, this would make an API call
-      // await fetch(`http://localhost:8000/api/requests/${requestId}/decline/`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ mechanic_id: mechanicId })
-      // });
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      
+      if (!token) {
+        setToastMessage('Authentication required. Please login.');
+        setShowToast(true);
+        return;
+      }
 
-      // For demo, update local state
-      setJobs(prevJobs => 
-        prevJobs.filter(job => job.request_id !== requestId)
-      );
+      const response = await fetch(`http://localhost:8000/api/requests/${requestId}/decline/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to decline request');
+      }
+
       setShowToast(true);
-      setToastMessage('Request declined');
-    } catch (error) {
+      setToastMessage('Request declined successfully');
+      
+      // Refresh the jobs list
+      fetchJobs(activeTab);
+    } catch (error: any) {
       console.error('Error declining request:', error);
       setShowToast(true);
-      setToastMessage('Failed to decline request');
+      setToastMessage(error.message || 'Failed to decline request');
     }
+  };
+
+  const handleQuotationClick = (job: JobData) => {
+    // Navigate to dedicated quotation page
+    history.push('/mechanic/quotation', { job });
   };
 
   useEffect(() => {
@@ -209,6 +240,7 @@ const Jobs: React.FC = () => {
     { id: 'all', label: 'All', count: activeTab === 'all' ? jobs.length : undefined },
     { id: 'requests', label: 'Requests', count: activeTab === 'requests' ? jobs.length : undefined },
     { id: 'available', label: 'Available', count: activeTab === 'available' ? jobs.length : undefined },
+    { id: 'quotation', label: 'Quotation', count: activeTab === 'quotation' ? jobs.length : undefined },
     { id: 'active', label: 'Active', count: activeTab === 'active' ? jobs.length : undefined },
     { id: 'completed', label: 'Completed', count: activeTab === 'completed' ? jobs.length : undefined },
     { id: 'backjob', label: 'Backjobs', count: activeTab === 'backjob' ? jobs.length : undefined },
@@ -221,6 +253,7 @@ const Jobs: React.FC = () => {
         return 'status-pending';
       case 'available':
       case 'quoted':
+      case 'qouted':
         return 'status-available';
       case 'active':
         return 'status-active';
@@ -242,6 +275,7 @@ const Jobs: React.FC = () => {
       case 'available':
         return 'Available';
       case 'quoted':
+      case 'qouted':
         return 'Quoted';
       case 'active':
         return 'In Progress';
@@ -325,6 +359,8 @@ const Jobs: React.FC = () => {
                   ? 'No available jobs at the moment. Check back later!'
                   : activeTab === 'requests'
                   ? 'No pending requests at the moment.'
+                  : activeTab === 'quotation'
+                  ? 'No quoted requests at the moment.'
                   : activeTab === 'all'
                   ? 'No jobs found.'
                   : `No ${activeTab} jobs found.`
@@ -379,16 +415,6 @@ const Jobs: React.FC = () => {
                   {job.status === 'pending' && (
                     <div className="mechanic-job-actions">
                       <button
-                        className="action-button accept-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAcceptRequest(job.request_id);
-                        }}
-                      >
-                        <span className="material-icons-round">check</span>
-                        Accept
-                      </button>
-                      <button
                         className="action-button decline-button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -397,6 +423,29 @@ const Jobs: React.FC = () => {
                       >
                         <span className="material-icons-round">close</span>
                         Decline
+                      </button>
+                      
+                      {/* Show Quotation button for all pending requests */}
+                      <button
+                        className="action-button quotation-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuotationClick(job);
+                        }}
+                      >
+                        <span className="material-icons-round">receipt</span>
+                        Quote
+                      </button>
+                      
+                      <button
+                        className="action-button accept-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAcceptRequest(job.request_id);
+                        }}
+                      >
+                        <span className="material-icons-round">check</span>
+                        {job.request_type === 'direct' ? 'Confirm' : 'Accept'}
                       </button>
                     </div>
                   )}
