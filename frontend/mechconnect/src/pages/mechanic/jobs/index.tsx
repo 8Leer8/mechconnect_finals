@@ -418,7 +418,7 @@ const Jobs: React.FC = () => {
                     </div>
                   )}
 
-                  {job.status === 'pending' && (
+                  {(job.status === 'pending' || activeTab === 'requests' || (activeTab === 'available' && !job.booking_id)) && (
                     <div className="mechanic-job-actions">
                       <button
                         className="action-button decline-button"
@@ -451,7 +451,7 @@ const Jobs: React.FC = () => {
                         }}
                       >
                         <span className="material-icons-round">check</span>
-                        {job.request_type === 'direct' ? 'Confirm' : 'Accept'}
+                        Accept
                       </button>
                     </div>
                   )}
