@@ -18,15 +18,24 @@ interface PaymentData {
   notes?: string;
 }
 
+interface ExistingPayment {
+  payment_id?: number;
+  payment_status: string;
+  total_amount: string;
+  amount_paid: string;
+  remaining_balance: string;
+}
+
 const PaymentForm: React.FC = () => {
   const history = useHistory();
   const location = useLocation<LocationState>();
   const { bookingId, totalAmount, bookingDetails } = location.state || {};
 
+  const [existingPayment, setExistingPayment] = useState<ExistingPayment | null>(null);
   const [paymentData, setPaymentData] = useState<PaymentData>({
     payment_type: 'full',
     payment_method: 'gcash',
-    amount_paid: totalAmount || '0',
+    amount_paid: '0',
     reference_number: '',
     notes: '',
   });
@@ -36,11 +45,38 @@ const PaymentForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch existing payment information
   useEffect(() => {
     if (!bookingId) {
       setError('Booking information not found');
+      return;
     }
-  }, [bookingId]);
+
+    const fetchPaymentInfo = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/payments/booking/${bookingId}/`);
+        const data = await response.json();
+        
+        setExistingPayment(data);
+        
+        // Set amount_paid to remaining balance by default
+        const remainingBalance = data.remaining_balance || totalAmount || '0';
+        setPaymentData(prev => ({
+          ...prev,
+          amount_paid: remainingBalance
+        }));
+      } catch (err) {
+        console.error('Error fetching payment info:', err);
+        // Fallback to totalAmount if fetch fails
+        setPaymentData(prev => ({
+          ...prev,
+          amount_paid: totalAmount || '0'
+        }));
+      }
+    };
+
+    fetchPaymentInfo();
+  }, [bookingId, totalAmount]);
 
   const goBack = () => {
     history.goBack();
@@ -50,9 +86,10 @@ const PaymentForm: React.FC = () => {
     const { name, value } = e.target;
     setPaymentData(prev => ({ ...prev, [name]: value }));
 
-    // Auto-set amount for full payment
+    // Auto-set amount for full payment (use remaining balance)
     if (name === 'payment_type' && value === 'full') {
-      setPaymentData(prev => ({ ...prev, amount_paid: totalAmount }));
+      const remainingBalance = existingPayment?.remaining_balance || totalAmount || '0';
+      setPaymentData(prev => ({ ...prev, amount_paid: remainingBalance }));
     }
   };
 
@@ -137,8 +174,9 @@ const PaymentForm: React.FC = () => {
       return;
     }
 
-    if (parseFloat(paymentData.amount_paid) > parseFloat(totalAmount)) {
-      setError('Amount paid cannot exceed total amount');
+    const remainingBalance = parseFloat(existingPayment?.remaining_balance || totalAmount);
+    if (parseFloat(paymentData.amount_paid) > remainingBalance) {
+      setError(`Amount paid cannot exceed remaining balance (₱${remainingBalance.toFixed(2)})`);
       return;
     }
 
@@ -162,28 +200,63 @@ const PaymentForm: React.FC = () => {
         paymentProof = await compressImage(proofFile);
       }
 
-      const payload = {
-        booking_id: bookingId,
-        paid_by_id: clientId,
-        ...paymentData,
-        payment_proof: paymentProof,
-      };
+      // Check if this is an additional payment or first payment
+      const isAdditionalPayment = existingPayment && existingPayment.payment_id && existingPayment.payment_status === 'advance_paid';
+      
+      if (isAdditionalPayment) {
+        // Update existing payment by adding to amount_paid
+        const newTotalPaid = parseFloat(existingPayment.amount_paid) + parseFloat(paymentData.amount_paid);
+        
+        const payload = {
+          amount_paid: newTotalPaid.toString(),
+          payment_proof: paymentProof,
+          reference_number: paymentData.reference_number,
+          notes: paymentData.notes,
+          payment_method: paymentData.payment_method,
+        };
 
-      const response = await fetch('http://localhost:8000/api/payments/create/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch(`http://localhost:8000/api/payments/${existingPayment.payment_id}/`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        alert('Payment submitted successfully!');
-        history.push('/client/booking');
+        if (response.ok) {
+          const isFullyPaid = newTotalPaid >= parseFloat(existingPayment.total_amount);
+          alert(isFullyPaid ? 'Payment completed! Booking is now fully paid.' : 'Additional payment submitted successfully!');
+          history.push('/client/booking');
+        } else {
+          setError(data.error || 'Failed to submit payment');
+        }
       } else {
-        setError(data.error || Object.values(data).flat().join(', ') || 'Failed to submit payment');
+        // Create new payment
+        const payload = {
+          booking_id: bookingId,
+          paid_by_id: clientId,
+          ...paymentData,
+          payment_proof: paymentProof,
+        };
+
+        const response = await fetch('http://localhost:8000/api/payments/create/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Payment submitted successfully!');
+          history.push('/client/booking');
+        } else {
+          setError(data.error || Object.values(data).flat().join(', ') || 'Failed to submit payment');
+        }
       }
     } catch (err) {
       console.error('Payment submission error:', err);
@@ -228,8 +301,27 @@ const PaymentForm: React.FC = () => {
             </div>
             <div className="info-row">
               <span className="info-label">Total Amount:</span>
-              <span className="info-value total">₱{parseFloat(totalAmount).toFixed(2)}</span>
+              <span className="info-value total">₱{parseFloat(existingPayment?.total_amount || totalAmount).toFixed(2)}</span>
             </div>
+            {existingPayment && existingPayment.payment_status !== 'unpaid' && (
+              <>
+                <div className="info-row">
+                  <span className="info-label">Payment Status:</span>
+                  <span className={`info-value status-${existingPayment.payment_status}`}>
+                    {existingPayment.payment_status === 'advance_paid' ? 'Advance Paid' : 
+                     existingPayment.payment_status === 'fully_paid' ? 'Fully Paid' : 'Unpaid'}
+                  </span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Already Paid:</span>
+                  <span className="info-value">₱{parseFloat(existingPayment.amount_paid).toFixed(2)}</span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">Remaining Balance:</span>
+                  <span className="info-value remaining">₱{parseFloat(existingPayment.remaining_balance).toFixed(2)}</span>
+                </div>
+              </>
+            )}
           </div>
 
           <form className="payment-form" onSubmit={handleSubmit}>
@@ -272,7 +364,7 @@ const PaymentForm: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="amount_paid">Amount Paid</label>
+              <label htmlFor="amount_paid">Amount to Pay</label>
               <input
                 type="number"
                 id="amount_paid"
@@ -281,13 +373,15 @@ const PaymentForm: React.FC = () => {
                 onChange={handleInputChange}
                 step="0.01"
                 min="0"
-                max={totalAmount}
+                max={existingPayment?.remaining_balance || totalAmount}
                 required
               />
               <small className="hint">
-                {paymentData.payment_type === 'advance' 
-                  ? 'Enter the advance payment amount' 
-                  : `Full payment: ₱${parseFloat(totalAmount).toFixed(2)}`}
+                {existingPayment?.payment_status === 'advance_paid'
+                  ? `Remaining balance: ₱${parseFloat(existingPayment.remaining_balance).toFixed(2)}`
+                  : paymentData.payment_type === 'advance' 
+                    ? 'Enter the advance payment amount' 
+                    : `Full payment: ₱${parseFloat(existingPayment?.remaining_balance || totalAmount).toFixed(2)}`}
               </small>
             </div>
 

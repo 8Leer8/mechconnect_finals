@@ -4,6 +4,30 @@
   padding-bottom: 140px;
 }
 
+/* Material Icons */
+.material-icons-round {
+  font-family: 'Material Icons Round';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-size: 20px;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
 /* Header */
 .request-header-top {
   display: flex;
@@ -35,8 +59,17 @@
   transition: all 0.2s ease;
 }
 
+.notification-button .material-icons-round {
+  color: hsl(25, 15%, 25%) !important;
+}
+
 .notification-button:hover {
+  color: hsl(25, 15%, 25%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.notification-button:hover .material-icons-round {
+  color: hsl(25, 15%, 25%) !important;
 }
 
 /* Request Section */

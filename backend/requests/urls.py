@@ -17,6 +17,7 @@ urlpatterns = [
     path('<int:request_id>/delete/', views.delete_request, name='delete_request'),
     path('<int:request_id>/assign/', views.assign_provider_to_request, name='assign_provider_to_request'),
     path('<int:request_id>/accept/', views.accept_request, name='accept_request'),
+    path('<int:request_id>/decline/', views.decline_request, name='decline_request'),
     path('cancel/', views.cancel_request, name='cancel_request'),
     
     # Quotation management

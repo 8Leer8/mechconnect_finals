@@ -50,17 +50,22 @@ const Jobs: React.FC = () => {
 
   // Navigation to job detail pages
   const goToJobDetail = (job: JobData) => {
-    const jobId = job.booking_id || job.request_id;
     const status = job.status;
     
-    console.log('Navigating to job detail:', jobId, status);
+    console.log('Navigating to job detail:', job);
     
-    // Use request-detail for pending requests, otherwise use unified job-detail
-    let route = '/mechanic/job-detail';
-    if (status === 'pending') {
+    // Use request-detail for items without booking_id (pure requests)
+    // Use job-detail for items with booking_id (actual bookings)
+    let route = '';
+    let jobId = 0;
+    
+    if (!job.booking_id) {
+      // This is a request (pending, quoted, accepted, rejected) - use request_id
+      jobId = job.request_id;
       route = `/mechanic/request-detail/${jobId}`;
     } else {
-      // All other statuses (active, completed, cancelled, etc.) use the same job detail page
+      // This is a booking (active, completed, cancelled, etc.) - use booking_id
+      jobId = job.booking_id;
       route = `/mechanic/job-detail/${jobId}`;
     }
     

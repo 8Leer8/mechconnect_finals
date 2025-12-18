@@ -54,7 +54,11 @@
   transform: scale(0.95);
 }
 
-.page-title {
+.back-button .material-icons-round {
+  color: hsl(25, 15%, 25%) !important;
+}
+
+.page-title:
   font-size: 20px;
   font-weight: 600;
   color: var(--text, hsl(25, 15%, 25%));

@@ -59,8 +59,17 @@
   position: relative;
 }
 
+.notification-button .material-icons-round {
+  color: hsl(25, 15%, 25%) !important;
+}
+
 .notification-button:hover {
+  color: hsl(25, 15%, 25%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.notification-button:hover .material-icons-round {
+  color: hsl(25, 15%, 25%) !important;
 }
 
 .notification-badge {

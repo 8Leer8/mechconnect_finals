@@ -7,8 +7,7 @@ import './RequestDetail.css';
 
 interface RequestData {
   request_id: number;
-  status: string;
-  request_summary: string;
+  request_status: string;
   request_type: string;
   created_at: string;
   client_name: string;
@@ -16,10 +15,9 @@ interface RequestData {
   service_location?: string;
   estimated_amount?: number;
   custom_request?: {
-    problem_description?: string;
-    images?: string[];
-    preferred_date?: string;
-    preferred_time?: string;
+    description?: string;
+    concern_picture?: string;
+    providers_note?: string;
   };
   direct_request?: any;
   emergency_request?: any;
@@ -80,7 +78,12 @@ const RequestDetail: React.FC = () => {
       }
 
       const data = await response.json();
-      setRequestData(data);
+      console.log('API Response:', data);
+      console.log('Request data:', data.request);
+      console.log('Request status:', data.request?.request_status);
+      console.log('Should show buttons:', data.request?.request_status === 'pending');
+      // Extract the request data from the response
+      setRequestData(data.request);
       setError(null);
     } catch (err) {
       console.error('Error fetching request details:', err);
@@ -124,7 +127,7 @@ const RequestDetail: React.FC = () => {
       if (requestData && data.request) {
         setRequestData({
           ...requestData,
-          status: 'accepted',
+          request_status: 'accepted',
         });
       }
 
@@ -221,8 +224,8 @@ const RequestDetail: React.FC = () => {
             <div className="detail-card">
               <div className="card-header">
                 <h2>Request Information</h2>
-                <span className={`status-badge status-${requestData.status}`}>
-                  {requestData.status === 'pending' ? 'Pending Response' : requestData.status}
+                <span className={`status-badge status-${requestData.request_status}`}>
+                  {requestData.request_status === 'pending' ? 'Pending Response' : requestData.request_status}
                 </span>
               </div>
               <div className="card-content">
@@ -233,10 +236,6 @@ const RequestDetail: React.FC = () => {
                 <div className="info-row">
                   <span className="label">Type:</span>
                   <span className="value">{requestData.request_type}</span>
-                </div>
-                <div className="info-row">
-                  <span className="label">Summary:</span>
-                  <span className="value">{requestData.request_summary}</span>
                 </div>
                 <div className="info-row">
                   <span className="label">Requested:</span>
@@ -287,9 +286,9 @@ const RequestDetail: React.FC = () => {
                 </div>
                 <div className="card-content">
                   <p className="description">
-                    {requestData.custom_request.problem_description || 'No description provided'}
+                    {requestData.custom_request.description || 'No description provided'}
                   </p>
-                  {requestData.custom_request.preferred_date && (
+                  {requestData.custom_request.concern_picture && (
                     <div className="info-row">
                       <span className="label">Preferred Date:</span>
                       <span className="value">{requestData.custom_request.preferred_date}</span>
@@ -306,7 +305,7 @@ const RequestDetail: React.FC = () => {
             )}
 
             {/* Action Buttons */}
-            {requestData.status === 'pending' && (
+            {requestData.request_status === 'pending' && (
               <div className="action-buttons">
                 <IonButton
                   expand="block"
@@ -330,7 +329,7 @@ const RequestDetail: React.FC = () => {
             )}
             
             {/* Show acceptance confirmation when accepted */}
-            {requestData.status === 'accepted' && (
+            {requestData.request_status === 'accepted' && (
               <div className="acceptance-confirmation">
                 <div className="confirmation-icon">
                   <span className="material-icons-round">check_circle</span>

@@ -613,11 +613,20 @@ def accept_request(request, request_id):
             req.request_status = 'accepted'
             req.save()
             
+            # Determine the booking amount based on request type
+            booking_amount = 0
+            if req.request_type == 'custom' and hasattr(req, 'custom_request') and req.custom_request:
+                # Use estimated_budget from custom request
+                booking_amount = req.custom_request.estimated_budget or 0
+            elif req.request_type == 'direct' and hasattr(req, 'direct_request') and req.direct_request:
+                # Use service price for direct requests
+                booking_amount = req.direct_request.service.price if req.direct_request.service else 0
+            
             # Create a booking for this accepted request
             booking = Booking.objects.create(
                 request=req,
                 status='active',
-                amount_fee=0  # Will be updated later with actual fee
+                amount_fee=booking_amount
             )
             
             # Serialize and return the updated request
@@ -632,6 +641,74 @@ def accept_request(request, request_id):
     except Exception as e:
         return Response({
             'error': 'Failed to accept request',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def decline_request(request, request_id):
+    """
+    Decline a request as a mechanic.
+    - Validates user is authenticated
+    - Validates user has mechanic role
+    - Validates request is in pending/quoted state
+    - Updates request status to rejected
+    - Unassigns mechanic from request if assigned
+    """
+    try:
+        # Get the authenticated user
+        user = request.user
+        
+        # Check if user has a mechanic profile
+        try:
+            mechanic = Mechanic.objects.get(mechanic_id=user.acc_id)
+        except Mechanic.DoesNotExist:
+            return Response({
+                'error': 'Access denied. User is not a mechanic.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get the request
+        try:
+            req = Request.objects.select_related(
+                'client', 'provider'
+            ).prefetch_related(
+                'custom_request', 'direct_request', 'emergency_request'
+            ).get(request_id=request_id)
+        except Request.DoesNotExist:
+            return Response({
+                'error': 'Request not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Validate request state - only pending or quoted requests can be declined
+        if req.request_status not in ['pending', 'qouted']:
+            return Response({
+                'error': f'Cannot decline request. Current status is "{req.request_status}". Only pending or quoted requests can be declined.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Use transaction to ensure atomicity
+        with transaction.atomic():
+            # Update status to rejected
+            req.request_status = 'rejected'
+            
+            # Unassign mechanic if this mechanic is assigned
+            if req.provider and req.provider.acc_id == user.acc_id:
+                req.provider = None
+            
+            req.save()
+            
+            # Serialize and return the updated request
+            serializer = RequestSerializer(req)
+            
+            return Response({
+                'message': 'Request declined successfully',
+                'request': serializer.data
+            }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({
+            'error': 'Failed to decline request',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

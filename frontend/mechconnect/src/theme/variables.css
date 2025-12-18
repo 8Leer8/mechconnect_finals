@@ -53,3 +53,32 @@ body {
   background-color: var(--bg);
   color: var(--text);
 }
+
+/* Material Icons Global Definition */
+.material-icons-round {
+  font-family: 'Material Icons Round', 'Material Icons', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+  font-size: 20px;
+  vertical-align: middle;
+  color: inherit;
+}
+
+.icon-sm {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}

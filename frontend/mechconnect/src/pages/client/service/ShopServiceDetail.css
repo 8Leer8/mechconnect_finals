@@ -35,7 +35,7 @@
 .back-button .material-icons-round {
   font-family: 'Material Icons Round';
   font-size: 24px;
-  color: var(--text, hsl(25, 15%, 25%));
+  color: hsl(25, 15%, 25%) !important;
 }
 
 .page-title {
