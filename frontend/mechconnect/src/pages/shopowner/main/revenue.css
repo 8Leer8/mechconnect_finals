@@ -9,15 +9,34 @@
   padding-bottom: 80px;
 }
 
-/* Transparent Scrollbar */
-.revenue-content::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+/* Hide Scrollbar */
+.revenue-content,
+.revenue-content::part(scroll),
+.revenue-content .inner-scroll {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-.revenue-content {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+.revenue-content::-webkit-scrollbar,
+.revenue-content::part(scroll)::-webkit-scrollbar,
+.revenue-content .inner-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.revenue-content::-webkit-scrollbar-track,
+.revenue-content::part(scroll)::-webkit-scrollbar-track,
+.revenue-content .inner-scroll::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.revenue-content::-webkit-scrollbar-thumb,
+.revenue-content::part(scroll)::-webkit-scrollbar-thumb,
+.revenue-content .inner-scroll::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 /* Material Icons */

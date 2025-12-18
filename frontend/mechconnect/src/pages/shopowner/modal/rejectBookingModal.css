@@ -110,6 +110,24 @@
   color: #0f172a;
   background: white;
   outline: none;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.reject-notes::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.reject-notes::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.reject-notes::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 .reject-notes::placeholder {

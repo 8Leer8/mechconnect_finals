@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Shop, ShopMechanic
+from .models import Shop, ShopMechanic, ShopItem
 from accounts.models import AccountAddress
 
 
@@ -61,3 +61,13 @@ class ShopDiscoverySerializer(serializers.ModelSerializer):
     def get_total_mechanics(self, obj):
         """Get total mechanics in shop"""
         return obj.shop_mechanics.count()
+
+
+class ShopItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShopItem
+        fields = [
+            'item_id', 'shop', 'item_name', 'category', 
+            'price', 'stock', 'description', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['item_id', 'created_at', 'updated_at']

@@ -1,14 +1,24 @@
 import { IonModal } from '@ionic/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './addItemModal.css';
 
-interface AddItemModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onItemAdded?: () => void; // Callback to refresh items list
+interface ShopItem {
+  item_id: number;
+  item_name: string;
+  category: string;
+  price: number;
+  stock: number;
+  description?: string;
 }
 
-const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdded }) => {
+interface EditItemModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  item: ShopItem | null;
+  onItemUpdated?: () => void;
+}
+
+const EditItemModal: React.FC<EditItemModalProps> = ({ isOpen, onClose, item, onItemUpdated }) => {
   const [itemName, setItemName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
@@ -17,12 +27,26 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Populate form when item changes
+  useEffect(() => {
+    if (item) {
+      setItemName(item.item_name);
+      setCategory(item.category);
+      setPrice(item.price.toString());
+      setStock(item.stock.toString());
+      setDescription(item.description || '');
+      setError(null);
+    }
+  }, [item]);
+
   const resetForm = () => {
-    setItemName('');
-    setCategory('');
-    setPrice('');
-    setStock('');
-    setDescription('');
+    if (item) {
+      setItemName(item.item_name);
+      setCategory(item.category);
+      setPrice(item.price.toString());
+      setStock(item.stock.toString());
+      setDescription(item.description || '');
+    }
     setError(null);
   };
 
@@ -33,36 +57,22 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
       return;
     }
 
+    if (!item) {
+      setError('No item selected');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Get shop ID from localStorage or use default
-      let shopId = localStorage.getItem('shop_id');
-      
-      // If shop_id is not in localStorage, try to get it from user data
-      if (!shopId) {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          try {
-            const user = JSON.parse(userStr);
-            shopId = user.shop_id?.toString() || '1';
-          } catch {
-            shopId = '1'; // Default fallback
-          }
-        } else {
-          shopId = '1'; // Default fallback
-        }
-      }
-
-      // Call API to add item
-      const response = await fetch('http://localhost:8000/api/shops/add-item/', {
-        method: 'POST',
+      // Call API to update item
+      const response = await fetch(`http://localhost:8000/api/shops/items/${item.item_id}/update/`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          shop_id: parseInt(shopId),
           item_name: itemName,
           category: category,
           price: parseFloat(price),
@@ -74,20 +84,19 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
       const data = await response.json();
 
       if (response.ok) {
-        // Success - reset form and close modal
-        resetForm();
+        // Success - close modal
         onClose();
         
         // Call callback to refresh items list if provided
-        if (onItemAdded) {
-          onItemAdded();
+        if (onItemUpdated) {
+          onItemUpdated();
         }
       } else {
         // Handle error
-        setError(data.error || data.message || 'Failed to add item. Please try again.');
+        setError(data.error || data.message || 'Failed to update item. Please try again.');
       }
     } catch (err) {
-      console.error('Error adding item:', err);
+      console.error('Error updating item:', err);
       setError('Network error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -105,7 +114,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
       <div className="add-item-modal-container">
         {/* Header */}
         <div className="add-item-modal-header">
-          <h2>Add New Item</h2>
+          <h2>Edit Item</h2>
           <button className="close-icon" onClick={handleClose}>
             <span className="material-icons-round">close</span>
           </button>
@@ -198,12 +207,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
             {loading ? (
               <>
                 <span className="material-icons-round loading-spinner">hourglass_empty</span>
-                Adding...
+                Updating...
               </>
             ) : (
               <>
-                <span className="material-icons-round">add</span>
-                Add Item
+                <span className="material-icons-round">save</span>
+                Update Item
               </>
             )}
           </button>
@@ -213,4 +222,5 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
   );
 };
 
-export default AddItemModal;
+export default EditItemModal;
+

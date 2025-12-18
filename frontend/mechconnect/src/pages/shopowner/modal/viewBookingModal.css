@@ -17,6 +17,25 @@
   gap: 20px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.view-modal-container::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  background: transparent;
+}
+
+.view-modal-container::-webkit-scrollbar-track {
+  display: none;
+  background: transparent;
+}
+
+.view-modal-container::-webkit-scrollbar-thumb {
+  display: none;
+  background: transparent;
 }
 
 .view-modal-header {

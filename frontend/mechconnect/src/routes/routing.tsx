@@ -58,6 +58,7 @@ import ManageBooking from '../pages/shopowner/main/booking';
 import Shop from '../pages/shopowner/main/shop';
 import Revenue from '../pages/shopowner/main/revenue';
 import ShopOwnerProfile from '../pages/shopowner/main/profile';
+import ShopOwnerNotifications from '../pages/shopowner/notifications';
 
 // Mechanic Pages
 import MechanicHome from '../pages/mechanic/home';
@@ -174,6 +175,9 @@ const AppRoutes: React.FC = () => {
       <AuthGuard exact path="/shopowner/profile">
         <ShopOwnerProfile />
       </AuthGuard>
+      <AuthGuard exact path="/shopowner/notifications">
+        <ShopOwnerNotifications />
+      </AuthGuard>
       
       {/* Protected Mechanic Routes */}
       <AuthGuard exact path="/mechanic/home">
@@ -233,6 +237,7 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/shopowner/shop" component={Shop} />
       <Route exact path="/shopowner/revenue" component={Revenue} />
       <Route exact path="/shopowner/profile" component={ShopOwnerProfile} />
+      <Route exact path="/shopowner/notifications" component={ShopOwnerNotifications} />
       
       {/* Mechanic Routes */}
       <Route exact path="/mechanic/home" component={MechanicHome} />
@@ -251,7 +256,7 @@ const AppRoutes: React.FC = () => {
       
       {/* Default Route */}
       <Route exact path="/">
-        <Redirect to="/shopowner/dashboard" />
+        <Redirect to="/login" />
       </Route>
     </IonRouterOutlet>
   );

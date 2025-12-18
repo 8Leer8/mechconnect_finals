@@ -36,6 +36,10 @@ urlpatterns = [
     
     # Mechanic detail endpoint
     path('mechanic/<int:mechanic_id>/', users.mechanic_detail, name='mechanic_detail'),
+    
+    # Notifications endpoints
+    path('notifications/', users.user_notifications, name='user_notifications'),
+    path('notifications/<int:notification_id>/read/', users.mark_notification_read, name='mark_notification_read'),
 
     # Head Admin Dashboard
     path('head-admin/dashboard/stats/', dashboard.head_admin_dashboard_stats, name='head_admin_dashboard_stats'),
