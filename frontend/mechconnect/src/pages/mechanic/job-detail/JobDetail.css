@@ -219,22 +219,26 @@
   align-items: flex-start;
   margin-bottom: 8px;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
 }
 
 .detail-label {
-  font-size: 14px;
+  font-size: 13px;
   color: hsl(25, 15%, 45%);
   font-weight: 500;
   min-width: 80px;
+  flex-shrink: 0;
 }
 
 .detail-value {
-  font-size: 14px;
+  font-size: 13px;
   color: hsl(25, 15%, 25%);
   font-weight: 500;
   text-align: right;
   flex: 1;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .provider-name {
@@ -247,10 +251,14 @@
 }
 
 .service-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: hsl(25, 15%, 25%);
   display: block;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.5;
 }
 
 /* Accordion for Location */
@@ -604,4 +612,122 @@
 .btn-add-new:hover {
   background: hsl(120, 60%, 40%);
   transform: translateY(-1px);
+}
+/* Pricing Section */
+.pricing-section {
+  background: hsl(40, 30%, 98%);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.pricing-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(25, 15%, 25%);
+  margin: 0 0 16px 0;
+}
+
+.pricing-breakdown {
+  margin-bottom: 12px;
+}
+
+.pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.pricing-label {
+  font-size: 14px;
+  color: hsl(25, 15%, 40%);
+  font-weight: 500;
+}
+
+.pricing-value {
+  font-size: 14px;
+  color: hsl(25, 15%, 25%);
+  font-weight: 600;
+}
+
+.pricing-divider {
+  height: 1px;
+  background: hsl(25, 15%, 85%);
+  margin: 12px 0;
+}
+
+.pricing-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 4px 0;
+}
+
+.pricing-total .total-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: hsl(25, 15%, 20%);
+}
+
+.pricing-total .total-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: hsl(25, 85%, 55%);
+}
+
+/* Complete Job Button */
+.btn-complete {
+  background: hsl(120, 60%, 45%);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.btn-complete:hover {
+  background: hsl(120, 60%, 40%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.btn-complete:active {
+  transform: translateY(0);
+}
+
+/* Decline Button for Back Jobs */
+.btn-decline {
+  background: hsl(0, 70%, 55%);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.btn-decline:hover {
+  background: hsl(0, 70%, 50%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.btn-decline:active {
+  transform: translateY(0);
 }

@@ -21,10 +21,11 @@ class CustomRequestSerializer(serializers.ModelSerializer):
 class DirectRequestSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name', read_only=True)
     service_price = serializers.DecimalField(source='service.price', max_digits=12, decimal_places=2, read_only=True)
+    quoted_items = QuotedRequestItemSerializer(many=True, read_only=True)
     
     class Meta:
         model = DirectRequest
-        fields = ['request', 'service', 'service_name', 'service_price']
+        fields = ['request', 'service', 'service_name', 'service_price', 'quoted_items', 'providers_note']
 
 
 class EmergencyRequestSerializer(serializers.ModelSerializer):
@@ -144,6 +145,34 @@ class CreateCustomRequestSerializer(serializers.ModelSerializer):
             if not data.get('scheduled_time'):
                 raise serializers.ValidationError("Scheduled time is required for freely scheduled requests")
         return data
+
+
+class CreateDirectRequestQuotationSerializer(serializers.Serializer):
+    """Serializer for creating quotations on direct requests"""
+    quoted_items = serializers.ListField(
+        child=serializers.DictField(child=serializers.CharField()),
+        help_text="List of items with 'item' and 'price' keys"
+    )
+    providers_note = serializers.CharField(max_length=2000, required=False, allow_blank=True)
+    
+    def validate_quoted_items(self, value):
+        """Validate that each item has required fields"""
+        if not value:
+            raise serializers.ValidationError("At least one quotation item is required")
+        
+        for item in value:
+            if 'item' not in item or 'price' not in item:
+                raise serializers.ValidationError("Each item must have 'item' and 'price' fields")
+            
+            # Validate price is a valid decimal
+            try:
+                price = float(item['price'])
+                if price < 0:
+                    raise serializers.ValidationError("Price cannot be negative")
+            except (ValueError, TypeError):
+                raise serializers.ValidationError("Invalid price format")
+        
+        return value
 
 
 class RequestListSerializer(serializers.ModelSerializer):

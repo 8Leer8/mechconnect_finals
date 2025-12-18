@@ -1,0 +1,577 @@
+/* ==========================================================================
+   Quotation Page Styles
+   Clean, professional UI consistent with MechConnect design system
+   ========================================================================== */
+
+/* Page Background - Neutral, clean backdrop */
+.quotation-content {
+  --background: #f8f9fb;
+  --padding-bottom: 80px;
+}
+
+/* ==========================================================================
+   Header Section - Consistent with app-wide header styling
+   ========================================================================== */
+.quotation-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #eef0f2;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-back-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f5f6f8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #374151;
+}
+
+.header-back-btn:hover {
+  background: #eef0f2;
+}
+
+.header-back-btn:active {
+  transform: scale(0.95);
+}
+
+.header-title {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f5f6f8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #374151;
+}
+
+.header-icon-btn:hover {
+  background: #eef0f2;
+}
+
+.header-icon-btn .material-icons-round {
+  font-size: 22px;
+}
+
+/* ==========================================================================
+   Main Content Container - Proper spacing system
+   ========================================================================== */
+.quotation-container {
+  padding: 16px;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   Card Component - Clean, minimal shadows
+   ========================================================================== */
+.quotation-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef0f2;
+}
+
+/* ==========================================================================
+   Section 1: Request Info Card
+   ========================================================================== */
+.request-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.client-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.client-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.request-meta {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.request-type-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: #f3f4f6;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.request-type-badge.custom {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.request-type-badge.direct {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.request-description {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* Inline Details - No expandable section */
+.request-details-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-icon {
+  font-size: 16px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Section 2: Quotation Items
+   ========================================================================== */
+.card-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.section-icon {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.optional-label {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Column Headers */
+.items-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0 8px 36px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.items-header-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex: 1;
+}
+
+.items-header-label.price-header {
+  flex: 0 0 100px;
+  text-align: right;
+  padding-right: 32px;
+}
+
+/* Items List */
+.quotation-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Individual Item Row - Horizontal alignment */
+.quotation-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.item-index {
+  width: 24px;
+  height: 24px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.item-inputs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #6b7280;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.item-description {
+  flex: 1;
+  min-width: 0;
+}
+
+.price-input {
+  width: 100px;
+  flex-shrink: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Remove spinner for number input */
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.price-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Remove Item Button */
+.remove-item-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.remove-item-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.remove-item-btn .material-icons-round {
+  font-size: 18px;
+}
+
+/* Add Item Button */
+.add-item-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-item-btn:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.add-item-btn .material-icons-round {
+  font-size: 18px;
+}
+
+/* ==========================================================================
+   Total Row - Simple inline style
+   ========================================================================== */
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.total-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.total-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f97316;
+}
+
+/* ==========================================================================
+   Section 3: Note Section
+   ========================================================================== */
+.note-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #ffffff;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+}
+
+.note-textarea:focus {
+  outline: none;
+  border-color: #6b7280;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1);
+}
+
+.note-textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* ==========================================================================
+   Action Buttons
+   ========================================================================== */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btn-primary {
+  background: #f97316;
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #ea580c;
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn .material-icons-round {
+  font-size: 18px;
+}
+
+/* Loading Spinner */
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Error State
+   ========================================================================== */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.error-state-icon {
+  font-size: 56px;
+  color: #f87171;
+  margin-bottom: 16px;
+}
+
+.error-state-text {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+}
+
+.error-state-btn {
+  padding: 12px 32px;
+  background: #f97316;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error-state-btn:hover {
+  background: #ea580c;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+@media (max-width: 400px) {
+  .quotation-container {
+    padding: 12px;
+  }
+  
+  .quotation-card {
+    padding: 12px;
+  }
+  
+  .item-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .price-input {
+    width: 100%;
+  }
+  
+  .items-header {
+    display: none;
+  }
+  
+  .btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Larger screens - wider content */
+@media (min-width: 768px) {
+  .quotation-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

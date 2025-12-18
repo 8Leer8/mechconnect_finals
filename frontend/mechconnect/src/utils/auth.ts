@@ -24,8 +24,9 @@ export const clearAuthData = (): void => {
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
-    // Keep active_role so user's last selected role persists across logout/login
-    // localStorage.removeItem('active_role'); // DO NOT REMOVE
+    localStorage.removeItem('userId');
+    // CRITICAL: Clear active_role to prevent role leakage between accounts
+    localStorage.removeItem('active_role');
     sessionStorage.clear();
   } catch (error) {
     console.error('Error clearing auth data:', error);

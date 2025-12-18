@@ -12,6 +12,7 @@ urlpatterns = [
     path('mechanic/', views.mechanic_bookings_list, name='mechanic_bookings_list'),
     
     path('<int:booking_id>/', views.booking_detail, name='booking_detail'),
+    path('<int:booking_id>/complete/', views.complete_booking, name='complete_booking'),
     
     # Specific booking types
     path('active/<int:booking_id>/', views.active_booking_detail, name='active_booking_detail'),

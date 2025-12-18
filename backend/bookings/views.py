@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from django.utils import timezone
 from .models import (
     Booking, ActiveBooking, RescheduledBooking, CancelledBooking,
     BackJobsBooking, Dispute, RefundedBooking, CompletedBooking
@@ -68,9 +70,10 @@ def client_bookings_list(request):
     })
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PATCH'])
+@permission_classes([IsAuthenticated])
 def booking_detail(request, booking_id):
-    """Get detailed information about a specific booking"""
+    """Get or update detailed information about a specific booking"""
     try:
         booking = Booking.objects.select_related(
             'request',
@@ -83,8 +86,41 @@ def booking_detail(request, booking_id):
             'request__emergency_request'
         ).get(booking_id=booking_id)
         
-        serializer = BookingSerializer(booking)
-        return Response(serializer.data)
+        if request.method == 'GET':
+            serializer = BookingSerializer(booking)
+            return Response(serializer.data)
+        
+        elif request.method == 'PATCH':
+            # Handle status updates for back_jobs
+            new_status = request.data.get('status')
+            
+            if new_status:
+                # Validate status transition
+                valid_transitions = {
+                    'back_jobs': ['active', 'completed'],
+                    'active': ['completed', 'back_jobs'],
+                }
+                
+                current_status = booking.status
+                if current_status in valid_transitions:
+                    if new_status not in valid_transitions[current_status]:
+                        return Response(
+                            {'error': f'Cannot transition from {current_status} to {new_status}'},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                
+                booking.status = new_status
+                if new_status == 'completed':
+                    booking.completed_at = timezone.now()
+                booking.save()
+                
+                serializer = BookingSerializer(booking)
+                return Response(serializer.data)
+            
+            return Response(
+                {'error': 'Status field is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
     except Booking.DoesNotExist:
         return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -420,6 +456,82 @@ def mechanic_bookings_list(request):
         'jobs': serializer.data,
         'total': len(serializer.data)
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def complete_booking(request, booking_id):
+    """Complete an active booking (mechanic only)"""
+    try:
+        # Get the booking
+        booking = Booking.objects.select_related(
+            'request',
+            'request__provider'
+        ).get(booking_id=booking_id)
+        
+        # Verify the requesting user is a mechanic
+        try:
+            from accounts.models import Mechanic
+            mechanic = Mechanic.objects.get(mechanic_id=request.user)
+        except Mechanic.DoesNotExist:
+            return Response(
+                {'error': 'Only mechanics can complete bookings'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Verify the mechanic is assigned to this booking
+        # booking.request.provider is an Account instance
+        # request.user is also an Account instance
+        if booking.request.provider != request.user:
+            # Add logging for debugging
+            print(f"Permission denied: booking.request.provider={booking.request.provider.id}, request.user={request.user.id}")
+            return Response(
+                {'error': 'You are not assigned to this booking'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Verify booking is in a valid state to be completed
+        if booking.status not in ['active']:
+            return Response(
+                {'error': f'Cannot complete booking with status: {booking.status}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update booking status to completed
+        booking.status = 'completed'
+        booking.completed_at = timezone.now()
+        booking.save()
+        
+        # Create CompletedBooking record if needed
+        try:
+            CompletedBooking.objects.get_or_create(
+                booking=booking,
+                defaults={
+                    'status': 'completed',
+                    'completed_at': booking.completed_at
+                }
+            )
+        except Exception as e:
+            # Log but don't fail if CompletedBooking creation fails
+            print(f"Warning: Could not create CompletedBooking: {e}")
+        
+        # Serialize and return the updated booking
+        serializer = BookingSerializer(booking)
+        return Response({
+            'message': 'Booking completed successfully',
+            'booking': serializer.data
+        }, status=status.HTTP_200_OK)
+        
+    except Booking.DoesNotExist:
+        return Response(
+            {'error': 'Booking not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to complete booking: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 @api_view(['GET'])
