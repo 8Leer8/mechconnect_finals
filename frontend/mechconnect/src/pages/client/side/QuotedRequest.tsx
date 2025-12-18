@@ -31,6 +31,13 @@ interface RequestData {
     concern_picture: string | null;
     quoted_items: QuoteItem[];
   };
+  direct_request?: {
+    service: number;
+    service_name: string;
+    service_price: number;
+    quoted_items: QuoteItem[];
+    providers_note: string | null;
+  };
 }
 
 const QuotedRequest: React.FC = () => {
@@ -42,7 +49,8 @@ const QuotedRequest: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
-  const quoteItems = requestData?.custom_request?.quoted_items || [];
+  // Get quoted items from either custom_request or direct_request
+  const quoteItems = requestData?.custom_request?.quoted_items || requestData?.direct_request?.quoted_items || [];
   const total = quoteItems.reduce((sum, item) => sum + Number(item.price), 0);
 
   // Fetch request details from API

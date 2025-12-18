@@ -185,6 +185,7 @@ def get_request_detail(request, request_id):
             'client__client_id', 'provider'
         ).prefetch_related(
             'custom_request__quoted_items',
+            'direct_request__quoted_items',
             'direct_request__service',
             'emergency_request'
         ).get(request_id=request_id)

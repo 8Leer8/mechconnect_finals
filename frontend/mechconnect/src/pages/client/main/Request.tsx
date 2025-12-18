@@ -109,16 +109,19 @@ const Request: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Request - Fetching with clientId:', clientId);
+      console.log('Request - Fetching with clientId:', clientId, 'status:', status);
       // Map frontend status to backend status (quoted -> qouted in backend)
       const backendStatus = status === 'quoted' ? 'qouted' : status;
+      console.log('Request - Backend status:', backendStatus);
       const result = await requestsAPI.getClientRequests(clientId, backendStatus);
+      console.log('Request - API Result:', result);
       
       if (result.error) {
         setError(result.error);
         setShowToast(true);
         setRequests([]);
       } else if (result.data) {
+        console.log('Request - Requests data:', result.data.requests);
         setRequests(result.data.requests || []);
       }
     } catch (err) {
