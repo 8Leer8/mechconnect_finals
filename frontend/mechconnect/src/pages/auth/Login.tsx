@@ -80,7 +80,7 @@ const Login: React.FC = () => {
             const roleRoutes: Record<string, string> = {
               'head_admin': '/headadmin/dashboard',
               'admin': '/admin/dashboard',
-              'shop_owner': '/shopowner/home',
+              'shop_owner': '/shopowner/dashboard',
               'mechanic': '/mechanic/home',
               'client': '/client/home'
             };
