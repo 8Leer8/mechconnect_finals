@@ -8,7 +8,7 @@ from .models import Shop, ShopMechanic, ShopItem
 from .serializers import ShopDiscoverySerializer, ShopItemSerializer
 from services.models import Service, ShopServiceMechanic
 from services.serializers import ServiceDiscoverySerializer
-from accounts.models import Mechanic, Account, Notification
+from accounts.models import Mechanic, Account, Notification, AccountAddress
 from specialties.models import MechanicSpecialty
 
 
@@ -70,6 +70,17 @@ def shop_detail(request, shop_id):
         # Get shop by ID
         shop = get_object_or_404(Shop, shop_id=shop_id)
         
+        # Get shop location from shop owner's address
+        location = "Location not specified"
+        if shop.shop_owner and hasattr(shop.shop_owner.shop_owner_id, 'address') and shop.shop_owner.shop_owner_id.address:
+            address = shop.shop_owner.shop_owner_id.address
+            location_parts = []
+            if address.barangay:
+                location_parts.append(address.barangay)
+            if address.city_municipality:
+                location_parts.append(address.city_municipality)
+            location = ", ".join(location_parts) if location_parts else "Location not specified"
+        
         # Get shop data
         shop_data = {
             'shop_id': shop.shop_id,
@@ -82,6 +93,7 @@ def shop_detail(request, shop_id):
             'is_verified': shop.is_verified,
             'status': shop.status,
             'created_at': shop.created_at,
+            'location': location,
         }
         
         # Get shop services through ShopService relationship

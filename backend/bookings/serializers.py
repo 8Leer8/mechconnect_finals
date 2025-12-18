@@ -32,7 +32,9 @@ class BookingSerializer(serializers.ModelSerializer):
     
     def get_client_name(self, obj):
         if obj.request.client and obj.request.client.client_id:
-            return f"{obj.request.client.client_id.firstname} {obj.request.client.client_id.lastname}"
+            account = obj.request.client.client_id
+            middlename = f" {account.middlename}" if account.middlename else ""
+            return f"{account.firstname}{middlename} {account.lastname}"
         return "Unknown Client"
     
     def get_provider_name(self, obj):
@@ -333,7 +335,9 @@ class BookingListSerializer(serializers.ModelSerializer):
     
     def get_client_name(self, obj):
         if obj.request.client and obj.request.client.client_id:
-            return f"{obj.request.client.client_id.firstname} {obj.request.client.client_id.lastname}"
+            account = obj.request.client.client_id
+            middlename = f" {account.middlename}" if account.middlename else ""
+            return f"{account.firstname}{middlename} {account.lastname}"
         return "Unknown Client"
     
     def get_provider_name(self, obj):

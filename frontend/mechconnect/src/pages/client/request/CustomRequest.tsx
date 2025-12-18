@@ -313,10 +313,10 @@ const CustomRequest: React.FC = () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           
-          // Calculate new dimensions (max 1200px width/height)
+          // Calculate new dimensions (max 400px width/height for smaller base64)
           let width = img.width;
           let height = img.height;
-          const maxSize = 1200;
+          const maxSize = 400;
           
           if (width > height && width > maxSize) {
             height = (height * maxSize) / width;
@@ -332,8 +332,8 @@ const CustomRequest: React.FC = () => {
           // Draw compressed image
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Convert to base64 with compression (0.7 quality)
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          // Convert to base64 with high compression (0.3 quality)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.3);
           setSelectedImage(compressedBase64);
         };
         img.src = event.target?.result as string;

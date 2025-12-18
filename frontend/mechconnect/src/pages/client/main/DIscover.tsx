@@ -80,6 +80,7 @@ const Discover: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
     city: '',
+    barangay: '',
     ranking: '',
     status: ''
   });
@@ -197,6 +198,7 @@ const Discover: React.FC = () => {
       // Build query parameters
       const params = new URLSearchParams();
       if (filterParams.city) params.append('city', filterParams.city);
+      if (filterParams.barangay) params.append('barangay', filterParams.barangay);
       if (filterParams.ranking) params.append('ranking', filterParams.ranking);
       if (filterParams.status) params.append('status', filterParams.status);
       
@@ -322,7 +324,7 @@ const Discover: React.FC = () => {
   };
 
   const clearFilters = () => {
-    const clearedFilters: Filters = { city: '', ranking: '', status: '' };
+    const clearedFilters: Filters = { city: '', barangay: '', ranking: '', status: '' };
     setFilters(clearedFilters);
     setSearchQuery('');
     fetchMechanics(clearedFilters, '');

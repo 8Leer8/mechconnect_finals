@@ -400,12 +400,12 @@ class MechanicDiscoverySerializer(serializers.ModelSerializer):
         """Get formatted location from address"""
         if hasattr(obj, 'address') and obj.address:
             address = obj.address
-            # Create a readable location string
+            # Create a readable location string with barangay and city
             location_parts = []
+            if address.barangay:
+                location_parts.append(address.barangay)
             if address.city_municipality:
                 location_parts.append(address.city_municipality)
-            if address.province:
-                location_parts.append(address.province)
             return ", ".join(location_parts) if location_parts else "Location not specified"
         return "Location not specified"
     

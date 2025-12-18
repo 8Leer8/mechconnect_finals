@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
-from ..models import Account, AccountRole, AccountBan, Notification
+from ..models import Account, AccountRole, AccountBan, Notification, AccountAddress
 from ..serializers import AccountSerializer, NotificationSerializer, MechanicDiscoverySerializer
 from ..permissions import head_admin_required
 
@@ -213,9 +213,12 @@ def mark_notification_read(request, notification_id):
 @permission_classes([AllowAny])
 def discover_mechanics(request):
     """
-    Get all available mechanics for discovery page
+    Get all available mechanics for discovery page.
+    Prioritizes mechanics from the same barangay as the requesting user.
     """
     try:
+        from django.db.models import Case, When, IntegerField, Q
+        
         # Get all accounts with mechanic role
         mechanic_accounts = Account.objects.filter(
             roles__account_role=AccountRole.ROLE_MECHANIC,
@@ -223,13 +226,19 @@ def discover_mechanics(request):
             is_verified=True
         ).select_related(
             'mechanic_profile', 'address'
-        ).prefetch_related('roles').order_by('-mechanic_profile__average_rating')
+        ).prefetch_related('roles')
         
         # Apply filters if provided
         city = request.GET.get('city')
         if city:
             mechanic_accounts = mechanic_accounts.filter(
                 address__city_municipality__icontains=city
+            )
+        
+        barangay_filter = request.GET.get('barangay')
+        if barangay_filter:
+            mechanic_accounts = mechanic_accounts.filter(
+                address__barangay__icontains=barangay_filter
             )
         
         ranking = request.GET.get('ranking')
@@ -243,6 +252,28 @@ def discover_mechanics(request):
             mechanic_accounts = mechanic_accounts.filter(
                 mechanic_profile__status=status_filter
             )
+        
+        # Get requesting user's barangay for priority sorting
+        user_barangay = None
+        if request.user and request.user.is_authenticated:
+            try:
+                user_address = AccountAddress.objects.get(acc_add_id=request.user.acc_id)
+                user_barangay = user_address.barangay
+            except AccountAddress.DoesNotExist:
+                pass
+        
+        # If user has a barangay, prioritize mechanics from the same barangay
+        if user_barangay:
+            mechanic_accounts = mechanic_accounts.annotate(
+                barangay_priority=Case(
+                    When(address__barangay__iexact=user_barangay, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ).order_by('-barangay_priority', '-mechanic_profile__average_rating')
+        else:
+            # If no user barangay, just order by rating
+            mechanic_accounts = mechanic_accounts.order_by('-mechanic_profile__average_rating')
         
         # Check if any mechanics found
         if not mechanic_accounts.exists():
@@ -269,12 +300,55 @@ def discover_mechanics(request):
             'total_count': total_count,
             'page': page,
             'page_size': page_size,
-            'total_pages': (total_count + page_size - 1) // page_size
+            'total_pages': (total_count + page_size - 1) // page_size,
+            'user_barangay': user_barangay  # Include for debugging/transparency
         }, status=status.HTTP_200_OK)
         
     except Exception as e:
         return Response({
             'error': 'Failed to fetch mechanics',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_available_barangays(request):
+    """
+    Get list of unique barangays where mechanics are available.
+    Returns the user's barangay as priority if authenticated.
+    """
+    try:
+        # Get unique barangays from mechanic addresses
+        barangays = AccountAddress.objects.filter(
+            acc_add_id__roles__account_role=AccountRole.ROLE_MECHANIC,
+            acc_add_id__is_active=True,
+            acc_add_id__is_verified=True,
+            barangay__isnull=False
+        ).exclude(
+            barangay=''
+        ).values_list('barangay', flat=True).distinct().order_by('barangay')
+        
+        barangay_list = list(barangays)
+        
+        # Get user's barangay if authenticated
+        user_barangay = None
+        if request.user and request.user.is_authenticated:
+            try:
+                user_address = AccountAddress.objects.get(acc_add_id=request.user.acc_id)
+                user_barangay = user_address.barangay
+            except AccountAddress.DoesNotExist:
+                pass
+        
+        return Response({
+            'barangays': barangay_list,
+            'user_barangay': user_barangay,
+            'total_count': len(barangay_list)
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response({
+            'error': 'Failed to fetch barangays',
             'details': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

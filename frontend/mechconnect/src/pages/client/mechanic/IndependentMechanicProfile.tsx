@@ -208,6 +208,14 @@ const IndependentMechanicProfile: React.FC = () => {
             {mechanicData.bio}
           </p>
 
+          {/* Location */}
+          {mechanicData.location && (
+            <div className="location-info">
+              <span className="material-icons-round location-icon">location_on</span>
+              <span className="location-text">{mechanicData.location}</span>
+            </div>
+          )}
+
           {/* Joined Date */}
           <div className="joined-info">
             <span className="material-icons-round joined-icon">event</span>

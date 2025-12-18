@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Filter interfaces
 interface Filters {
   city: string;
+  barangay: string;
   ranking: string;
   status: string;
 }
@@ -21,6 +22,39 @@ const MechanicDiscoveryFilter: React.FC<MechanicDiscoveryFilterProps> = ({
   onClose 
 }) => {
   const [tempFilters, setTempFilters] = useState<Filters>(filters);
+  const [availableBarangays, setAvailableBarangays] = useState<string[]>([]);
+  const [userBarangay, setUserBarangay] = useState<string | null>(null);
+
+  // Fetch available barangays from API
+  useEffect(() => {
+    const fetchBarangays = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch('http://localhost:8000/api/accounts/discover/barangays/', {
+          headers
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          setAvailableBarangays(data.barangays || []);
+          setUserBarangay(data.user_barangay || null);
+        }
+      } catch (error) {
+        console.error('Error fetching barangays:', error);
+      }
+    };
+    
+    if (isOpen) {
+      fetchBarangays();
+    }
+  }, [isOpen]);
 
   const handleTempFilterChange = (filterType: keyof Filters, value: string) => {
     setTempFilters({ ...tempFilters, [filterType]: value });
@@ -31,7 +65,7 @@ const MechanicDiscoveryFilter: React.FC<MechanicDiscoveryFilterProps> = ({
   };
 
   const handleReset = () => {
-    const resetFilters: Filters = { city: '', ranking: '', status: '' };
+    const resetFilters: Filters = { city: '', barangay: '', ranking: '', status: '' };
     setTempFilters(resetFilters);
   };
 
@@ -62,6 +96,34 @@ const MechanicDiscoveryFilter: React.FC<MechanicDiscoveryFilterProps> = ({
                     onClick={() => handleTempFilterChange('city', city)}
                   >
                     {city || 'All Cities'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-label">
+                Barangay
+                {userBarangay && (
+                  <span className="filter-label-hint"> (Your area: {userBarangay})</span>
+                )}
+              </label>
+              <div className="filter-options">
+                <button
+                  key="all-barangays"
+                  className={`filter-option ${tempFilters.barangay === '' ? 'active' : ''}`}
+                  onClick={() => handleTempFilterChange('barangay', '')}
+                >
+                  All Barangays
+                </button>
+                {availableBarangays.map((barangay) => (
+                  <button
+                    key={barangay}
+                    className={`filter-option ${tempFilters.barangay === barangay ? 'active' : ''} ${userBarangay === barangay ? 'priority' : ''}`}
+                    onClick={() => handleTempFilterChange('barangay', barangay)}
+                  >
+                    {barangay}
+                    {userBarangay === barangay && ' ⭐'}
                   </button>
                 ))}
               </div>

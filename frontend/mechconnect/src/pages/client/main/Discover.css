@@ -667,6 +667,13 @@
   margin-bottom: 12px;
 }
 
+.filter-label-hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  font-style: italic;
+}
+
 .filter-options {
   display: flex;
   flex-wrap: wrap;
@@ -691,6 +698,18 @@
 }
 
 .filter-option.active {
+  background: hsl(25, 85%, 55%);
+  border-color: hsl(25, 85%, 55%);
+  color: white;
+}
+
+.filter-option.priority {
+  border-color: #fbbf24;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.filter-option.priority.active {
   background: hsl(25, 85%, 55%);
   border-color: hsl(25, 85%, 55%);
   color: white;

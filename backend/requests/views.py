@@ -133,7 +133,10 @@ def get_client_requests(request):
         ).select_related(
             'provider', 'client__client_id'
         ).prefetch_related(
-            'custom_request', 'direct_request', 'emergency_request'
+            'custom_request__quoted_items',
+            'direct_request__quoted_items',
+            'direct_request__service',
+            'emergency_request'
         ).order_by('-created_at')
         
         # Apply status filter if provided

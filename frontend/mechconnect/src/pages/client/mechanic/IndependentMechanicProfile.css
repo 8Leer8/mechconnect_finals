@@ -185,6 +185,28 @@
   margin-bottom: 16px;
 }
 
+/* Location Info */
+.location-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.location-icon {
+  color: #64748b;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.location-text {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+  flex: 1;
+  word-break: break-word;
+}
+
 /* Joined Info */
 .joined-info {
   display: flex;

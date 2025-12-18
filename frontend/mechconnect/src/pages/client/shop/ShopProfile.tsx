@@ -45,6 +45,7 @@ interface ShopData {
   is_verified: boolean;
   status: string;
   created_at: string;
+  location?: string;
 }
 
 interface ShopDetailResponse {
@@ -212,6 +213,14 @@ const ShopProfile: React.FC = () => {
           <p className="shop-bio">
             {shopData.shop.description || 'Full-service automotive repair shop offering comprehensive vehicle maintenance and repair solutions.'}
           </p>
+
+          {/* Location */}
+          {shopData.shop.location && (
+            <div className="location-info">
+              <span className="material-icons-round location-icon">location_on</span>
+              <span className="location-text">{shopData.shop.location}</span>
+            </div>
+          )}
 
           {/* Contact Info */}
           <div className="contact-info">

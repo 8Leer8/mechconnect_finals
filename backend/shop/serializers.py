@@ -27,10 +27,10 @@ class ShopDiscoverySerializer(serializers.ModelSerializer):
         if obj.shop_owner and hasattr(obj.shop_owner.shop_owner_id, 'address') and obj.shop_owner.shop_owner_id.address:
             address = obj.shop_owner.shop_owner_id.address
             location_parts = []
+            if address.barangay:
+                location_parts.append(address.barangay)
             if address.city_municipality:
                 location_parts.append(address.city_municipality)
-            if address.province:
-                location_parts.append(address.province)
             return ", ".join(location_parts) if location_parts else "Location not specified"
         return "Location not specified"
     

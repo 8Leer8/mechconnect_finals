@@ -36,6 +36,7 @@ urlpatterns = [
 
     # Discovery endpoints
     path('discover/mechanics/', users.discover_mechanics, name='discover_mechanics'),
+    path('discover/barangays/', users.get_available_barangays, name='get_available_barangays'),
     
     # Mechanic detail endpoint
     path('mechanic/<int:mechanic_id>/', users.mechanic_detail, name='mechanic_detail'),
