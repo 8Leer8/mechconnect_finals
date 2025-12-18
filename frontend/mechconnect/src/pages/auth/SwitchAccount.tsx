@@ -91,7 +91,7 @@ const SwitchAccount: React.FC = () => {
     // Store active role in localStorage
     localStorage.setItem('active_role', 'shop_owner');
     // Navigate to shop owner dashboard  
-    history.push('/shopowner/home');
+    history.push('/shopowner/dashboard');
   };
   
   const handleSwitchToClient = () => {
@@ -169,6 +169,21 @@ const SwitchAccount: React.FC = () => {
                     <span className="material-icons-round">launch</span>
                   </div>
                 </button>
+              ) : userRoles.mechanic_status.registered ? (
+                <button className="application-card mechanic pending" disabled>
+                  <div className="card-icon">
+                    <span className="material-icons-round">hourglass_empty</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Mechanic Registration Pending</h3>
+                    <p className="card-description">
+                      Registration completed. Waiting for admin verification.
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">check_circle</span>
+                  </div>
+                </button>
               ) : (
                 <button className="application-card mechanic" onClick={handleApplyMechanic}>
                   <div className="card-icon">
@@ -203,6 +218,21 @@ const SwitchAccount: React.FC = () => {
                   </div>
                   <div className="card-arrow">
                     <span className="material-icons-round">launch</span>
+                  </div>
+                </button>
+              ) : userRoles.shop_owner_status.registered ? (
+                <button className="application-card shop pending" disabled>
+                  <div className="card-icon">
+                    <span className="material-icons-round">hourglass_empty</span>
+                  </div>
+                  <div className="card-content">
+                    <h3 className="card-title">Shop Owner Registration Pending</h3>
+                    <p className="card-description">
+                      Registration completed. Waiting for admin verification.
+                    </p>
+                  </div>
+                  <div className="card-arrow">
+                    <span className="material-icons-round">check_circle</span>
                   </div>
                 </button>
               ) : (

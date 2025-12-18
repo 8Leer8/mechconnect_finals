@@ -209,3 +209,40 @@
 .application-card.registered .card-arrow .material-icons-round {
   color: white;
 }
+
+/* Pending State Styles */
+.application-card.pending {
+  border: 2px solid #f97316;
+  background: #fff7ed;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.application-card.pending:active {
+  transform: none;
+}
+
+.application-card.pending .card-icon {
+  background: #fed7aa;
+}
+
+.application-card.pending .card-icon .material-icons-round {
+  color: #f97316;
+}
+
+.application-card.pending .card-title {
+  color: #9a3412;
+}
+
+.application-card.pending .card-description {
+  color: #c2410c;
+}
+
+.application-card.pending .card-arrow {
+  background: #f97316;
+}
+
+.application-card.pending .card-arrow .material-icons-round {
+  color: white;
+}
+

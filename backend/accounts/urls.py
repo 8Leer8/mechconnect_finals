@@ -28,6 +28,9 @@ urlpatterns = [
     # Mechanic registration
     path('mechanic/register/', authentication.mechanic_register, name='mechanic_register'),
     
+    # Shop Owner registration
+    path('shopowner/register/', authentication.shopowner_register, name='shopowner_register'),
+    
     # Health check
     path('health/', dashboard.health_check, name='health_check'),
 

@@ -423,14 +423,111 @@ const ShopOwnerSignup: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Shop owner application submitted');
-    // Show success message
-    showToastMessage('Application submitted successfully! Pending verification.', 'success');
-    // Redirect to switch account page after a brief delay
-    setTimeout(() => {
-      history.push('/auth/switch-account');
-    }, 2000);
+  const handleSubmit = async () => {
+    // Validate client is logged in
+    if (!clientData) {
+      showToastMessage('Please login first', 'danger');
+      history.push('/login');
+      return;
+    }
+
+    // Basic validation
+    if (!shopName || !shopContactNumber) {
+      showToastMessage('Please fill in required fields (Shop Name, Contact Number)', 'danger');
+      return;
+    }
+
+    if (addressMode === 'new') {
+      if (!region || !province || !city || !barangay) {
+        showToastMessage('Please complete the address information', 'danger');
+        return;
+      }
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        user_id: clientData.acc_id,
+        
+        // Address handling
+        use_existing_address: addressMode === 'existing',
+        
+        // Only send address data if creating new address
+        address: addressMode === 'new' ? {
+          house_building_number: houseNumber,
+          street_name: street,
+          subdivision_village: subdivision,
+          barangay: barangay,
+          city_municipality: city,
+          province: province,
+          region: region,
+          postal_code: postalCode
+        } : null,
+        
+        // Shop Information
+        shop_name: shopName,
+        shop_contact_number: shopContactNumber,
+        shop_email: shopEmail,
+        shop_website: shopWebsite,
+        shop_description: shopDescription,
+        service_banner: serviceBanner,
+        
+        // Profile Information
+        profile_photo: profilePhoto,
+        bio: bio,
+        
+        // Owner Documents for verification
+        owner_documents: ownerDocuments.filter(doc => doc.name && doc.file).map(doc => ({
+          name: doc.name,
+          type: doc.type,
+          file: doc.file,
+          date_issued: doc.dateIssued || null,
+          date_expiry: doc.dateExpiry || null
+        })),
+        
+        // Shop Documents for verification
+        shop_documents: shopDocuments.filter(doc => doc.name && doc.file).map(doc => ({
+          name: doc.name,
+          type: doc.type,
+          file: doc.file,
+          date_issued: doc.dateIssued || null,
+          date_expiry: doc.dateExpiry || null
+        }))
+      };
+
+      const response = await fetch('http://localhost:8000/api/accounts/shopowner/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToastMessage('Shop owner application submitted successfully! Pending verification.', 'success');
+        
+        // Update local user data with new role
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          user.roles = [...(user.roles || []), 'shop_owner'];
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+        
+        setTimeout(() => {
+          history.push('/auth/switch-account');
+        }, 2000);
+      } else {
+        showToastMessage(data.error || 'Failed to submit application', 'danger');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      showToastMessage('Network error. Please try again.', 'danger');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

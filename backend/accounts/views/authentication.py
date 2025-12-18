@@ -942,3 +942,243 @@ def mechanic_register(request):
             'error': f'An error occurred during mechanic registration: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def shopowner_register(request):
+    """
+    Register an existing CLIENT user as a SHOP OWNER (role extension).
+    
+    This endpoint does NOT create a new account - it adds the shop owner role
+    and creates a shop owner profile linked to an existing user account.
+    
+    Expected POST data:
+        - user_id: ID of the existing user account
+        - use_existing_address: boolean (if True, reuses client's address)
+        - address: optional dict with address fields (if use_existing_address is False)
+        - profile_photo: optional base64 encoded image
+        - bio: shop owner bio text
+        - shop_name: name of the shop
+        - shop_contact_number: shop contact number
+        - shop_email: optional shop email
+        - shop_website: optional shop website
+        - shop_description: optional shop description
+        - service_banner: optional shop banner image
+        - owner_documents: array of owner document objects
+        - shop_documents: array of shop document objects
+    
+    Returns:
+        - Success message with shop owner profile data
+        - Error if user not found, already a shop owner, or validation fails
+    """
+    try:
+        from ..models import AccountRole, AccountAddress, ShopOwner
+        from documents.models import ShopOwnerDocument, ShopDocument
+        from shop.models import Shop
+        from datetime import datetime
+        
+        # Get user_id from request
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({
+                'error': 'User ID is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get existing user account
+        try:
+            user = Account.objects.get(acc_id=user_id)
+        except Account.DoesNotExist:
+            return Response({
+                'error': 'User account not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if user is verified
+        if not user.is_verified:
+            return Response({
+                'error': 'Please verify your email first'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if user already has shop owner role
+        existing_role = AccountRole.objects.filter(
+            acc=user,
+            account_role=AccountRole.ROLE_SHOP_OWNER
+        ).exists()
+        
+        if existing_role:
+            return Response({
+                'error': 'User already has a shop owner profile'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if shop owner profile already exists
+        if hasattr(user, 'shop_owner_profile'):
+            return Response({
+                'error': 'Shop owner profile already exists for this user'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate required fields
+        use_existing_address = request.data.get('use_existing_address', True)
+        bio = request.data.get('bio', '').strip()
+        shop_name = request.data.get('shop_name', '').strip()
+        shop_contact_number = request.data.get('shop_contact_number', '').strip()
+        owner_documents = request.data.get('owner_documents', [])
+        shop_documents = request.data.get('shop_documents', [])
+        
+        if not shop_name:
+            return Response({
+                'error': 'Shop name is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not shop_contact_number:
+            return Response({
+                'error': 'Shop contact number is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not owner_documents or len(owner_documents) == 0:
+            return Response({
+                'error': 'At least one owner document is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Start transaction
+        with transaction.atomic():
+            # Handle address
+            shop_address = None
+            
+            if use_existing_address:
+                # Use client's existing address
+                if not hasattr(user, 'address'):
+                    return Response({
+                        'error': 'User does not have an existing address'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                shop_address = user.address
+            else:
+                # Create new address for shop
+                address_data = request.data.get('address', {})
+                
+                # Validate required address fields
+                required_fields = ['region', 'province', 'city_municipality', 'barangay']
+                missing_fields = [field for field in required_fields if not address_data.get(field)]
+                
+                if missing_fields:
+                    return Response({
+                        'error': f'Missing required address fields: {", ".join(missing_fields)}'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Create new address
+                shop_address = AccountAddress.objects.create(
+                    acc_add_id=user,
+                    house_building_number=address_data.get('house_building_number', ''),
+                    street_name=address_data.get('street_name', ''),
+                    subdivision_village=address_data.get('subdivision_village', ''),
+                    barangay=address_data.get('barangay'),
+                    city_municipality=address_data.get('city_municipality'),
+                    province=address_data.get('province'),
+                    region=address_data.get('region'),
+                    postal_code=address_data.get('postal_code', '')
+                )
+            
+            # Create shop owner profile
+            shop_owner_profile = ShopOwner.objects.create(
+                shop_owner_id=user,
+                profile_photo=request.data.get('profile_photo'),
+                bio=bio,
+                approval_status='pending'  # Set to pending - requires admin approval
+            )
+            
+            # Create shop
+            shop = Shop.objects.create(
+                shop_owner=shop_owner_profile,
+                shop_name=shop_name,
+                contact_number=shop_contact_number,
+                email=request.data.get('shop_email', ''),
+                website=request.data.get('shop_website', ''),
+                description=request.data.get('shop_description', ''),
+                service_banner=request.data.get('service_banner'),
+                is_verified=False,  # Not verified until admin approves
+                status='closed'  # Start as closed until approved
+            )
+            
+            # DO NOT add shop owner role yet - only after admin approval
+            
+            # Create owner documents
+            for doc in owner_documents:
+                doc_name = doc.get('name', '').strip()
+                doc_type = doc.get('type', 'others')
+                doc_file = doc.get('file')
+                
+                if not doc_name or not doc_file:
+                    continue
+                
+                date_issued = None
+                date_expiry = None
+                
+                if doc.get('date_issued'):
+                    try:
+                        date_issued = datetime.strptime(doc['date_issued'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
+                if doc.get('date_expiry'):
+                    try:
+                        date_expiry = datetime.strptime(doc['date_expiry'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
+                ShopOwnerDocument.objects.create(
+                    shop_owner=shop_owner_profile,
+                    document_name=doc_name,
+                    document_type=doc_type,
+                    document_file=doc_file,
+                    date_issued=date_issued,
+                    date_expiry=date_expiry
+                )
+            
+            # Create shop documents
+            for doc in shop_documents:
+                doc_name = doc.get('name', '').strip()
+                doc_type = doc.get('type', 'others')
+                doc_file = doc.get('file')
+                
+                if not doc_name or not doc_file:
+                    continue
+                
+                date_issued = None
+                date_expiry = None
+                
+                if doc.get('date_issued'):
+                    try:
+                        date_issued = datetime.strptime(doc['date_issued'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
+                if doc.get('date_expiry'):
+                    try:
+                        date_expiry = datetime.strptime(doc['date_expiry'], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
+                ShopDocument.objects.create(
+                    shop=shop,
+                    document_name=doc_name,
+                    document_type=doc_type,
+                    document_file=doc_file,
+                    date_issued=date_issued,
+                    date_expiry=date_expiry
+                )
+            
+            return Response({
+                'message': 'Shop owner application submitted successfully. Pending admin approval.',
+                'shop_owner_id': shop_owner_profile.shop_owner_id.acc_id,
+                'shop_id': shop.shop_id,
+                'approval_status': shop_owner_profile.approval_status,
+                'note': 'You will be notified once your application is reviewed.'
+            }, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        import traceback
+        print(f"Shop owner registration error: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return Response({
+            'error': f'An error occurred during shop owner registration: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
