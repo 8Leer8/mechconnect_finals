@@ -80,6 +80,7 @@ import MechanicMap from '../pages/mechanic/map';
 import MechanicJobs from '../pages/mechanic/jobs';
 import MechanicJobDetail from '../pages/mechanic/job-detail';
 import RequestDetail from '../pages/mechanic/request-detail';
+import Quotation from '../pages/mechanic/quotation';
 import CompletedJobDetail from '../pages/mechanic/completed-job-detail';
 import BackjobDetail from '../pages/mechanic/backjob-detail';
 import MechanicEarnings from '../pages/mechanic/earnings';
@@ -295,6 +296,7 @@ const AppRoutes: React.FC = () => {
       <Route exact path="/mechanic/map" component={MechanicMap} />
       <Route exact path="/mechanic/job-detail/:id" component={MechanicJobDetail} />
       <Route exact path="/mechanic/request-detail/:id" component={RequestDetail} />
+      <Route exact path="/mechanic/quotation" component={Quotation} />
       <Route exact path="/mechanic/available-job/:id" component={RequestDetail} />
       <Route exact path="/mechanic/start-job/:id" component={StartingJob} />
       <Route exact path="/mechanic/working-job/:id" component={WorkingJob} />
