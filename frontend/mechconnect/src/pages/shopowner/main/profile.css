@@ -9,15 +9,34 @@
   padding-bottom: 80px;
 }
 
-/* Transparent Scrollbar */
-.profile-content::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+/* Hide Scrollbar */
+.profile-content,
+.profile-content::part(scroll),
+.profile-content .inner-scroll {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-.profile-content {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+.profile-content::-webkit-scrollbar,
+.profile-content::part(scroll)::-webkit-scrollbar,
+.profile-content .inner-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.profile-content::-webkit-scrollbar-track,
+.profile-content::part(scroll)::-webkit-scrollbar-track,
+.profile-content .inner-scroll::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.profile-content::-webkit-scrollbar-thumb,
+.profile-content::part(scroll)::-webkit-scrollbar-thumb,
+.profile-content .inner-scroll::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 /* Material Icons */
@@ -278,6 +297,24 @@
 .form-textarea {
   resize: vertical;
   min-height: 80px;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.form-textarea::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.form-textarea::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.form-textarea::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 .form-select {

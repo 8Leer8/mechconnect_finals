@@ -8,15 +8,34 @@
   padding-bottom: 120px;
 }
 
-/* Transparent Scrollbar */
-.booking-content::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+/* Hide Scrollbar */
+.booking-content,
+.booking-content::part(scroll),
+.booking-content .inner-scroll {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-.booking-content {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+.booking-content::-webkit-scrollbar,
+.booking-content::part(scroll)::-webkit-scrollbar,
+.booking-content .inner-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.booking-content::-webkit-scrollbar-track,
+.booking-content::part(scroll)::-webkit-scrollbar-track,
+.booking-content .inner-scroll::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.booking-content::-webkit-scrollbar-thumb,
+.booking-content::part(scroll)::-webkit-scrollbar-thumb,
+.booking-content .inner-scroll::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 /* Header */

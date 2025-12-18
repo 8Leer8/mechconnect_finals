@@ -22,6 +22,25 @@
   gap: 20px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.assign-modal-container::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  background: transparent;
+}
+
+.assign-modal-container::-webkit-scrollbar-track {
+  display: none;
+  background: transparent;
+}
+
+.assign-modal-container::-webkit-scrollbar-thumb {
+  display: none;
+  background: transparent;
 }
 
 .assign-modal-header {
@@ -95,6 +114,25 @@
   gap: 12px;
   max-height: 340px;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mechanic-list::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  background: transparent;
+}
+
+.mechanic-list::-webkit-scrollbar-track {
+  display: none;
+  background: transparent;
+}
+
+.mechanic-list::-webkit-scrollbar-thumb {
+  display: none;
+  background: transparent;
 }
 
 .mechanic-row {

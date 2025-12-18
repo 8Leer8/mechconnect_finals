@@ -8,15 +8,34 @@
   padding-bottom: 120px;
 }
 
-/* Transparent Scrollbar */
-.shop-content::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+/* Hide Scrollbar */
+.shop-content,
+.shop-content::part(scroll),
+.shop-content .inner-scroll {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-.shop-content {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+.shop-content::-webkit-scrollbar,
+.shop-content::part(scroll)::-webkit-scrollbar,
+.shop-content .inner-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.shop-content::-webkit-scrollbar-track,
+.shop-content::part(scroll)::-webkit-scrollbar-track,
+.shop-content .inner-scroll::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.shop-content::-webkit-scrollbar-thumb,
+.shop-content::part(scroll)::-webkit-scrollbar-thumb,
+.shop-content .inner-scroll::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 .shop-header,
@@ -231,6 +250,24 @@
 
 .shop-form textarea {
   resize: none;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.shop-form textarea::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.shop-form textarea::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.shop-form textarea::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 .items-summary {
@@ -398,11 +435,21 @@
 .edit-button {
   background: #f1f5f9;
   color: #475569;
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+  background: #e2e8f0;
 }
 
 .delete-button {
   background: #fee2e2;
   color: #b91c1c;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #fecaca;
 }
 
 @media (min-width: 768px) {
@@ -410,6 +457,35 @@
     max-width: 1100px;
     margin: 0 auto;
   }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
 }
 
 @media (max-width: 640px) {

@@ -42,6 +42,10 @@ urlpatterns = [
     
     # Client address endpoint
     path('client/<int:client_id>/address/', users.get_client_address, name='get_client_address'),
+    
+    # Notifications endpoints
+    path('notifications/', users.user_notifications, name='user_notifications'),
+    path('notifications/<int:notification_id>/read/', users.mark_notification_read, name='mark_notification_read'),
 
     # Head Admin Dashboard
     path('head-admin/dashboard/stats/', dashboard.head_admin_dashboard_stats, name='head_admin_dashboard_stats'),

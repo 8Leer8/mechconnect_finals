@@ -82,3 +82,80 @@ body {
   width: 16px;
   height: 16px;
 }
+
+/* Global Scrollbar Hiding */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
+}
+
+/* Ionic Content Scrollbar Hiding */
+ion-content,
+ion-content::part(scroll),
+ion-content .inner-scroll {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+ion-content::-webkit-scrollbar,
+ion-content::part(scroll)::-webkit-scrollbar,
+ion-content .inner-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+ion-content::-webkit-scrollbar-track,
+ion-content::part(scroll)::-webkit-scrollbar-track,
+ion-content .inner-scroll::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+ion-content::-webkit-scrollbar-thumb,
+ion-content::part(scroll)::-webkit-scrollbar-thumb,
+ion-content .inner-scroll::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
+}
+
+/* Textarea Scrollbar Hiding */
+textarea {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+textarea::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+textarea::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
+}
+

@@ -19,7 +19,25 @@
   gap: 50px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   position: relative;
+}
+
+.add-item-modal-container::-webkit-scrollbar {
+  display: none;
+  width: 0px;
+  background: transparent;
+}
+
+.add-item-modal-container::-webkit-scrollbar-track {
+  display: none;
+  background: transparent;
+}
+
+.add-item-modal-container::-webkit-scrollbar-thumb {
+  display: none;
+  background: transparent;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -102,6 +120,24 @@
   resize: vertical;
   min-height: 80px;
   font-family: inherit;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.form-group textarea::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
+.form-group textarea::-webkit-scrollbar-track {
+  display: none !important;
+  background: transparent !important;
+}
+
+.form-group textarea::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
 }
 
 .form-row {
@@ -156,6 +192,36 @@
 
 .add-btn .material-icons-round {
   font-size: 18px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.error-message .material-icons-round {
+  font-size: 20px;
+  color: #dc2626;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 520px) {

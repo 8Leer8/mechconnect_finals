@@ -1,18 +1,21 @@
 import { IonContent, IonPage } from '@ionic/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import BottomNavShop from '../../../components/bottomnavshop';
 import AddItemModal from '../modal/AddItemModal';
+import EditItemModal from '../modal/EditItemModal';
+import DeleteItemModal from '../modal/DeleteItemModal';
 import './shop.css';
 
 interface ShopItem {
-  id: string;
-  name: string;
+  item_id: number;
+  item_name: string;
   category: string;
   price: number;
   stock: number;
-  sold: number;
-  status: 'active' | 'out';
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const Shop: React.FC = () => {
@@ -21,6 +24,11 @@ const Shop: React.FC = () => {
   const [itemSearch, setItemSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<'All' | string>('All');
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
+  const [isEditItemModalOpen, setIsEditItemModalOpen] = useState(false);
+  const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
+  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const goToNotifications = () => history.push('/shopowner/notifications');
   const goToProfile = () => history.push('/shopowner/profile');
@@ -34,17 +42,63 @@ const Shop: React.FC = () => {
       'Professional automotive repair services with certified mechanics and quality parts. We specialize in engine diagnostics, brake repair, and routine maintenance.'
   };
 
-  const shopItems: ShopItem[] = [];
+  // Fetch shop items from API
+  const fetchShopItems = async () => {
+    setLoading(true);
+    try {
+      // Get shop ID from localStorage or use default
+      let shopId = localStorage.getItem('shop_id');
+      
+      if (!shopId) {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            shopId = user.shop_id?.toString() || '1';
+          } catch {
+            shopId = '1';
+          }
+        } else {
+          shopId = '1';
+        }
+      }
+
+      const response = await fetch(`http://localhost:8000/api/shops/items/?shop_id=${shopId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setShopItems(data.items || []);
+      } else {
+        console.error('Failed to fetch items:', data.error || data.message);
+        setShopItems([]);
+      }
+    } catch (err) {
+      console.error('Error fetching shop items:', err);
+      setShopItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch items when component mounts or when items tab is active
+  useEffect(() => {
+    if (activeTab === 'items') {
+      fetchShopItems();
+    }
+  }, [activeTab]);
 
   const filteredItems = shopItems.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(itemSearch.toLowerCase());
+    const matchesSearch = item.item_name.toLowerCase().includes(itemSearch.toLowerCase());
     const matchesCategory = categoryFilter === 'All' || item.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
+  // Get unique categories for filter dropdown
+  const categories = ['All', ...Array.from(new Set(shopItems.map(item => item.category)))];
+
   const summaryStats = {
     totalItems: shopItems.length,
-    totalSales: 0,
+    totalSales: 0, // TODO: Calculate from sales data
     mostSold: shopItems[0] || { name: 'No items', sold: 0 },
     leastSold: shopItems[0] || { name: 'No items', sold: 0 }
   };
@@ -175,10 +229,11 @@ const Shop: React.FC = () => {
                 />
               </div>
               <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value as any)}>
-                <option value="All">All Categories</option>
-                <option value="Engine">Engine</option>
-                <option value="Electrical">Electrical</option>
-                <option value="Brake System">Brake System</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
               <button className="add-item-button" onClick={() => setIsAddItemModalOpen(true)}>
                 <span className="material-icons-round">add</span>
@@ -187,30 +242,91 @@ const Shop: React.FC = () => {
             </div>
 
             <div className="shop-items-list">
-              {filteredItems.map((item) => (
-                <div key={item.id} className="shop-item-card">
-                  <div className="item-thumbnail">
-                    <span className="material-icons-round">image</span>
-                  </div>
-                  <div className="item-info">
-                    <h4>{item.name}</h4>
-                    <p>{item.category}</p>
-                    <span className="item-price">₱{item.price.toFixed(2)}</span>
-                    <p className="stock-info">
-                      Stock: {item.stock} | Sold: {item.sold}
-                    </p>
-                  </div>
-                  <div className="item-actions">
-                    <button className="edit-button">Edit</button>
-                    <button className="delete-button">Delete</button>
-                  </div>
+              {loading ? (
+                <div className="empty-state">
+                  <span className="material-icons-round empty-icon">hourglass_empty</span>
+                  <h3>Loading Items...</h3>
+                  <p>Please wait while we fetch your shop items.</p>
                 </div>
-              ))}
+              ) : filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
+                  <div key={item.item_id} className="shop-item-card">
+                    <div className="item-thumbnail">
+                      <span className="material-icons-round">inventory_2</span>
+                    </div>
+                    <div className="item-info">
+                      <h4>{item.item_name}</h4>
+                      <p>{item.category}</p>
+                      <span className="item-price">₱{parseFloat(item.price.toString()).toFixed(2)}</span>
+                      <p className="stock-info">
+                        Stock: {item.stock}
+                      </p>
+                    </div>
+                    <div className="item-actions">
+                      <button 
+                        className="edit-button" 
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setIsEditItemModalOpen(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        className="delete-button"
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setIsDeleteItemModalOpen(true);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <span className="material-icons-round empty-icon">inventory_2</span>
+                  <h3>No Items Found</h3>
+                  <p>{itemSearch || categoryFilter !== 'All' ? 'No items match your search criteria.' : 'No items in your shop yet. Add your first item to get started!'}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
       </IonContent>
-      <AddItemModal isOpen={isAddItemModalOpen} onClose={() => setIsAddItemModalOpen(false)} />
+      <AddItemModal 
+        isOpen={isAddItemModalOpen} 
+        onClose={() => setIsAddItemModalOpen(false)}
+        onItemAdded={() => {
+          // Refresh items list after adding
+          fetchShopItems();
+        }}
+      />
+      <EditItemModal
+        isOpen={isEditItemModalOpen}
+        onClose={() => {
+          setIsEditItemModalOpen(false);
+          setSelectedItem(null);
+        }}
+        item={selectedItem}
+        onItemUpdated={() => {
+          // Refresh items list after updating
+          fetchShopItems();
+        }}
+      />
+      <DeleteItemModal
+        isOpen={isDeleteItemModalOpen}
+        onClose={() => {
+          setIsDeleteItemModalOpen(false);
+          setSelectedItem(null);
+        }}
+        item={selectedItem}
+        onItemDeleted={() => {
+          // Refresh items list after deleting
+          fetchShopItems();
+        }}
+      />
       <BottomNavShop />
     </IonPage>
   );
